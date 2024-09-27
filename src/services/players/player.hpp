@@ -96,12 +96,16 @@ namespace big
 		bool log_clones         = false;
 		bool log_network_events = false;
 
+		bool bad_host = false;
+
 		bool trigger_desync_kick = false;
 		bool trigger_end_session_kick = false;
 
 		bool spam_killfeed = false;
 
 		int spectating_player = -1;
+
+		bool tampered_with_be = false;
 
 		menu_settings::script_block_opts script_block_opts{};
 	protected:

@@ -3,7 +3,7 @@
 #include "gta_pointers_layout_info.hpp"
 #include "sc_pointers_layout_info.hpp"
 
-#define GTA_VERSION_TARGET "1.69-3323"
+#define GTA_VERSION_TARGET "1.69-3337"
 
 namespace big
 {
@@ -1817,7 +1817,7 @@ namespace big
         // Session Request Patch
         {
             "SRP",
-            "48 8B BD 80 01 00 00 E9 FF 00 00 00",
+            "48 8B 9D 70 01 00 00 E9 FF 00 00 00",
             [](memory::handle ptr)
             {
                 g_pointers->m_gta.m_session_request_patch = ptr.add(0x13).as<PVOID>();
@@ -1985,6 +1985,15 @@ namespace big
             [](memory::handle ptr)
             {
                 g_pointers->m_gta.m_network_can_access_multiplayer = ptr.add(1).rip().as<PVOID>();
+            }
+        },
+        // Send Clone Create
+        {
+            "SCC",
+            "48 8B 02 4D 8B F8",
+            [](memory::handle ptr)
+            {
+                g_pointers->m_gta.m_send_clone_create = ptr.sub(0x1C).as<PVOID>();
             }
         }
         >(); // don't leave a trailing comma at the end

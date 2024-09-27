@@ -8,7 +8,9 @@
 #include "lua/lua_manager.hpp"
 #include "natives.hpp"
 #include "services/players/player_service.hpp"
+#include "services/battleye/battleye_service.hpp"
 #include "util/chat.hpp"
+#include "util/entity.hpp"
 #include "util/session.hpp"
 #include "gta/net_object_mgr.hpp"
 
@@ -370,7 +372,7 @@ namespace big
 		}
 		case rage::eNetMessage::MsgKickPlayer:
 		{
-			KickReason reason = buffer.Read<KickReason>(3);
+			KickReason reason = buffer.Read<KickReason>(5);
 
 			if (!is_host_of_session(gta_util::get_network()->m_game_session_ptr, event->m_peer_id))
 			{
@@ -378,13 +380,16 @@ namespace big
 				return true;
 			}
 
+			LOGF(stream::net_messages, VERBOSE, "{} sent us a MsgKickPlayer, reason = {}", peer->m_info.name, (int)reason);
+
 			if (reason == KickReason::VOTED_OUT)
 			{
 				g_notification_service.push_warning("PROTECTIONS"_T.data(), "YOU_HAVE_BEEN_KICKED"_T.data());
 				return true;
 			}
 
-			LOGF(stream::net_messages, VERBOSE, "{} sent us a MsgKickPlayer, reason = {}", peer->m_info.name, (int)reason);
+			if (reason == KickReason::BATTLEYE_KICK || reason == KickReason::BATTLEYE_BAN)
+				return true;
 			break;
 		}
 		case rage::eNetMessage::MsgRadioStationSyncRequest:
@@ -706,9 +711,6 @@ namespace big
 			{
 				if (g.session.log_chat_messages)
 					chat::log_chat(message, player, spam_reason, is_team);
-				g_notification_service.push("PROTECTIONS"_T.data(),
-
-				    std::format("{} {}", player->get_name(), "IS_A_SPAMMER"_T.data()));
 				player->is_spammer = true;
 				g.reactions.chat_spam.process(player);
 				return true;
@@ -735,6 +737,30 @@ namespace big
 			}
 
 			return true;
+		}
+		case rage::eNetMessage::MsgBattlEyeCmd:
+		{
+			char data[1028]{};
+			int size = buffer.Read<int>(11);
+			bool client = buffer.Read<bool>(1);
+			buffer.SeekForward(4); // normalize before we read
+
+			buffer.ReadArray(&data, size * 8);
+
+			if (client && player)
+			{
+				g_battleye_service.receive_message(player->get_net_game_player()->get_host_token(), &data, size);
+			}
+			else if (player && !player->bad_host)
+			{
+				player->bad_host = true;
+				g_fiber_pool->queue_job([player] {
+					entity::force_remove_network_entity(g_local_player, player, false);
+				});
+				g_battleye_service.send_message_to_server(player->get_net_game_player()->get_host_token(), &data, size);
+			}
+
+			break;
 		}
 		default:
 		{
