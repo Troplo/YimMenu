@@ -3,7 +3,7 @@ include(FetchContent)
 FetchContent_Declare(
     gtav_classes
     GIT_REPOSITORY https://github.com/Mr-X-GTA/GTAV-Classes-1.git
-    GIT_TAG        98c2c1959e2ba129ccb6268f24f89b49596bbd2b
+    GIT_TAG        6e53c26ac9904e00e3f851826fb61367829eca26
     GIT_PROGRESS TRUE
     CONFIGURE_COMMAND ""
     BUILD_COMMAND ""

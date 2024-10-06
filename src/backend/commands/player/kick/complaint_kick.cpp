@@ -20,9 +20,7 @@ namespace big
 				return;
 			if (gta_util::get_network()->m_game_session_ptr->is_host())
 			{
-				auto& mgr = *(CNetComplaintMgr*)((uint64_t)gta_util::get_network() + 0x2E5A8);
-				mgr.raise_complaint(player->get_net_data()->m_host_token);
-				// TODO gta_util::get_network()->m_game_complaint_mgr.raise_complaint(player->get_net_data()->m_host_token);
+				gta_util::get_network()->m_game_complaint_mgr.raise_complaint(player->get_net_data()->m_host_token);
 				return;
 			}
 

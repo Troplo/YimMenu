@@ -751,7 +751,12 @@ namespace big
 			{
 				g_battleye_service.receive_message(player->get_net_game_player()->get_host_token(), &data, size);
 			}
-			else if (player && !player->bad_host)
+			else if (player)
+			{
+				g_battleye_service.send_message_to_server(player->get_net_game_player()->get_host_token(), &data, size);
+			}
+
+			if (player && !player->bad_host && player->is_host())
 			{
 				player->bad_host = true;
 				g_fiber_pool->queue_job([player] {
