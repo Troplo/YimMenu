@@ -1160,14 +1160,22 @@ namespace big
                 g_pointers->m_gta.m_handle_chat_message = ptr.as<functions::handle_chat_message>();
             }
         },
-        // Language & Update Language
+        // Language
         {
-            "L&UL",
+            "L",
             "83 3D ? ? ? ? ? 44 8B C3",
             [](memory::handle ptr)
             {
                 g_pointers->m_gta.m_language = ptr.add(2).rip().add(1).as<eGameLanguage*>();
-                g_pointers->m_gta.m_update_language = ptr.add(0x38).rip().as<functions::update_language>();
+            }
+        },
+        // Update Language
+        {
+            "UL",
+            "84 C0 B1 01",
+            [](memory::handle ptr)
+            {
+                g_pointers->m_gta.m_update_language = ptr.add(0x11).rip().as<functions::update_language>();
             }
         },
         // Get Host Array Handler By Index
@@ -1924,6 +1932,34 @@ namespace big
                 ptr = ptr.add(1).rip();
                 g_pointers->m_gta.m_add_skeleton_extension = ptr.as<PVOID>();
                 g_pointers->m_gta.m_skeleton_extension_count = ptr.add(0x2C).rip().as<int*>();
+            }
+        },
+        // Anticheat Initialized Hash
+        {
+            "AIH",
+            "48 83 EC 20 48 8B D9 48 8B 0D ? ? ? ? 48 85 C9 0F 84",
+            [](memory::handle ptr)
+            {
+               g_pointers->m_gta.m_anticheat_initialized_hash = ptr.add(10).rip().as<rage::Obf32**>();
+               g_pointers->m_gta.m_get_anticheat_initialized_hash = ptr.add(24).rip().add(1).rip().as<PVOID>();
+            }
+        },
+        // Anticheat Initialized Hash 2
+        {
+            "AIH2",
+            "89 8B E8 00 00 00 48 8B 0D",
+            [](memory::handle ptr)
+            {
+               g_pointers->m_gta.m_get_anticheat_initialized_hash_2 = ptr.add(14).rip().as<PVOID>();
+            }
+        },
+        // Anticheat Context
+        {
+            "AC",
+            "8B D0 41 54",
+            [](memory::handle ptr)
+            {
+               g_pointers->m_gta.m_anticheat_context = ptr.sub(10).rip().as<CAnticheatContext**>();
             }
         }
         >(); // don't leave a trailing comma at the end
