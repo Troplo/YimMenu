@@ -6,6 +6,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	// rate limit script events to prevent crashes
 	static int offRadarPlayer    = 0;
 	static int neverWantedPlayer = 0;
@@ -74,4 +75,5 @@ namespace big
 			});
 		}
 	}
+	#endif
 }

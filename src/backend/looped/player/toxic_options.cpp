@@ -4,6 +4,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	void looped::player_toxic_options()
 	{
 		if (!*g_pointers->m_gta.m_is_session_started)
@@ -53,4 +54,5 @@ namespace big
 			}
 		});
 	}
+	#endif
 }

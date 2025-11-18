@@ -7,6 +7,7 @@
 
 namespace big
 {
+#if ENABLE_TOXIC_CHEATS
 	reaction::reaction(const char* event_name, const char* notify_message, const char* announce_message) :
 	    m_event_name(event_name),
 	    m_notify_message(notify_message),
@@ -101,4 +102,5 @@ namespace big
        std::vformat("REACTION_START_SCRIPT_ALLOWED"_T.data(), std::make_format_args(p_name)));
 		}
 	}
+#endif
 }

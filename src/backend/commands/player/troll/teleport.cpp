@@ -3,6 +3,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class teleport_to_player : player_command
 	{
 		using player_command::player_command;
@@ -14,4 +15,5 @@ namespace big
 	};
 
 	teleport_to_player g_teleport_to_player("playertp", "TELEPORT", "TELEPORT_DESC", 0, false);
+	#endif
 }

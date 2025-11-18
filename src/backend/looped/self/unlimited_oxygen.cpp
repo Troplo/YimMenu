@@ -4,6 +4,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class unlimited_oxygen : looped_command
 	{
 		using looped_command::looped_command;
@@ -16,4 +17,5 @@ namespace big
 	};
 
 	unlimited_oxygen g_unlimited_oxygen("infoxy", "UNLIMITED_OXYGEN", "UNLIMITED_OXYGEN_DESC", g.self.unlimited_oxygen);
+	#endif
 }

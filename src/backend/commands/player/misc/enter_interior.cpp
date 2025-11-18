@@ -7,6 +7,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class enter_interior : player_command
 	{
 		using player_command::player_command;
@@ -48,4 +49,5 @@ namespace big
 	};
 
 	enter_interior g_enter_interior("enterint", "ENTER_INTERIOR", "ENTER_INTERIOR_DESC", 0, false);
+	#endif
 }

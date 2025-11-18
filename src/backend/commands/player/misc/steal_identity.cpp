@@ -4,6 +4,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class steal_identity : player_command
 	{
 		using player_command::player_command;
@@ -15,4 +16,5 @@ namespace big
 	};
 
 	steal_identity g_steal_identity("copymodel", "STEAL_IDENTITY", "STEAL_IDENTITY_DESC", 0, false); // do we really need this?
+	#endif
 }

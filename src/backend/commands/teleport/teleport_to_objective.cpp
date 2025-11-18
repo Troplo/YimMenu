@@ -4,6 +4,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class teleport_to_objective : command
 	{
 		using command::command;
@@ -15,4 +16,5 @@ namespace big
 	};
 
 	teleport_to_objective g_teleport_to_objective("objectivetp", "VIEW_HOTKEY_SETTINGS_TELEPORT_TO_OBJECTIVE", "BACKEND_TELEPORT_TO_OBJECTIVE_DESC", 0);
+	#endif
 }

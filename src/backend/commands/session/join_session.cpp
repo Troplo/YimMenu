@@ -3,6 +3,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class switch_session : command
 	{
 		std::unordered_map<eSessionType, const char*> m_session_types = {
@@ -101,4 +102,5 @@ namespace big
 		}
 	};
 	switch_session g_switch_session("joinsession", "JOIN_SESSION", "BACKEND_SESSION_JOIN_SESSION_DESC", 1);
+	#endif
 }

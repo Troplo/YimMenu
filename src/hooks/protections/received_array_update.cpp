@@ -13,6 +13,10 @@ namespace big
 {
 	bool hooks::received_array_update(rage::netArrayHandlerBase* array, CNetGamePlayer* sender, rage::datBitBuffer* buffer, int size, std::int16_t cycle)
 	{
+		bool result = g_hooking->get_original<hooks::received_array_update>()(array, sender, buffer, size, cycle);
+
+        return result;
+	#if ENABLE_TOXIC_CHEATS
 		int old_beast_index = -1;
 		int participant_id  = 0;
 		auto beast          = gta_util::find_script_thread("am_hunt_the_beast"_J);
@@ -24,7 +28,6 @@ namespace big
 				participant_id = ((CGameScriptHandlerNetComponent*)beast->m_net_component)->m_local_participant_index;
 		}
 
-		bool result = g_hooking->get_original<hooks::received_array_update>()(array, sender, buffer, size, cycle);
 
 		if (beast && array->m_array == script_local(beast->m_stack, scr_locals::am_hunt_the_beast::broadcast_idx).as<void*>()
 		    && old_beast_index
@@ -72,5 +75,6 @@ namespace big
 		}
 
 		return result;
+		#endif
 	}
 }

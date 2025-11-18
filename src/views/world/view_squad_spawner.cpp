@@ -6,7 +6,7 @@
 
 namespace big
 {
-
+#if ENABLE_TOXIC_CHEATS
 	void view::squad_spawner()
 	{
 		const char* const spawn_distance_modes[5]{"CUSTOM"_T.data(),
@@ -412,4 +412,5 @@ namespace big
 				g_squad_spawner_service.save_squad(new_template);
 		});
 	}
+	#endif
 }

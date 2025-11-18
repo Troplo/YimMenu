@@ -3,6 +3,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class send_to_apartment : player_command
 	{
 		using player_command::player_command;
@@ -31,4 +32,5 @@ namespace big
 	};
 
 	send_to_apartment g_send_to_apartment("apartmenttp", "TP_TO_APARTMENT", "TP_TO_APARTMENT_DESC", 1);
+	#endif
 }

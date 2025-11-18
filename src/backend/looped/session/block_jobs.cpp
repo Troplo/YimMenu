@@ -7,6 +7,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	static bool bLastBlockJobsEnabled = false;
 
 	void looped::session_block_jobs()
@@ -32,4 +33,5 @@ namespace big
 			bLastBlockJobsEnabled = false;
 		}
 	}
+	#endif
 }

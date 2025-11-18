@@ -5,7 +5,7 @@
 
 namespace big
 {
-
+	#if ENABLE_TOXIC_CHEATS
 	class vehicle_rain : looped_command
 	{
 		using looped_command::looped_command;
@@ -31,4 +31,5 @@ namespace big
 	};
 
 	vehicle_rain g_vehicle_rain("vehiclerain", "BACKEND_LOOPED_WORLD_RAIN_VEHICLES", "BACKEND_LOOPED_WORLD_RAIN_VEHICLES_DESC",g.world.nearby.veh_rain);
+	#endif
 }

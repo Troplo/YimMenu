@@ -29,7 +29,7 @@ namespace big
 		{
 			if (auto plyr = g_player_service->get_by_id(src->m_player_id))
 			{
-				g.reactions.delete_vehicle.process(plyr);
+//				g.reactions.delete_vehicle.process(plyr);
 			}
 			return;
 		}

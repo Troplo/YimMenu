@@ -6,6 +6,7 @@
 
 namespace big
 {
+#if ENABLE_TOXIC_CHEATS
 	static bool bLastForceThunderEnabled = false;
 
 	void looped::session_force_thunder()
@@ -33,4 +34,5 @@ namespace big
 			bLastForceThunderEnabled = false;
 		}
 	}
+	#endif
 }

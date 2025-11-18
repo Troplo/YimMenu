@@ -4,6 +4,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class teleport_into_vehicle : player_command
 	{
 		using player_command::player_command;
@@ -18,4 +19,5 @@ namespace big
 	};
 
 	teleport_into_vehicle g_teleport_into_vehicle("playervehtp", "TELEPORT_INTO_VEHICLE", "TELEPORT_INTO_VEHICLE_DESC", 0, false);
+	#endif
 }

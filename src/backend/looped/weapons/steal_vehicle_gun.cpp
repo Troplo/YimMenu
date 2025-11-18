@@ -7,6 +7,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	static Entity ent;
 
 	void looped::weapons_steal_vehicle_gun()
@@ -44,6 +45,5 @@ namespace big
 			}
 		}
 	}
-
-
+#endif
 }

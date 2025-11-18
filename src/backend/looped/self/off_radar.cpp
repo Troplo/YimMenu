@@ -7,6 +7,8 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
+
 	class off_radar : looped_command
 	{
 		using looped_command::looped_command;
@@ -29,4 +31,5 @@ namespace big
 
 	off_radar g_off_radar("otr", "OFF_THE_RADAR", "OFF_RADAR_DESC", g.self.off_radar);
 	bool_command ghost_org("ghostorg", "GHOST_ORG", "GHOST_ORG_DESC", g.self.ghost_org);
+	#endif
 }

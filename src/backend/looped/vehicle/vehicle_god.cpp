@@ -5,6 +5,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class vehicle_godmode_internal : looped_command
 	{
 		using looped_command::looped_command;
@@ -123,4 +124,5 @@ namespace big
 	vehicle_godmode_internal g_vehicle_godmode_internal("$$vehgodmode", "", "", true_ref);
 	bool_command g_vehicle_godmode("vehgodmode", "VEHICLE_GOD", "VEHICLE_GOD_DESC",
 	    g.vehicle.god_mode);
+	#endif
 }

@@ -4,6 +4,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class fill_ammo : command
 	{
 		using command::command;
@@ -19,4 +20,5 @@ namespace big
 		}
 	};
 	fill_ammo g_fill_ammo("fillammo", "FILL_AMMO", "FILL_AMMO_DESC", 0);
+	#endif
 }

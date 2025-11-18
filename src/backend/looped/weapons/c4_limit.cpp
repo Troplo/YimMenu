@@ -2,6 +2,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	void looped::weapons_c4_limit()
 	{
 		if (g_local_player)
@@ -12,4 +13,5 @@ namespace big
 				g_local_player->fired_flares = 0;
 		}
 	}
+	#endif
 }

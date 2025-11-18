@@ -2,6 +2,7 @@
 
 namespace big
 {
+#if ENABLE_TOXIC_CHEATS
 	class godmode_internal : looped_command
 	{
 		using looped_command::looped_command;
@@ -36,4 +37,5 @@ namespace big
 	static bool true_ref = true;
 	godmode_internal g_godmode_internal("$$godmode", "", "", true_ref);
 	bool_command g_godmode("godmode", "GODMODE", "GODMODE_DESC", g.self.god_mode);
+#endif
 }

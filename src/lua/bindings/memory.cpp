@@ -76,10 +76,10 @@ namespace lua::memory
 	// Name: scan_pattern
 	// Param: pattern: string: byte pattern (IDA format)
 	// Returns: pointer: A pointer to the found address.
-	// Scans the specified memory pattern within the "GTA5.exe" module and returns a pointer to the found address.
+	// Scans the specified memory pattern within the "Paragon_Legacy.exe" module and returns a pointer to the found address.
 	static pointer scan_pattern(const std::string& pattern)
 	{
-		return pointer(::memory::module("GTA5.exe").scan(::memory::pattern(pattern)).value().as<uint64_t>());
+		return pointer(::memory::module("Paragon_Legacy.exe").scan(::memory::pattern(pattern)).value().as<uint64_t>());
 	}
 
 	// Lua API: Function

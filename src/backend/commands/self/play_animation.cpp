@@ -11,6 +11,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class play_animation : command
 	{
 		using command::command;
@@ -92,4 +93,5 @@ namespace big
 	};
 
 	play_animation g_play_animation("anim", "PLAY_ANIMATION", "PLAY_ANIMATION_DESC", 1);
+	#endif
 }

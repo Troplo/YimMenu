@@ -5,6 +5,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class give_all_weapons : player_command
 	{
 		using player_command::player_command;
@@ -42,4 +43,5 @@ namespace big
 
 	give_all_weapons g_give_all_weapons("giveweaps", "GIVE_WEAPONS", "GIVE_WEAPONS_DESC", 0, false);
 	give_all_weapons_all g_give_all_weapons_all("giveweapsall", "GIVE_WEAPONS", "GIVE_WEAPONS_ALL_DESC", 0);
+	#endif
 }

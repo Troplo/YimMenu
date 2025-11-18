@@ -2,6 +2,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class no_water_collision : looped_command
 	{
 		using looped_command::looped_command;
@@ -20,4 +21,5 @@ namespace big
 	};
 
 	no_water_collision g_no_water_collision("walkunder", "WALK_UNDERWATER", "WALK_UNDERWATER_DESC", g.self.no_water_collision);
+	#endif
 }

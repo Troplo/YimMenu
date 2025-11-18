@@ -5,6 +5,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	static bool last_online = false;
 
 	inline void cleanup_spawned_ped(spawned_ped& ped)
@@ -83,4 +84,5 @@ namespace big
 			it++;
 		}
 	}
+	#endif
 }

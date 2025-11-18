@@ -5,6 +5,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class ped_rain : looped_command
 	{
 		using looped_command::looped_command;
@@ -27,4 +28,5 @@ namespace big
 	};
 
 	ped_rain g_ped_rain("pedrain", "BACKEND_LOOPED_WORLD_RAIN_PEDS", "BACKEND_LOOPED_WORLD_RAIN_PEDS_DESC", g.world.nearby.ped_rain);
+	#endif
 }

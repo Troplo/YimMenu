@@ -42,6 +42,7 @@ inline bool is_kick_instruction(rage::datBitBuffer& buffer)
 
 namespace big
 {
+#if ENABLE_TOXIC_CHEATS
 	bool try_read_secondary_header(rage::datBitBuffer& buffer)
 	{
 		auto data = buffer.Read<std::uint32_t>(20);
@@ -785,7 +786,6 @@ namespace big
 			}
 		}
 		}
-
-		return g_hooking->get_original<hooks::receive_net_message>()(a1, net_cxn_mgr, event);
 	}
+#endif
 }

@@ -8,6 +8,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	void looped::drive_train()
 	{
 		if (self::veh && VEHICLE::IS_THIS_MODEL_A_TRAIN(ENTITY::GET_ENTITY_MODEL(self::veh)))
@@ -32,4 +33,5 @@ namespace big
 		if (self::veh && VEHICLE::IS_THIS_MODEL_A_TRAIN(ENTITY::GET_ENTITY_MODEL(self::veh)))
 			VEHICLE::SET_RENDER_TRAIN_AS_DERAILED(self::veh, g.world.train.derail_train);
 	}
+	#endif
 }

@@ -6,7 +6,7 @@ Table containing helper functions related to process memory.
 
 ### `scan_pattern(pattern)`
 
-Scans the specified memory pattern within the "GTA5.exe" module and returns a pointer to the found address.
+Scans the specified memory pattern within the "Paragon_Legacy.exe" module and returns a pointer to the found address.
 
 - **Parameters:**
   - `pattern` (string): byte pattern (IDA format)

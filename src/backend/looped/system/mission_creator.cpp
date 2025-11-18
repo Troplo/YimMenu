@@ -5,6 +5,7 @@
 #include "natives.hpp"
 #include "script.hpp"
 
+#if ENABLE_TOXIC_CHEATS
 namespace big
 {
 	bool bLastMissionCreator = false;
@@ -37,3 +38,4 @@ namespace big
 		}
 	}
 }
+#endif

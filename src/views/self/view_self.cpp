@@ -9,12 +9,13 @@
 
 namespace big
 {
-	extern bool user_updated_wanted_level;
+	//extern bool user_updated_wanted_level;
 
 	void view::self()
 	{
 		components::command_button<"suicide">();
 		ImGui::SameLine();
+#if ENABLE_TOXIC_CHEATS
 		components::command_button<"heal">();
 		ImGui::SameLine();
 		components::command_button<"fillsnacks">();
@@ -24,11 +25,12 @@ namespace big
 		components::command_button<"clean">();
 		ImGui::SameLine();
 		components::command_button<"fillammo">();
-
+#endif
 		ImGui::SeparatorText("GENERAL"_T.data());
 
 		ImGui::BeginGroup();
 
+#if ENABLE_TOXIC_CHEATS
 		components::command_checkbox<"godmode">();
 		components::command_checkbox<"otr">();
 		const auto gpbd_fm_3 = scr_globals::gpbd_fm_3.as<GPBD_FM_3*>();
@@ -70,21 +72,24 @@ namespace big
 
 		components::command_checkbox<"noragdoll">();
 		components::command_checkbox<"fastrun">();
+#endif
 		components::command_checkbox<"noidlekick">();
 		components::command_checkbox<"interactionmenufreedom">();
+#if ENABLE_TOXIC_CHEATS
 		components::command_checkbox<"walkunder">();
 		if (!g.self.super_jump)
 			components::command_checkbox<"beastjump">();
 		if (!g.self.beast_jump)
 			components::command_checkbox<"superjump">();
 		components::command_checkbox<"nocollision">();
-
+#endif
 		ImGui::EndGroup();
 		ImGui::SameLine();
 		ImGui::BeginGroup();
 
 		components::command_checkbox<"cleanloop">();
 		components::command_checkbox<"mobileradio">();
+#if ENABLE_TOXIC_CHEATS
 		components::command_checkbox<"superherofly">();
 		components::options_modal("SUPER_HERO_FLY_OPTION_MODAL"_T, [] {
 			ImGui::Text("SUPER_HERO_FLY_OPTION_MODAL_DETAILED_DESC"_T.data());
@@ -166,7 +171,6 @@ namespace big
 				}
 			}
 		});
-
 		components::command_checkbox<"ptfx">();
 		components::options_modal("VIEW_SELF_PTFX"_T.data(), [] {
 			ImGui::SliderFloat("VIEW_SELF_PTFX_SIZE"_T.data(), &g.self.ptfx_effects.size, 0.1f, 2.f);
@@ -208,8 +212,9 @@ namespace big
 		ImGui::SeparatorText("WANTED_LEVEL"_T.data());
 
 		components::command_checkbox<"neverwanted">();
-
+#endif
 		// Only show all the other stuff like clear wanted, force wanted, and the slider if we don't have never_wanted enabled, since never_wanted overrides all of that
+        #if ENABLE_TOXIC_CHEATS
 		if (!g.self.never_wanted)
 		{
 			ImGui::SameLine();
@@ -226,7 +231,6 @@ namespace big
 			if (ImGui::IsItemHovered())
 				ImGui::SetTooltip("FORCE_WANTED_LEVEL_DESC"_T.data());
 		}
-
 		ImGui::SeparatorText("PROOFS"_T.data());
 
 		if (ImGui::Button("CHECK_ALL"_T.data()))
@@ -377,10 +381,11 @@ namespace big
 				}
 			});
 		}
-
+        #endif
 		ImGui::EndGroup();
 
 		g.self.proof_mask = 0;
+    #if ENABLE_TOXIC_CHEATS
 		if (g.self.god_mode)
 		{
 			g.self.proof_mask |= static_cast<int>(eEntityProofs::GOD);
@@ -413,5 +418,6 @@ namespace big
 		{
 			g.self.proof_mask |= static_cast<int>(eEntityProofs::WATER);
 		}
+#endif
 	}
 }

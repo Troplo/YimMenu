@@ -3,6 +3,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class tp_to_player : player_command
 	{
 		using player_command::player_command;
@@ -89,4 +90,5 @@ namespace big
 	};
 
 	tp_to_player tp_to_player_shortcut("tp", "TELEPORT_PLAYER_TO_PLAYER", "TELEPORT_PLAYER_TO_PLAYER_DESC", 1);
+	#endif
 }

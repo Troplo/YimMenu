@@ -7,6 +7,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	void looped::session_randomize_ceo_colors()
 	{
 		if (g.session.randomize_ceo_colors && *g_pointers->m_gta.m_is_session_started && !STREAMING::IS_PLAYER_SWITCH_IN_PROGRESS() && SCRIPT::GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH("maintransition"_J) == 0)
@@ -21,4 +22,5 @@ namespace big
 			}
 		}
 	}
+	#endif
 }

@@ -2,6 +2,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class smart_kick : player_command
 	{
 		using player_command::player_command;
@@ -28,4 +29,5 @@ namespace big
 	};
 
 	smart_kick g_smart_kick("smartkick", "SMART_KICK", "SMART_KICK_DESC", 0, false);
+	#endif
 }

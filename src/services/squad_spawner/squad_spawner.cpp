@@ -9,7 +9,7 @@
 
 namespace big
 {
-
+#if ENABLE_TOXIC_CHEATS
 	squad_member squad_spawner::spawn_squad_member(squad s)
 	{
 		auto handle = ped::spawn(ePedType::PED_TYPE_CIVMALE, rage::joaat(s.m_ped_model), 0, s.m_spawn_pos, 0, true);
@@ -331,4 +331,5 @@ namespace big
 			}
 		}
 	}
+#endif
 }

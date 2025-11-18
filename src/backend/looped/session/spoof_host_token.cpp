@@ -7,6 +7,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	void set_peer_id_upper(std::uint64_t upper)
 	{
 		*g_pointers->m_gta.m_peer_id &= 0xFFFFFFFF;
@@ -102,4 +103,5 @@ namespace big
 
 	static bool true_ref = true;
 	spoof_host_token_internal g_spoof_host_token_internal("$$spoofhosttoken", "", "", true_ref);
+	#endif
 }

@@ -3,6 +3,7 @@
 
 namespace big
 {
+#if ENABLE_TOXIC_CHEATS
 	void draw_pair_option(const std::string_view name, decltype(g.notifications.gta_thread_kill)& option)
 	{
 		ImGui::Text(name.data());
@@ -185,5 +186,5 @@ namespace big
 
 		draw_pair_option("SETTINGS_NOTIFY_TRANSACTION_RATE_LIMIT"_T, g.notifications.transaction_rate_limit);
 	}
-
+#endif
 }

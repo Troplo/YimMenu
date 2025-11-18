@@ -4,6 +4,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class increase_player_limit : looped_command
 	{
 		using looped_command::looped_command;
@@ -29,4 +30,5 @@ namespace big
 	};
 
 	increase_player_limit g_increase_player_limit("32players", "INCREASE_PLAYER_LIMIT", "INCREASE_PLAYER_LIMIT_DESC", g.spoofing.increase_player_limit);
+	#endif
 }

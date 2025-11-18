@@ -138,209 +138,220 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 		    nullptr,
 		    0,
 		    [](PVOID) -> DWORD {
-			    auto handler = exception_handler();
-			    std::srand(std::chrono::system_clock::now().time_since_epoch().count());
+		    	auto sc_module = memory::module("Paragon.Sdk.dll");
+		    	sc_module.wait_for_module();
+		    	std::this_thread::sleep_for(5000ms);
+		    	auto handler = exception_handler();
+				std::srand(std::chrono::system_clock::now().time_since_epoch().count());
 
-			    while (!FindWindow("grcWindow", nullptr))
-				    std::this_thread::sleep_for(100ms);
+				while (!FindWindow("grcWindow", nullptr))
+					std::this_thread::sleep_for(100ms);
 
-			    std::filesystem::path base_dir = std::getenv("appdata");
-			    base_dir /= "YimMenu";
-			    g_file_manager.init(base_dir);
+				std::filesystem::path base_dir = std::getenv("appdata");
+				base_dir /= "Paragon\\YimShim";
+				g_file_manager.init(base_dir);
 
-			    g.init(g_file_manager.get_project_file("./settings.json"));
-			    g_log.initialize("YimMenu", g_file_manager.get_project_file("./cout.log"), g.debug.external_console);
-			    LOG(INFO) << "Settings Loaded and logger initialized.";
+				g.init(g_file_manager.get_project_file("./settings.json"));
+				g_log.initialize("YimMenu for Paragon Legacy", g_file_manager.get_project_file("./cout.log"), g.debug.external_console);
+				LOG(INFO) << "Settings Loaded and logger initialized.";
 
-			    LOG(INFO) << "Yim's Menu Initializing";
-			    LOGF(INFO, "Git Info\n\tBranch:\t{}\n\tHash:\t{}\n\tDate:\t{}", version::GIT_BRANCH, version::GIT_SHA1, version::GIT_DATE);
+				LOG(INFO) << "Yim's Menu Initializing";
+				LOGF(INFO, "Git Info\n\tBranch:\t{}\n\tHash:\t{}\n\tDate:\t{}", version::GIT_BRANCH, version::GIT_SHA1, version::GIT_DATE);
 
-			    // more tech debt, YAY!
-			    if (is_proton())
-			    {
-				    LOG(INFO) << "Running on proton!";
-			    }
-			    else
-			    {
-				    auto display_version = ReadRegistryKeySZ(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", "DisplayVersion");
-				    auto current_build = ReadRegistryKeySZ(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", "CurrentBuild");
-				    auto UBR = ReadRegistryKeyDWORD(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", "UBR");
-				    LOG(INFO) << GetWindowsVersion() << " Version " << display_version << " (OS Build " << current_build << "." << UBR << ")";
-			    }
+				// more tech debt, YAY!
+				if (is_proton())
+				{
+					LOG(INFO) << "Running on proton!";
+				}
+				else
+				{
+					auto display_version = ReadRegistryKeySZ(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", "DisplayVersion");
+					auto current_build = ReadRegistryKeySZ(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", "CurrentBuild");
+					auto UBR = ReadRegistryKeyDWORD(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", "UBR");
+					LOG(INFO) << GetWindowsVersion() << " Version " << display_version << " (OS Build " << current_build << "." << UBR << ")";
+				}
 
 #ifndef NDEBUG
-			    LOG(WARNING) << "Debug Build. Switch to RelWithDebInfo or Release Build for a more stable experience";
+				LOG(WARNING) << "Debug Build. Switch to RelWithDebInfo or Release Build for a more stable experience";
 #endif
 
-			    auto thread_pool_instance = std::make_unique<thread_pool>();
-			    LOG(INFO) << "Thread pool initialized.";
+				auto thread_pool_instance = std::make_unique<thread_pool>();
+				LOG(INFO) << "Thread pool initialized.";
 
-			    auto pointers_instance = std::make_unique<pointers>();
-			    LOG(INFO) << "Pointers initialized.";
+				auto pointers_instance = std::make_unique<pointers>();
+				LOG(INFO) << "Pointers initialized.";
 
-			    while (!disable_anticheat_skeleton())
-			    {
-				    LOG(WARNING) << "Failed patching anticheat gameskeleton (injected too early?). Waiting 100ms and trying again";
-				    std::this_thread::sleep_for(100ms);
-			    }
-			    LOG(INFO) << "Disabled anticheat gameskeleton.";
+				while (!disable_anticheat_skeleton())
+				{
+					LOG(WARNING) << "Failed patching anticheat gameskeleton (injected too early?). Waiting 100ms and trying again";
+					std::this_thread::sleep_for(100ms);
+				}
+				LOG(INFO) << "Disabled anticheat gameskeleton.";
 
-			    auto byte_patch_manager_instance = std::make_unique<byte_patch_manager>();
-			    LOG(INFO) << "Byte Patch Manager initialized.";
+				auto byte_patch_manager_instance = std::make_unique<byte_patch_manager>();
+				LOG(INFO) << "Byte Patch Manager initialized.";
 
-			    g_renderer.init();
-			    LOG(INFO) << "Renderer initialized.";
-			    auto gui_instance = std::make_unique<gui>();
+				g_renderer.init();
+				LOG(INFO) << "Renderer initialized.";
+				auto gui_instance = std::make_unique<gui>();
 
-			    auto fiber_pool_instance = std::make_unique<fiber_pool>(11);
-			    LOG(INFO) << "Fiber pool initialized.";
+				auto fiber_pool_instance = std::make_unique<fiber_pool>(11);
+				LOG(INFO) << "Fiber pool initialized.";
 
-			    g_http_client.init(g_file_manager.get_project_file("./proxy_settings.json"));
-			    LOG(INFO) << "HTTP Client initialized.";
+				g_http_client.init(g_file_manager.get_project_file("./proxy_settings.json"));
+				LOG(INFO) << "HTTP Client initialized.";
 
-			    g_translation_service.init();
-			    LOG(INFO) << "Translation Service initialized.";
+				g_translation_service.init();
+				LOG(INFO) << "Translation Service initialized.";
 
-			    auto hooking_instance = std::make_unique<hooking>();
-			    LOG(INFO) << "Hooking initialized.";
+				auto hooking_instance = std::make_unique<hooking>();
+				LOG(INFO) << "Hooking initialized.";
 
-			    g_gta_data_service.init();
+				g_gta_data_service.init();
 
-			    auto context_menu_service_instance      = std::make_unique<context_menu_service>();
-			    auto custom_text_service_instance       = std::make_unique<custom_text_service>();
-			    auto mobile_service_instance            = std::make_unique<mobile_service>();
-			    auto pickup_service_instance            = std::make_unique<pickup_service>();
-			    auto player_service_instance            = std::make_unique<player_service>();
-			    auto model_preview_service_instance     = std::make_unique<model_preview_service>();
-			    auto handling_service_instance          = std::make_unique<handling_service>();
-			    auto gui_service_instance               = std::make_unique<gui_service>();
-			    auto script_patcher_service_instance    = std::make_unique<script_patcher_service>();
-			    auto player_database_service_instance   = std::make_unique<player_database_service>();
-			    auto hotkey_service_instance            = std::make_unique<hotkey_service>();
-			    auto matchmaking_service_instance       = std::make_unique<matchmaking_service>();
-			    auto api_service_instance               = std::make_unique<api_service>();
-			    auto tunables_service_instance          = std::make_unique<tunables_service>();
-			    auto script_connection_service_instance = std::make_unique<script_connection_service>();
-			    auto xml_vehicles_service_instance      = std::make_unique<xml_vehicles_service>();
-			    auto xml_maps_service_instance          = std::make_unique<xml_map_service>();
-			    LOG(INFO) << "Registered service instances...";
+				auto context_menu_service_instance      = std::make_unique<context_menu_service>();
+				auto custom_text_service_instance       = std::make_unique<custom_text_service>();
+				auto mobile_service_instance            = std::make_unique<mobile_service>();
+				auto pickup_service_instance            = std::make_unique<pickup_service>();
+				auto player_service_instance            = std::make_unique<player_service>();
+				auto model_preview_service_instance     = std::make_unique<model_preview_service>();
+				auto handling_service_instance          = std::make_unique<handling_service>();
+				auto gui_service_instance               = std::make_unique<gui_service>();
+				auto script_patcher_service_instance    = std::make_unique<script_patcher_service>();
+				auto player_database_service_instance   = std::make_unique<player_database_service>();
+				auto hotkey_service_instance            = std::make_unique<hotkey_service>();
+				auto matchmaking_service_instance       = std::make_unique<matchmaking_service>();
+				auto api_service_instance               = std::make_unique<api_service>();
+				auto tunables_service_instance          = std::make_unique<tunables_service>();
+				auto script_connection_service_instance = std::make_unique<script_connection_service>();
+				auto xml_vehicles_service_instance      = std::make_unique<xml_vehicles_service>();
+				auto xml_maps_service_instance          = std::make_unique<xml_map_service>();
+				LOG(INFO) << "Registered service instances...";
 
-			    g_notification_service.initialise();
-			    LOG(INFO) << "Finished initialising services.";
+				g_notification_service.initialise();
+				LOG(INFO) << "Finished initialising services.";
 
-			    g_script_mgr.add_script(std::make_unique<script>(&gui::script_func, "GUI", false));
+				g_script_mgr.add_script(std::make_unique<script>(&gui::script_func, "GUI", false));
 
-			    g_script_mgr.add_script(std::make_unique<script>(&backend::loop, "Backend Loop", false));
-			    g_script_mgr.add_script(std::make_unique<script>(&backend::self_loop, "Self"));
-			    g_script_mgr.add_script(std::make_unique<script>(&backend::weapons_loop, "Weapon"));
-			    g_script_mgr.add_script(std::make_unique<script>(&backend::vehicles_loop, "Vehicle"));
-			    g_script_mgr.add_script(std::make_unique<script>(&backend::misc_loop, "Miscellaneous"));
-			    g_script_mgr.add_script(std::make_unique<script>(&backend::remote_loop, "Remote"));
-			    g_script_mgr.add_script(std::make_unique<script>(&backend::rainbowpaint_loop, "Rainbow Paint"));
-			    g_script_mgr.add_script(std::make_unique<script>(&backend::disable_control_action_loop, "Disable Controls"));
-			    g_script_mgr.add_script(std::make_unique<script>(&backend::world_loop, "World"));
-			    g_script_mgr.add_script(std::make_unique<script>(&backend::orbital_drone, "Orbital Drone"));
-			    g_script_mgr.add_script(std::make_unique<script>(&backend::vehicle_control, "Vehicle Control"));
-			    g_script_mgr.add_script(std::make_unique<script>(&context_menu_service::context_menu, "Context Menu"));
-			    g_script_mgr.add_script(std::make_unique<script>(&backend::tunables_script, "Tunables"));
-			    g_script_mgr.add_script(std::make_unique<script>(&backend::squad_spawner, "Squad Spawner"));
-			    g_script_mgr.add_script(std::make_unique<script>(&backend::ambient_animations_loop, "Ambient Animations"));
+				g_script_mgr.add_script(std::make_unique<script>(&backend::loop, "Backend Loop", false));
+				g_script_mgr.add_script(std::make_unique<script>(&backend::self_loop, "Self"));
+                #if ENABLE_TOXIC_CHEATS
+				g_script_mgr.add_script(std::make_unique<script>(&backend::weapons_loop, "Weapon"));
+				g_script_mgr.add_script(std::make_unique<script>(&backend::vehicles_loop, "Vehicle"));
+				#endif
+				g_script_mgr.add_script(std::make_unique<script>(&backend::misc_loop, "Miscellaneous"));
+				g_script_mgr.add_script(std::make_unique<script>(&backend::remote_loop, "Remote"));
+                #if ENABLE_TOXIC_CHEATS
+				g_script_mgr.add_script(std::make_unique<script>(&backend::rainbowpaint_loop, "Rainbow Paint"));
+				#endif
+				g_script_mgr.add_script(std::make_unique<script>(&backend::disable_control_action_loop, "Disable Controls"));
+                #if ENABLE_TOXIC_CHEATS
+				g_script_mgr.add_script(std::make_unique<script>(&backend::world_loop, "World"));
+				g_script_mgr.add_script(std::make_unique<script>(&backend::orbital_drone, "Orbital Drone"));
+				g_script_mgr.add_script(std::make_unique<script>(&backend::vehicle_control, "Vehicle Control"));
+				#endif
+				g_script_mgr.add_script(std::make_unique<script>(&context_menu_service::context_menu, "Context Menu"));
+				g_script_mgr.add_script(std::make_unique<script>(&backend::tunables_script, "Tunables"));
+                #if ENABLE_TOXIC_CHEATS
+				g_script_mgr.add_script(std::make_unique<script>(&backend::squad_spawner, "Squad Spawner"));
+				#endif
+				g_script_mgr.add_script(std::make_unique<script>(&backend::ambient_animations_loop, "Ambient Animations"));
 
-			    LOG(INFO) << "Scripts registered.";
+				LOG(INFO) << "Scripts registered.";
 
-			    g_hooking->enable();
-			    LOG(INFO) << "Hooking enabled.";
+				g_hooking->enable();
+				LOG(INFO) << "Hooking enabled.";
 
-			    auto native_hooks_instance = std::make_unique<native_hooks>();
-			    LOG(INFO) << "Dynamic native hooker initialized.";
+				auto native_hooks_instance = std::make_unique<native_hooks>();
+				LOG(INFO) << "Dynamic native hooker initialized.";
 
-			    auto lua_manager_instance =
-			        std::make_unique<lua_manager>(g_file_manager.get_project_folder("scripts"), g_file_manager.get_project_folder("scripts_config"));
-			    LOG(INFO) << "Lua manager initialized.";
+				auto lua_manager_instance =
+					std::make_unique<lua_manager>(g_file_manager.get_project_folder("scripts"), g_file_manager.get_project_folder("scripts_config"));
+				LOG(INFO) << "Lua manager initialized.";
 
-			    g_running = true;
+				g_running = true;
 
-			    while (g_running)
-			    {
-				    g.attempt_save();
+				while (g_running)
+				{
+					g.attempt_save();
 
-				    std::this_thread::sleep_for(500ms);
-			    }
+					std::this_thread::sleep_for(500ms);
+				}
 
-			    g_script_mgr.remove_all_scripts();
-			    LOG(INFO) << "Scripts unregistered.";
+				g_script_mgr.remove_all_scripts();
+				LOG(INFO) << "Scripts unregistered.";
 
-			    lua_manager_instance.reset();
-			    LOG(INFO) << "Lua manager uninitialized.";
+				lua_manager_instance.reset();
+				LOG(INFO) << "Lua manager uninitialized.";
 
-			    g_hooking->disable();
-			    LOG(INFO) << "Hooking disabled.";
+				g_hooking->disable();
+				LOG(INFO) << "Hooking disabled.";
 
-			    native_hooks_instance.reset();
-			    LOG(INFO) << "Dynamic native hooker uninitialized.";
+				native_hooks_instance.reset();
+				LOG(INFO) << "Dynamic native hooker uninitialized.";
 
-			    // Make sure that all threads created don't have any blocking loops
-			    // otherwise make sure that they have stopped executing
-			    thread_pool_instance->destroy();
-			    LOG(INFO) << "Destroyed thread pool.";
+				// Make sure that all threads created don't have any blocking loops
+				// otherwise make sure that they have stopped executing
+				thread_pool_instance->destroy();
+				LOG(INFO) << "Destroyed thread pool.";
 
-			    script_connection_service_instance.reset();
-			    LOG(INFO) << "Script Connection Service reset.";
-			    tunables_service_instance.reset();
-			    LOG(INFO) << "Tunables Service reset.";
-			    hotkey_service_instance.reset();
-			    LOG(INFO) << "Hotkey Service reset.";
-			    matchmaking_service_instance.reset();
-			    LOG(INFO) << "Matchmaking Service reset.";
-			    player_database_service_instance.reset();
-			    LOG(INFO) << "Player Database Service reset.";
-			    api_service_instance.reset();
-			    LOG(INFO) << "API Service reset.";
-			    script_patcher_service_instance.reset();
-			    LOG(INFO) << "Script Patcher Service reset.";
-			    gui_service_instance.reset();
-			    LOG(INFO) << "Gui Service reset.";
-			    handling_service_instance.reset();
-			    LOG(INFO) << "Vehicle Service reset.";
-			    model_preview_service_instance.reset();
-			    LOG(INFO) << "Model Preview Service reset.";
-			    mobile_service_instance.reset();
-			    LOG(INFO) << "Mobile Service reset.";
-			    player_service_instance.reset();
-			    LOG(INFO) << "Player Service reset.";
-			    pickup_service_instance.reset();
-			    LOG(INFO) << "Pickup Service reset.";
-			    custom_text_service_instance.reset();
-			    LOG(INFO) << "Custom Text Service reset.";
-			    context_menu_service_instance.reset();
-			    LOG(INFO) << "Context Service reset.";
-			    xml_vehicles_service_instance.reset();
-			    LOG(INFO) << "Xml Vehicles Service reset.";
-			    LOG(INFO) << "Services uninitialized.";
+				script_connection_service_instance.reset();
+				LOG(INFO) << "Script Connection Service reset.";
+				tunables_service_instance.reset();
+				LOG(INFO) << "Tunables Service reset.";
+				hotkey_service_instance.reset();
+				LOG(INFO) << "Hotkey Service reset.";
+				matchmaking_service_instance.reset();
+				LOG(INFO) << "Matchmaking Service reset.";
+				player_database_service_instance.reset();
+				LOG(INFO) << "Player Database Service reset.";
+				api_service_instance.reset();
+				LOG(INFO) << "API Service reset.";
+				script_patcher_service_instance.reset();
+				LOG(INFO) << "Script Patcher Service reset.";
+				gui_service_instance.reset();
+				LOG(INFO) << "Gui Service reset.";
+				handling_service_instance.reset();
+				LOG(INFO) << "Vehicle Service reset.";
+				model_preview_service_instance.reset();
+				LOG(INFO) << "Model Preview Service reset.";
+				mobile_service_instance.reset();
+				LOG(INFO) << "Mobile Service reset.";
+				player_service_instance.reset();
+				LOG(INFO) << "Player Service reset.";
+				pickup_service_instance.reset();
+				LOG(INFO) << "Pickup Service reset.";
+				custom_text_service_instance.reset();
+				LOG(INFO) << "Custom Text Service reset.";
+				context_menu_service_instance.reset();
+				LOG(INFO) << "Context Service reset.";
+				xml_vehicles_service_instance.reset();
+				LOG(INFO) << "Xml Vehicles Service reset.";
+				LOG(INFO) << "Services uninitialized.";
 
-			    hooking_instance.reset();
-			    LOG(INFO) << "Hooking uninitialized.";
+				hooking_instance.reset();
+				LOG(INFO) << "Hooking uninitialized.";
 
-			    fiber_pool_instance.reset();
-			    LOG(INFO) << "Fiber pool uninitialized.";
+				fiber_pool_instance.reset();
+				LOG(INFO) << "Fiber pool uninitialized.";
 
-			    g_renderer.destroy();
-			    LOG(INFO) << "Renderer uninitialized.";
+				g_renderer.destroy();
+				LOG(INFO) << "Renderer uninitialized.";
 
-			    byte_patch_manager_instance.reset();
-			    LOG(INFO) << "Byte Patch Manager uninitialized.";
+				byte_patch_manager_instance.reset();
+				LOG(INFO) << "Byte Patch Manager uninitialized.";
 
-			    pointers_instance.reset();
-			    LOG(INFO) << "Pointers uninitialized.";
+				pointers_instance.reset();
+				LOG(INFO) << "Pointers uninitialized.";
 
-			    thread_pool_instance.reset();
-			    LOG(INFO) << "Thread pool uninitialized.";
+				thread_pool_instance.reset();
+				LOG(INFO) << "Thread pool uninitialized.";
 
-			    LOG(INFO) << "Farewell!";
-			    g_log.destroy();
+				LOG(INFO) << "Farewell!";
+				g_log.destroy();
 
-			    CloseHandle(g_main_thread);
-			    FreeLibraryAndExitThread(g_hmodule, 0);
+				CloseHandle(g_main_thread);
+				FreeLibraryAndExitThread(g_hmodule, 0);
 		    },
 		    nullptr,
 		    0,

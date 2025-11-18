@@ -6,6 +6,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class ignore : looped_command
 	{
 		using looped_command::looped_command;
@@ -36,4 +37,5 @@ namespace big
 	};
 
 	ignore g_ignore("pedsignore", "BACKEND_LOOPED_WORLD_IGNORE", "BACKEND_LOOPED_WORLD_IGNORE_DESC", g.world.nearby.ignore);
+	#endif
 }

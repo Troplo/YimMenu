@@ -6,7 +6,7 @@
 
 namespace big
 {
-
+#if ENABLE_TOXIC_CHEATS
 	struct squad_member
 	{
 		Ped handle;
@@ -236,4 +236,5 @@ namespace big
 	};
 
 	inline squad_spawner g_squad_spawner_service;
+	#endif
 }

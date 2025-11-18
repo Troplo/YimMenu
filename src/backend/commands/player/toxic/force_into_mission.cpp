@@ -3,6 +3,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class force_into_mission : player_command
 	{
 		using player_command::player_command;
@@ -22,4 +23,5 @@ namespace big
 	};
 
 	force_into_mission g_force_into_mission("mission", "FORCE_INTO_MISSION", "FORCE_INTO_MISSION_DESC", 0);
+	#endif
 }

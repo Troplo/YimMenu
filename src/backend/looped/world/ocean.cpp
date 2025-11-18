@@ -4,6 +4,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	static std::vector<float> original_heights;
 
 	struct quad_info
@@ -91,4 +92,5 @@ namespace big
 
 	modify_ocean g_modify_ocean("modifyocean", "BACKEND_LOOPED_WORLD_MODIFY_OCEAN", "BACKEND_LOOPED_WORLD_MODIFY_OCEAN_DESC", g.world.ocean.modify_ocean);
 	bool_command g_disable_ocean("disableocean", "BACKEND_LOOPED_WORLD_DISABLE_OCEAN", "BACKEND_LOOPED_WORLD_DISABLE_OCEAN_DESC", g.world.ocean.disable_ocean);
+	#endif
 }

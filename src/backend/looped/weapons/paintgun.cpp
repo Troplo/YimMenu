@@ -7,6 +7,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	void looped::weapons_paint_gun()
 	{
 		static Vector3 col = {0, 0, 0};
@@ -72,4 +73,5 @@ namespace big
 			}
 		}
 	}
+	#endif
 }

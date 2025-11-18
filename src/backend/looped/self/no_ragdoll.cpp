@@ -3,6 +3,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class no_ragdoll : looped_command
 	{
 		using looped_command::looped_command;
@@ -19,4 +20,5 @@ namespace big
 	};
 
 	no_ragdoll g_no_ragdoll("noragdoll", "NO_RAGDOLL", "NO_RAGDOLL_DESC", g.self.no_ragdoll);
+	#endif
 }

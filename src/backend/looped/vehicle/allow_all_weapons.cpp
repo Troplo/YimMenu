@@ -10,6 +10,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	void looped::vehicle_allow_all_weapons()
 	{
 		if (g_local_player == nullptr || g_local_player->m_vehicle == nullptr) [[unlikely]]
@@ -58,4 +59,5 @@ namespace big
 			}	
 		}
 	}
+	#endif
 }

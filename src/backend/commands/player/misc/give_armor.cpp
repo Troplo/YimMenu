@@ -3,6 +3,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class give_armor : player_command
 	{
 		using player_command::player_command;
@@ -19,4 +20,5 @@ namespace big
 	};
 
 	give_armor g_give_armor("givearmor", "GIVE_ARMOR", "GIVE_ARMOR_DESC", 0);
+	#endif
 }

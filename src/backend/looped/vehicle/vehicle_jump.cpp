@@ -4,6 +4,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class vehicle_jump : looped_command
 	{
 		using looped_command::looped_command;
@@ -20,4 +21,5 @@ namespace big
 
 	vehicle_jump
 	    g_vehicle_jump("vehjump", "VEHICLE_JUMP", "VEHICLE_JUMP_DESC", g.vehicle.vehicle_jump);
+	#endif
 }

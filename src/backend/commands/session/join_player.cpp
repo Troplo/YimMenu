@@ -7,6 +7,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class join_player : command
 	{
 		using command::command;
@@ -91,4 +92,5 @@ namespace big
 	};
 
 	join_player g_join_player("joinplayer", "JOIN_PLAYER", "JOIN_PLAYER_DESC", 1);
+	#endif
 }

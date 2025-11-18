@@ -5,6 +5,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	void looped::vehicle_boost_behavior()
 	{
 		if (g_local_player == nullptr)
@@ -56,4 +57,5 @@ namespace big
 			}
 		}
 	}
+	#endif
 }

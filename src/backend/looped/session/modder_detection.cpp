@@ -6,6 +6,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	static bool bLastInSession = false;
 
 	void looped::session_modder_detection()
@@ -57,4 +58,5 @@ namespace big
 			bLastInSession = false;
 		}
 	}
+	#endif
 }

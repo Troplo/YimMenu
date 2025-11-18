@@ -3,6 +3,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class no_sway : bool_command
 	{
 		using bool_command::bool_command;
@@ -18,4 +19,5 @@ namespace big
 		}
 	};
 	no_sway g_no_sway("nosway", "NO_SWAY", "NO_SWAY_DESC", g.weapons.no_sway);
+	#endif
 }

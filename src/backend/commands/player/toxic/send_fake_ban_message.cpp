@@ -3,6 +3,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class send_fake_ban_message : player_command
 	{
 		using player_command::player_command;
@@ -24,4 +25,5 @@ namespace big
 	};
 
 	send_fake_ban_message g_send_fake_ban_message("fakeban", "FAKE_BAN_MESSAGE", "FAKE_BAN_MESSAGE_DESC", 0);
+	#endif
 }

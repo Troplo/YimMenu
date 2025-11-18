@@ -9,15 +9,18 @@ namespace big
 		NONE,
 
 		SELF,
+		#if ENABLE_TOXIC_CHEATS
 		WEAPONS,
 		WEAPONS_AMMUNATION,
 		TELEPORT,
 		CUSTOM_TELEPORT,
 		MOBILE,
+		#endif
 		OUTFIT_EDITOR,
 		OUTFIT_SLOTS,
 		ANIMATIONS,
 
+		#if ENABLE_TOXIC_CHEATS
 		VEHICLE,
 		HANDLING,
 		HANDLING_SEARCH,
@@ -27,7 +30,9 @@ namespace big
 		LSC,
 		SPAWN_VEHICLE,
 		FUN_VEHICLE,
+		#endif
 
+		#if ENABLE_TOXIC_CHEATS
 		WORLD,
 		SPAWN_PED,
 		SQUAD_SPAWNER,
@@ -37,31 +42,42 @@ namespace big
 		MODEL_SWAPPER,
 		VFX,
 		XML_MAPS,
+		#endif
 
 		NETWORK,
 		CHAT,
 		NETWORK_CONTROLS,
 		MISSIONS,
+		#if ENABLE_TOXIC_CHEATS
 		SPOOFING,
 		PLAYER_DATABASE,
 		SESSION_BROWSER,
+		#endif
 		STAT_EDITOR,
 
 		SETTINGS,
 		LUA_SCRIPTS,
 		CONTEXT_MENU_SETTINGS,
+		#if ENABLE_TOXIC_CHEATS
 		ESP_SETTINGS,
+		#endif
 		GTA_CACHE_SETTINGS,
 		GUI_SETTINGS,
 		HOTKEY_SETTINGS,
+		#if ENABLE_TOXIC_CHEATS
 		REACTION_SETTINGS,
+		#endif
+		#if ENABLE_DISABLE_PROTECTIONS
 		PROTECTION_SETTINGS,
+		#endif
 		TRANSLATION_SETTINGS,
+		#if ENABLE_TOXIC_CHEATS
 		PROXY_SETTINGS,
+		#endif
 		DEBUG,
-
+#if ENABLE_TOXIC_CHEATS
 		PLAYER,
-
+#endif
 		// Added at runtime by things like lua scripts.
 		RUNTIME_CUSTOM
 	};
@@ -92,6 +108,7 @@ namespace big
 				TAB_DECL(SELF),
 		            view::self,
 		            {
+#if ENABLE_TOXIC_CHEATS
 						{
 							TAB_DECL(WEAPONS),
 								view::weapons,
@@ -105,12 +122,14 @@ namespace big
 						{
 							{TAB_DECL(CUSTOM_TELEPORT), view::custom_teleport}},
 						}}},
+#endif
 						{TAB_DECL(OUTFIT_EDITOR), view::outfit_editor}},
 		                {TAB_DECL(OUTFIT_SLOTS), view::outfit_slots}},
 						{TAB_DECL(ANIMATIONS), view::animations}},
 		            },
 		        },
 		    },
+#if ENABLE_TOXIC_CHEATS
 		    {
 		        TAB_DECL(VEHICLE),
 		            view::vehicle,
@@ -145,16 +164,19 @@ namespace big
 		            },
 		        },
 		    },
+#endif
 		    {
 		        TAB_DECL(NETWORK),
 		            view::network,
 		            {
+#if ENABLE_TOXIC_CHEATS
 						{TAB_DECL(CHAT), view::chat}},
 						{TAB_DECL(NETWORK_CONTROLS), view::network_controls}},
 						{TAB_DECL(MISSIONS), view::missions}},
 						{TAB_DECL(SPOOFING), view::spoofing}},
 						{TAB_DECL(PLAYER_DATABASE), view::player_database}},
 						{TAB_DECL(SESSION_BROWSER), view::session_browser}},
+#endif
 						{TAB_DECL(STAT_EDITOR), view::stat_editor}},
 		            },
 		        },
@@ -163,22 +185,30 @@ namespace big
 		        TAB_DECL(SETTINGS),
 		            view::settings,
 		            {
+#if ENABLE_TOXIC_CHEATS
 						{TAB_DECL(LUA_SCRIPTS), view::lua_scripts}},
 						{TAB_DECL(ESP_SETTINGS), view::esp_settings}},
+#endif
 						{TAB_DECL(GTA_CACHE_SETTINGS), view::gta_cache}},
 						{TAB_DECL(GUI_SETTINGS), view::gui_settings}},
 						{TAB_DECL(HOTKEY_SETTINGS), view::hotkey_settings}},
+#if ENABLE_TOXIC_CHEATS
 						{TAB_DECL(REACTION_SETTINGS), view::reaction_settings}},
+#endif
+#if ENABLE_DISABLE_PROTECTIONS
 						{TAB_DECL(PROTECTION_SETTINGS), view::protection_settings}},
 						{TAB_DECL(PROXY_SETTINGS), view::proxy_settings}},
+#endif
 						{TAB_DECL(DEBUG), nullptr}},
 		            },
 		        },
 		    },
+#if ENABLE_TOXIC_CHEATS
 		    {
 		        tabs::PLAYER,
 		        {"", view::view_player},
 		    },
+#endif
 		};
 		// clang-format on
 

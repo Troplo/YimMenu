@@ -9,6 +9,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class blackout : looped_command
 	{
 		using looped_command::looped_command;
@@ -25,4 +26,5 @@ namespace big
 	};
 
 	blackout g_blackout("blackout", "BACKEND_LOOPED_WORLD_BLACKOUT", "BACKEND_LOOPED_WORLD_BLACKOUT_DESC", g.world.blackout);
+#endif
 }

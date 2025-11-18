@@ -5,6 +5,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class oom_kick : player_command
 	{
 		using player_command::player_command;
@@ -31,4 +32,5 @@ namespace big
 	};
 
 	oom_kick g_oom_kick("oomkick", "OOM_KICK_CMD", "OOM_KICK_CMD_DESC", 0, false);
+	#endif
 }

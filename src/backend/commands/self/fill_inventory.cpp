@@ -3,6 +3,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class fill_inventory : command
 	{
 		using command::command;
@@ -28,4 +29,5 @@ namespace big
 	};
 
 	fill_inventory g_fill_inventory("fillsnacks", "FILL_INVENTORY", "FILL_INVENTORY_DESC", 0);
+	#endif
 }

@@ -21,4 +21,8 @@ namespace big
 		}
 		return original;
 	}
+
+	const char* paragon_banned_ros(const char* label) {
+	    return "We were unable to log you into Paragon, please make sure the Paragon Launcher is running, or have an up-to-date launch.bat file.";
+	}
 }

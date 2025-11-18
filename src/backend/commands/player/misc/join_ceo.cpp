@@ -3,6 +3,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class join_ceo : player_command
 	{
 		using player_command::player_command;
@@ -14,4 +15,5 @@ namespace big
 	};
 
 	join_ceo g_join_ceo("joinceo", "JOIN_CEO", "JOIN_CEO_DESC", 0, false);
+	#endif
 }

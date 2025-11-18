@@ -5,6 +5,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	inline std::atomic_bool translate_lock{false};
 
 	void looped::session_chat_translator()
@@ -37,4 +38,5 @@ namespace big
 			translate_queue.pop();
 		}
 	}
+	#endif
 }

@@ -4,7 +4,7 @@
 namespace big
 {
 	static auto last_time = std::chrono::steady_clock::now();
-
+	#if ENABLE_TOXIC_CHEATS
 	void looped::weapons_do_persist_weapons()
 	{
 		const auto time_now = std::chrono::steady_clock::now();
@@ -18,4 +18,5 @@ namespace big
 			persist_weapons::check_player_has_weapons();
 		}
 	}
+	#endif
 }

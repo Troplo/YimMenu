@@ -3,6 +3,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	interloper_reaction::interloper_reaction(const char* event_name, const char* notify_message, const char* announce_message, bool blockable, bool karmaable) :
 	    reaction(event_name, notify_message, announce_message),
 	    m_blockable(blockable),
@@ -44,4 +45,5 @@ namespace big
 
 		process_common(attacker);
 	}
+	#endif
 }

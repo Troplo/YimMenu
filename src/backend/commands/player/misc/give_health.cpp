@@ -3,6 +3,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class give_health : player_command
 	{
 		using player_command::player_command;
@@ -19,4 +20,5 @@ namespace big
 	};
 
 	give_health g_give_health("givehealth", "GIVE_HEALTH", "GIVE_HEALTH_DESC", 0);
+	#endif
 }

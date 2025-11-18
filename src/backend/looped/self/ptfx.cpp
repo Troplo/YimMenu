@@ -4,7 +4,6 @@
 
 namespace big
 {
-
 	class ptfx_looped : looped_command
 	{
 		using looped_command::looped_command;

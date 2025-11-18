@@ -5,6 +5,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	static bool is_next_in_queue()
 	{
 		uint64_t my_host_token = g_player_service->get_self()->get_net_data()->m_host_token;
@@ -45,4 +46,5 @@ namespace big
 		bLastKickHost = kick_host;
 		#endif
 	}
+	#endif
 }

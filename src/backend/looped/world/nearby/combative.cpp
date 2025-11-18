@@ -3,6 +3,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class combative : bool_command
 	{
 		using bool_command::bool_command;
@@ -19,4 +20,5 @@ namespace big
 	};
 
 	combative g_combative("riotmode", "BACKEND_LOOPED_WORLD_NEARBY_RIOT_MODE", "BACKEND_LOOPED_WORLD_NEARBY_RIOT_MODE_DESC", g.world.nearby.combative);
+	#endif
 }

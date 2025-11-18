@@ -3,6 +3,7 @@
 
 namespace big
 {
+#if ENABLE_TOXIC_CHEATS
 	class heal : command
 	{
 		using command::command;
@@ -15,4 +16,5 @@ namespace big
 	};
 
 	heal g_heal("heal", "HEAL", "HEAL_DESC", 0);
+#endif
 }

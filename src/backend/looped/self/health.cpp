@@ -3,7 +3,7 @@
 
 namespace big
 {
-
+	#if ENABLE_TOXIC_CHEATS
 	class health_regen_looped : looped_command
 	{
 		using looped_command::looped_command;
@@ -21,4 +21,5 @@ namespace big
 	};
 
 	health_regen_looped g_health_regen_looped("healthregen", "HEALTH_REGEN", "HEALTH_REGEN_DESC", g.self.healthregen);
+	#endif
 }

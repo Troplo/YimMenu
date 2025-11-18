@@ -2,6 +2,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class player;
 	using player_ptr = std::shared_ptr<player>;
 
@@ -29,4 +30,5 @@ namespace big
 		virtual void only_notify(player_ptr player);
 		virtual void process_common(player_ptr player);
 	};
+	#endif
 }

@@ -13,30 +13,30 @@ namespace big
 	hotkey_service::hotkey_service()
 	{
 		// ordered alphabetically to more easily see if a certain hotkey is present
-		register_hotkey("beastjump", g.settings.hotkeys.beastjump, "beastjump"_J);
-		register_hotkey("bringpv", g.settings.hotkeys.bringvehicle, "bringpv"_J);
-		register_hotkey("clearwantedself", g.settings.hotkeys.clear_wanted, "clearwantedself"_J);
-		register_hotkey("cmdexecutor", g.settings.hotkeys.cmd_excecutor, "cmdexecutor"_J);
+		// register_hotkey("beastjump", g.settings.hotkeys.beastjump, "beastjump"_J);
+		// register_hotkey("bringpv", g.settings.hotkeys.bringvehicle, "bringpv"_J);
+		// register_hotkey("clearwantedself", g.settings.hotkeys.clear_wanted, "clearwantedself"_J);
+		// register_hotkey("cmdexecutor", g.settings.hotkeys.cmd_excecutor, "cmdexecutor"_J);
 		register_hotkey("fastquit", g.settings.hotkeys.fast_quit, "fastquit"_J);
-		register_hotkey("fastrun", g.settings.hotkeys.superrun, "fastrun"_J);
-		register_hotkey("fillammo", g.settings.hotkeys.fill_ammo, "fillammo"_J);
-		register_hotkey("fillsnacks", g.settings.hotkeys.fill_inventory, "fillsnacks"_J);
-		register_hotkey("freecam", g.settings.hotkeys.freecam, "freecam"_J);
-		register_hotkey("heal", g.settings.hotkeys.heal, "heal"_J);
-		register_hotkey("invis", g.settings.hotkeys.invis, "invis"_J);
-		register_hotkey("invisveh", g.settings.hotkeys.invisveh, "invisveh"_J);
-		register_hotkey("localinvisveh", g.settings.hotkeys.localinvisveh, "localinvisveh"_J);
-		register_hotkey("noclip", g.settings.hotkeys.noclip, "noclip"_J);
-		register_hotkey("objective", g.settings.hotkeys.teleport_objective, "objectivetp"_J);
-		register_hotkey("pvtp", g.settings.hotkeys.teleport_pv, "pvtp"_J);
-		register_hotkey("passive", g.settings.hotkeys.passive, "passive"_J);
-		register_hotkey("repairpv", g.settings.hotkeys.repairpv, "repairpv"_J);
+		// register_hotkey("fastrun", g.settings.hotkeys.superrun, "fastrun"_J);
+		// register_hotkey("fillammo", g.settings.hotkeys.fill_ammo, "fillammo"_J);
+		// register_hotkey("fillsnacks", g.settings.hotkeys.fill_inventory, "fillsnacks"_J);
+		// register_hotkey("freecam", g.settings.hotkeys.freecam, "freecam"_J);
+		// register_hotkey("heal", g.settings.hotkeys.heal, "heal"_J);
+		// register_hotkey("invis", g.settings.hotkeys.invis, "invis"_J);
+		// register_hotkey("invisveh", g.settings.hotkeys.invisveh, "invisveh"_J);
+		// register_hotkey("localinvisveh", g.settings.hotkeys.localinvisveh, "localinvisveh"_J);
+		// register_hotkey("noclip", g.settings.hotkeys.noclip, "noclip"_J);
+		// register_hotkey("objective", g.settings.hotkeys.teleport_objective, "objectivetp"_J);
+		// register_hotkey("pvtp", g.settings.hotkeys.teleport_pv, "pvtp"_J);
+		// register_hotkey("passive", g.settings.hotkeys.passive, "passive"_J);
+		// register_hotkey("repairpv", g.settings.hotkeys.repairpv, "repairpv"_J);
 		register_hotkey("skipcutscene", g.settings.hotkeys.skip_cutscene, "skipcutscene"_J);
-		register_hotkey("superjump", g.settings.hotkeys.superjump, "superjump"_J);
-		register_hotkey("vehiclecontroller", g.settings.hotkeys.open_vehicle_controller, "vehiclecontrol"_J);
-		register_hotkey("vehiclefly", g.settings.hotkeys.vehicle_flymode, "vehiclefly"_J);
-		register_hotkey("waypoint", g.settings.hotkeys.teleport_waypoint, "waypointtp"_J);
-		register_hotkey("highlighttp", g.settings.hotkeys.teleport_selected, "highlighttp"_J);
+		// register_hotkey("superjump", g.settings.hotkeys.superjump, "superjump"_J);
+		// register_hotkey("vehiclecontroller", g.settings.hotkeys.open_vehicle_controller, "vehiclecontrol"_J);
+		// register_hotkey("vehiclefly", g.settings.hotkeys.vehicle_flymode, "vehiclefly"_J);
+		// register_hotkey("waypoint", g.settings.hotkeys.teleport_waypoint, "waypointtp"_J);
+		// register_hotkey("highlighttp", g.settings.hotkeys.teleport_selected, "highlighttp"_J);
 
 		g_renderer.add_wndproc_callback([this](HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 			wndproc(static_cast<eKeyState>(msg), wparam);

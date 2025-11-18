@@ -3,6 +3,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	static constexpr auto strippers = std::to_array({"HCH", "INF", "JUL", "NIK", "SAP", "TXI"});
 
 	static constexpr auto sext_types = std::to_array({"1ST", "2ND", "NEED"});
@@ -29,4 +30,5 @@ namespace big
 	};
 
 	send_sext g_send_sext("sext", "SEND_SEXT", "SEND_SEXT_DESC", 0);
+	#endif
 }

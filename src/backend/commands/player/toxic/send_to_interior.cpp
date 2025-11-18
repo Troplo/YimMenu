@@ -4,6 +4,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class send_to_interior : player_command
 	{
 		using player_command::player_command;
@@ -40,4 +41,5 @@ namespace big
 	};
 
 	send_to_interior g_send_to_interior("interiortp", "TP_TO_INTERIOR", "TP_TO_INTERIOR_DESC", 1);
+	#endif
 }

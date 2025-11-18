@@ -3,6 +3,7 @@
 
 namespace big
 {
+#if ENABLE_TOXIC_CHEATS
 	void view::view_player()
 	{
 		ImGui::Checkbox("SPECTATE"_T.data(), &g.player.spectating);
@@ -39,15 +40,17 @@ namespace big
 			}
 			strcpy(player_tab.name,
 			    std::format("{} ({}){}", current_player->get_name(), current_player->id(), name_appendage).c_str());
-
+			#if ENABLE_TOXIC_CHEATS
 			view::player_info();
 			view::player_teleport();
 			view::player_kick();
 			view::player_toxic();
 			view::player_vehicle();
 			view::player_misc();
+			#endif
 		}
 		else
 			g_gui_service->set_selected(tabs::NONE);
 	}
+#endif
 }

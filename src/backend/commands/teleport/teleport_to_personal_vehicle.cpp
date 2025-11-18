@@ -5,6 +5,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class teleport_to_personal_vehicle : command
 	{
 		using command::command;
@@ -18,4 +19,5 @@ namespace big
 	};
 
 	teleport_to_personal_vehicle g_teleport_to_personal_vehicle("pvtp", "TP_IN_PV", "BACKEND_TELEPORT_TO_PERSONAL_VEHICLE", 0);
+	#endif
 }

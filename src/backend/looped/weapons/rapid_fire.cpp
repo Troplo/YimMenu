@@ -6,6 +6,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class rapid_fire : looped_command
 	{
 		using looped_command::looped_command;
@@ -80,4 +81,5 @@ namespace big
 
 	rapid_fire g_rapid_fire("rapidfire", "BACKEND_LOOPED_WEAPONS_RAPID_FIRE", "BACKEND_LOOPED_WEAPONS_RAPID_FIRE_DESC",
 	    g.weapons.rapid_fire);
+	#endif
 }

@@ -15,7 +15,6 @@ namespace big
 	private:
 		void hook_instance(rage::scrProgram* program, const std::unordered_map<NativeIndex, rage::scrNativeHandler>& native_replacements);
 		static void scrprogram_dtor(rage::scrProgram* this_, char free_memory);
-
 		rage::scrProgram* m_program;
 		std::unique_ptr<vmt_hook> m_vmt_hook;
 		std::unique_ptr<vmt_hook> m_handler_hook;
@@ -26,10 +25,11 @@ namespace big
 		friend class native_hook;
 
 		using native_detour = std::pair<NativeIndex, rage::scrNativeHandler>;
-
+	public:
 		std::unordered_map<rage::joaat_t, std::vector<native_detour>> m_native_registrations;
 		std::unordered_map<rage::scrProgram*, std::unique_ptr<native_hook>> m_native_hooks;
 
+		static bool has_native_log_all();
 	public:
 		native_hooks();
 		~native_hooks();

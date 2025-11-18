@@ -4,6 +4,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class remove_all_weapons : player_command
 	{
 		using player_command::player_command;
@@ -21,4 +22,5 @@ namespace big
 	};
 
 	remove_all_weapons g_remove_all_weapons("remweaps", "REMOVE_ALL_WEAPONS", "REMOVE_ALL_WEAPONS_DESC", 0);
+	#endif
 }

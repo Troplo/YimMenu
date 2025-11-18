@@ -19,17 +19,22 @@ namespace big
 	public:
 		static void hud_transition_state();
 		static void hud_disable_input();
-
+		#if ENABLE_TOXIC_CHEATS
 		static void player_good_options();
 		static void player_toxic_options();
 		static void player_spectate();
+		#endif
 		static void player_remote_control_vehicle();
 
+		#if ENABLE_TOXIC_CHEATS
 		static void self_wanted();
+		#endif
 		static void self_hud();
 		static void self_persist_outfit();
-
 		static void session_pop_multiplier_areas();
+
+		#if ENABLE_TOXIC_CHEATS
+
 		static void session_force_thunder();
 		static void session_block_jobs();
 		static void session_randomize_ceo_colors();
@@ -37,13 +42,13 @@ namespace big
 		static void session_force_script_host();
 		static void session_chat_translator();
 		static void session_modder_detection();
-
+#endif
 		static void system_self_globals();
 		static void system_update_pointers();
 		static void system_update_desync_kick();
+#if ENABLE_TOXIC_CHEATS
 		static void system_spoofing();
 		static void system_mission_creator();
-
 		static void vehicle_auto_drive();
 		static void vehicle_allow_all_weapons();
 		static void vehicle_boost_behavior();
@@ -65,7 +70,7 @@ namespace big
 
 		static void drive_train();
 		static void derail_train();
-
 		static void world_spawn_ped();
+#endif
 	};
 }

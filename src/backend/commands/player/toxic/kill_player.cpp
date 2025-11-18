@@ -3,6 +3,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class kill_player : player_command
 	{
 		using player_command::player_command;
@@ -40,4 +41,5 @@ namespace big
 	};
 
 	kill_player g_kill_player("kill", "KILL_PLAYER", "KILL_PLAYER_DESC", 0);
+	#endif
 }

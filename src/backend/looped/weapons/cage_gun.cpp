@@ -6,6 +6,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	void looped::weapons_cage_gun()
 	{
 		if (g.weapons.custom_weapon == CustomWeapon::CAGE_GUN && (!g.self.custom_weapon_stop || WEAPON::IS_PED_ARMED(self::ped, 4 | 2)))
@@ -31,4 +32,5 @@ namespace big
 			}
 		}
 	}
+	#endif
 }

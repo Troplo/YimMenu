@@ -10,6 +10,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	bool_command g_aimbot_only_on_player("aimonlyatplayer", "BACKEND_LOOPED_WEAPONS_AIM_ONLY_AT_PLAYER", "BACKEND_LOOPED_WEAPONS_AIM_ONLY_AT_PLAYER_DESC",
 	    g.weapons.aimbot.only_on_player);
 
@@ -363,4 +364,5 @@ namespace big
 	exit:
 		return res;
 	}
+	#endif
 }

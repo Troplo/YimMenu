@@ -3,6 +3,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class trigger_ceo_raid : player_command
 	{
 		using player_command::player_command;
@@ -22,4 +23,5 @@ namespace big
 	};
 
 	trigger_ceo_raid g_trigger_ceo_raid("ceoraid", "TRIGGER_CEO_RAID", "TRIGGER_CEO_RAID_DESC", 0);
+	#endif
 }

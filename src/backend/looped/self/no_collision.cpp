@@ -5,6 +5,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class no_collision : looped_command
 	{
 		using looped_command::looped_command;
@@ -26,4 +27,5 @@ namespace big
 		}
 	};
 	no_collision g_no_collision("nocollision", "NO_COLLISION", "NO_COLLISION_DESC", g.self.no_collision);
+	#endif
 }

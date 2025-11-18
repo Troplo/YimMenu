@@ -313,8 +313,8 @@ namespace big
 				{
 					// Tweaks to make it easier for people playing in the China region
 					g.session_browser.filter_multiplexed_sessions = true;
-					g.reactions.chat_spam.block_joins             = true;
-					g.reactions.chat_spam.block_join_reason       = block_join_reason_t::BadReputation;
+					//g.reactions.chat_spam.block_joins             = true;
+					//g.reactions.chat_spam.block_join_reason       = block_join_reason_t::BadReputation;
 				}
 
 				if (does_language_exist(preferred_lang))

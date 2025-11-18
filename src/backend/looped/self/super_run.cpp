@@ -5,6 +5,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class super_run : looped_command
 	{
 		using looped_command::looped_command;
@@ -62,4 +63,5 @@ namespace big
 	};
 
 	super_run g_super_run("fastrun", "SUPER_RUN", "SUPER_RUN_DESC", g.self.super_run);
+	#endif
 }

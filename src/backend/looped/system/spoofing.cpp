@@ -9,6 +9,7 @@
 #include <script/globals/GPBD_FM.hpp>
 #include <script/globals/GlobalPlayerBD.hpp>
 
+#if ENABLE_TOXIC_CHEATS
 namespace big
 {
 	static bool bLastForceHost = false;
@@ -41,3 +42,4 @@ namespace big
 		}
 	}
 }
+#endif

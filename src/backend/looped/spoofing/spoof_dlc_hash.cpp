@@ -4,6 +4,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class copy_current_dlc_hash : command
 	{
 		using command::command;
@@ -17,4 +18,5 @@ namespace big
 	bool_command
 	    g_spoof_dlc_hash("spoofdlchash", "SPOOF_DLC_HASH", "SPOOF_DLC_HASH_DESC", g.spoofing.spoof_dlc_hash);
 	copy_current_dlc_hash g_copy_current_dlc_hash("storedlchash", "COPY_CURRENT_DLC_HASH", "COPY_CURRENT_DLC_HASH_DESC", 0);
+	#endif
 }

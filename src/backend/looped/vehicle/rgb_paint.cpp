@@ -6,6 +6,8 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
+
 	float red = 255.f, green = 0.f, blue = 0.f;
 	void looped::vehicle_rainbow_paint()
 	{
@@ -73,4 +75,5 @@ namespace big
 	bool_command g_rainbow_paint_neon("rainbowneons", "BACKEND_LOOPED_VEHICLE_RGB_PAINT_NEONS", "BACKEND_LOOPED_VEHICLE_RGB_PAINT_NEONS_DESC", g.vehicle.rainbow_paint.neon);
 	bool_command g_rainbow_paint_smoke("rainbowsmoke", "BACKEND_LOOPED_VEHICLE_RGB_PAINT_TIRE", "BACKEND_LOOPED_VEHICLE_RGB_PAINT_TIRE_DESC", g.vehicle.rainbow_paint.smoke);
 	int_command g_rainbow_paint_speed("rainbowspeed", "BACKEND_LOOPED_VEHICLE_RGB_PAINT_SPEED", "BACKEND_LOOPED_VEHICLE_RGB_PAINT_SPEED_DESC", g.vehicle.rainbow_paint.speed, 1, 10);
+	#endif
 }

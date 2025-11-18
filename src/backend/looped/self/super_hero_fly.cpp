@@ -10,6 +10,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class super_hero_fly : looped_command
 	{
 		using looped_command::looped_command;
@@ -421,4 +422,5 @@ namespace big
 	float_command speed("superheroflyspeed", "SUPER_HERO_FLY_SPEED", "SUPER_HERO_FLY_SPEED_DESC", g.self.super_hero_fly.fly_speed, 1.f, 50.f);
 	float_command initial_launch("superheroflyinitiallaunch", "SUPER_HERO_FLY_INITIAL_LAUNCH", "SUPER_HERO_FLY_INITIAL_LAUNCH_DESC",
 	    g.self.super_hero_fly.initial_launch, 1.f, 50.f);
+	#endif
 }

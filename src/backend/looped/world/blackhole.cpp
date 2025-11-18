@@ -7,6 +7,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class blackhole : looped_command
 	{
 		using looped_command::looped_command;
@@ -82,4 +83,5 @@ namespace big
 	    g_blackhole_peds("blackholeincpeds", "PEDS", "BACKEND_LOOPED_WORLD_BLACKHOLE_PEDS_DESC", g.world.blackhole.include_peds);
 	bool_command g_blackhole_vehicles("blackholeincvehs", "VEHICLES", "BACKEND_LOOPED_WORLD_BLACKHOLE_VEHS_DESC",
 	    g.world.blackhole.include_vehicles);
+	#endif
 }

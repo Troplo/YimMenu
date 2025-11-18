@@ -8,6 +8,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class spawn_vehicle : command
 	{
 		using command::command;
@@ -98,4 +99,5 @@ namespace big
 	spawn_vehicle g_spawn_vehicle("spawn", "GUI_TAB_SPAWN_VEHICLE", "BACKEND_SPAWN_VEHICLE_DESC", 1);
 	bool_command g_spawn_maxed("spawnmaxed", "SPAWN_MAXED", "SPAWN_MAXED_DESC", g.spawn_vehicle.spawn_maxed);
 	bool_command g_spawn_inside("spawnin", "SPAWN_IN", "SPAWN_IN_DESC", g.spawn_vehicle.spawn_inside);
+#endif
 }

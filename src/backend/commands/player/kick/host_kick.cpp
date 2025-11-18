@@ -3,6 +3,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class host_kick : player_command
 	{
 		using player_command::player_command;
@@ -27,4 +28,5 @@ namespace big
 	};
 
 	host_kick g_host_kick("hostkick", "HOST_KICK", "HOST_KICK_DESC", 0, false);
+	#endif
 }

@@ -5,6 +5,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class modify_gravity : looped_command
 	{
 		using looped_command::looped_command;
@@ -23,4 +24,5 @@ namespace big
 	};
 
 	modify_gravity g_modify_gravity("modifygravity", "BACKEND_LOOPED_WORLD_MODIFY_GRAVITY", "BACKEND_LOOPED_WORLD_MODIFY_GRAVITY_DESC", g.world.gravity.modify_gravity);
+	#endif
 }

@@ -15,7 +15,9 @@ namespace big
 			{
 				switch (nav_item.first)
 				{
+				#if ENABLE_TOXIC_CHEATS
 				case tabs::PLAYER:
+				#endif
 				case tabs::DEBUG: continue;
 				default: components::nav_item(nav_item, 0);
 				}

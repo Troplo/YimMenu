@@ -28,9 +28,9 @@ namespace big::notify
 			    || g_player_service->get_by_id(player->m_player_id)->is_trusted || g.session.trust_session)
 				return;
 
+#if ENABLE_TOXIC_CHEATS
 			if (g.reactions.crash.notify)
 				g_notification_service.push_error("Protections", std::format("Blocked {} crash from {}", crash, player->get_name()));
-
 			if (g.reactions.crash.log)
 				LOG(WARNING) << "Blocked " << crash << " crash from " << player->get_name() << " ("
 				             << (player->get_net_data() ? player->get_net_data()->m_gamer_handle.m_rockstar_id : 0) << ")";
@@ -46,11 +46,14 @@ namespace big::notify
 			}
 
 			g.reactions.crash.process_common(g_player_service->get_by_id(player->m_player_id));
+#endif
 		}
 		else
 		{
+#if ENABLE_TOXIC_CHEATS
 			if (g.reactions.crash.notify)
 				g_notification_service.push_error("Protections", std::format("Blocked {} crash from unknown player", crash));
+#endif
 		}
 	}
 

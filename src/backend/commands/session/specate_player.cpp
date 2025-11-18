@@ -5,6 +5,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class spectate_player : player_command
 	{
 		using player_command::player_command;
@@ -29,4 +30,5 @@ namespace big
 
 	spectate_player g_spectate_player("spectate", "SPECTATE", "SPECTATE_DESC", 0);
 	spectate_player g_spectate_player_shortcut("spec", "SPECTATE", "SPECTATE_DESC", 0);
+	#endif
 }

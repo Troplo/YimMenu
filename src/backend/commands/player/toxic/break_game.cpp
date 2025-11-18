@@ -3,6 +3,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class break_game : player_command
 	{
 		using player_command::player_command;
@@ -24,4 +25,5 @@ namespace big
 	};
 
 	break_game g_break_game("breakgame", "BREAK_GAME", "BREAK_GAME_DESC", 0);
+#endif
 }

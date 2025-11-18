@@ -4,6 +4,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class vehicle_fly : looped_command
 	{
 		using looped_command::looped_command;
@@ -170,4 +171,5 @@ namespace big
 	};
 
 	vehicle_fly g_vehicle_fly("vehiclefly", "VEHICLE_FLY", "VEHICLE_FLY_DESC", g.vehicle.fly.enabled);
+	#endif
 }

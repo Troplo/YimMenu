@@ -1440,10 +1440,10 @@ namespace big
 
 						if (target->id() != sender_plyr->spectating_player)
 						{
-							if (target->id() == self::id)
-								g.reactions.spectate.process(sender_plyr);
-							else
-								g.reactions.spectate_others.process(sender_plyr, target);
+//							if (target->id() == self::id)
+//								g.reactions.spectate.process(sender_plyr);
+//							else
+//								g.reactions.spectate_others.process(sender_plyr, target);
 
 							sender_plyr->spectating_player = target->id();
 						}

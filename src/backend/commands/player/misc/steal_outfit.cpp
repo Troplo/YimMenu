@@ -4,6 +4,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class steal_outfit : player_command
 	{
 		using player_command::player_command;
@@ -15,4 +16,5 @@ namespace big
 	};
 
 	steal_outfit g_steal_outfit("copyoutfit", "STEAL_OUTFIT", "STEAL_OUTFIT_DESC", 0, false);
+	#endif
 }

@@ -5,6 +5,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class auto_disarm : looped_command
 	{
 		using looped_command::looped_command;
@@ -39,4 +40,5 @@ namespace big
 	};
 
 	auto_disarm g_auto_disarm("autodisarm", "BACKEND_LOOPED_WORLD_NEARBY_AUTO_DISARM", "BACKEND_LOOPED_WORLD_NEARBY_AUTO_DISARM_DESC", g.world.nearby.auto_disarm.enable);
+	#endif
 }

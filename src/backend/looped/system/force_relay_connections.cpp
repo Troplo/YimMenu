@@ -1,6 +1,7 @@
 #include "backend/looped_command.hpp"
 #include "pointers.hpp"
 
+#if ENABLE_TOXIC_CHEATS
 namespace big
 {
 	class force_relay_connections : looped_command
@@ -21,3 +22,4 @@ namespace big
 	force_relay_connections g_force_relay_connections("forcerelays", "FORCE_RELAY_CXN", "FORCE_RELAY_CXN_DESC",
 	    g.protections.force_relay_connections);
 }
+#endif

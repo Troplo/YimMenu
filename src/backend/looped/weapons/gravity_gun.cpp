@@ -6,6 +6,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	static std::vector<Entity> ents = {};
 	static Vector3 location;
 	static Vector3 other;
@@ -124,4 +125,5 @@ namespace big
 			g_notification_service.push_success("CUSTOM_WEAPONS"_T.data(), "BACKEND_LOOPED_WEAPONS_GRAVITY_GUN_UNSET"_T.data());
 		}
 	}
+	#endif
 }

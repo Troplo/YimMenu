@@ -2,6 +2,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	static CWeaponInfo* p_modified_weapon          = nullptr;
 	static eDamageType modified_weapon_damage_type = eDamageType::None;
 	static CWeaponInfo::sExplosion modified_weapon_explosion{};
@@ -76,4 +77,5 @@ namespace big
 			p_modified_weapon                                   = nullptr;
 		}
 	}
+	#endif
 }

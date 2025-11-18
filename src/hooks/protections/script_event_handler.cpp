@@ -54,7 +54,7 @@ namespace big
 	{
 		return sender == scr_globals::gpbd_fm_3.as<GPBD_FM_3*>()->Entries[self::id].BossGoon.Boss;
 	}
-
+#if ENABLE_TOXIC_CHEATS
 	bool hooks::scripted_game_event(CScriptedGameEvent* scripted_game_event, CNetGamePlayer* player)
 	{
 		const auto args       = scripted_game_event->m_args;
@@ -494,4 +494,5 @@ namespace big
 
 		return false;
 	}
+	#endif
 }

@@ -7,7 +7,9 @@ namespace big
 	{
 		view::heading();
 		view::navigation();
+        #if ENABLE_TOXIC_CHEATS
 		view::players();
+		#endif
 		view::active_view();
 
 		debug::main();

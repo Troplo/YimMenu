@@ -9,6 +9,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	void looped::session_force_script_host()
 	{
 		if (!g.session.force_script_host)
@@ -60,4 +61,5 @@ namespace big
 			}
 		}
 	}
+	#endif
 }

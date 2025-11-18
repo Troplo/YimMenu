@@ -2,6 +2,7 @@
 
 namespace big
 {
+#if ENABLE_TOXIC_CHEATS
 
 	std::filesystem::path squad_spawner::get_file_path()
 	{
@@ -101,4 +102,5 @@ namespace big
 		m_templates.push_back(squad("Mobile squad", "s_m_m_highsec_01", "WEAPON_MICROSMG", "komoda", 4, false, false, ped_proofs, 0, 0, 0, 100, eSquadSpawnDistance::FAR_AWAY, eCombatAbilityLevel::PROFESSIONAL, true, true, "This squad makes use of 'Vehicle catchup'"));
 		m_templates.push_back(squad("Altruists", "a_m_m_acult_01", "WEAPON_SNSPISTOL", "", 8, false, false, ped_proofs, 0, 0, 0, 100, eSquadSpawnDistance::CLOSEBY, eCombatAbilityLevel::PROFESSIONAL, false, false, "Cannibals from the alrtuist cult will surround the victim using 'Disperse'", true));
 	}
+	#endif
 }

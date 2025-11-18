@@ -31,7 +31,7 @@ namespace big
 
 			m_cache_file.load();
 
-			if (m_cache_file.up_to_date(memory::module("GTA5.exe").timestamp()))
+			if (m_cache_file.up_to_date(memory::module("Paragon_Legacy.exe").timestamp()))
 			{
 				LOG(INFO) << "Loading tunables from cache";
 				m_loading = true;
@@ -119,7 +119,7 @@ namespace big
 			data_ptr += sizeof(tunable_save_struct);
 		}
 
-		m_cache_file.set_header_version(memory::module("GTA5.exe").timestamp());
+		m_cache_file.set_header_version(memory::module("Paragon_Legacy.exe").timestamp());
 		m_cache_file.set_data(std::move(data), data_size);
 		m_cache_file.write();
 	}

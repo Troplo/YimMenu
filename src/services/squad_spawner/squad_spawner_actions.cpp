@@ -3,7 +3,7 @@
 
 namespace big
 {
-
+#if ENABLE_TOXIC_CHEATS
 	void squad_spawner::terminate_squads()
 	{
 		for (auto& s : m_active_squads)
@@ -77,4 +77,5 @@ namespace big
 		TASK::CLOSE_SEQUENCE_TASK(s.m_members[member].task_sequence);
 		TASK::TASK_PERFORM_SEQUENCE(s.m_members[member].handle, s.m_members[member].task_sequence);
 	}
+	#endif
 }

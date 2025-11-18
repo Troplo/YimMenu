@@ -3,6 +3,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class explode_player : player_command
 	{
 		using player_command::player_command;
@@ -19,4 +20,5 @@ namespace big
 	};
 
 	explode_player g_explode_player("explode", "EXPLODE_PLAYER", "EXPLODE_PLAYER_DESC", 0);
+	#endif
 }

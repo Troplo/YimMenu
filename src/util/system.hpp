@@ -95,7 +95,7 @@ namespace big::system
 
 	inline uintptr_t get_relative_address(void* ptr)
 	{
-		uintptr_t base_address = memory::module("GTA5.exe").begin().as<uintptr_t>();
+		uintptr_t base_address = memory::module("Paragon_Legacy.exe").begin().as<uintptr_t>();
 
 		return (uintptr_t)ptr - base_address;
 	}

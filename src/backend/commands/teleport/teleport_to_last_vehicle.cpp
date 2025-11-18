@@ -4,6 +4,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class teleport_to_last_vehicle : command
 	{
 		using command::command;
@@ -19,4 +20,5 @@ namespace big
 	};
 
 	teleport_to_last_vehicle g_teleport_to_last_vehicle("lastvehtp", "BACKEND_TELEPORT_TO_LAST_VEHICLE", "BACKEND_TELEPORT_TO_LAST_VEHICLE_DESC", 0);
+	#endif
 }

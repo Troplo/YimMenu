@@ -12,6 +12,7 @@
 
 namespace big
 {
+#if ENABLE_TOXIC_CHEATS
 	bool has_scrollbar = false;
 	static void player_button(const player_ptr& plyr)
 	{
@@ -141,4 +142,5 @@ namespace big
 		ImGui::PopStyleVar();
 		ImGui::End();
 	}
+#endif
 }

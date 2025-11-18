@@ -3,7 +3,7 @@
 
 namespace big
 {
-
+	#if ENABLE_TOXIC_CHEATS
 	class infinite_range : looped_command
 	{
 		using looped_command::looped_command;
@@ -47,4 +47,5 @@ namespace big
 	};
 
 	infinite_range g_infinite_range("infrange", "BACKEND_LOOPED_WEAPONS_INFINITE_RANGE", "BACKEND_LOOPED_WEAPONS_INFINITE_RANGE_DESC", g.weapons.infinite_range);
+	#endif
 }

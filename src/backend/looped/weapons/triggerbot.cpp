@@ -8,6 +8,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class triggerbot : looped_command
 	{
 		using looped_command::looped_command;
@@ -119,4 +120,5 @@ namespace big
 	};
 
 	triggerbot g_triggerbot("triggerbot", "VIEW_OVERLAY_TRIGGERBOT", "BACKEND_LOOPED_WEAPONS_TRIGGERBOT_DESC", g.weapons.triggerbot);
+	#endif
 }

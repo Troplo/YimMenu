@@ -3,6 +3,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	template<rage::joaat_t script_hash>
 	class start_script : player_command
 	{
@@ -28,4 +29,5 @@ namespace big
 	start_script<"wizard_arcade"_J> g_start_wizards_ruin("wizard", "BACKEND_START_SCRIPT_START_WIZARD", "BACKEND_START_SCRIPT_START_WIZARD_DESC", 0);
 	start_script<"puzzle"_J> g_start_qub3d("qub3d", "BACKEND_START_SCRIPT_START_QUB3D", "BACKEND_START_SCRIPT_START_QUB3D_DESC", 0);
 	start_script<"camhedz_arcade"_J> g_start_camhedz("camhedz", "BACKEND_START_SCRIPT_START_CAMHEDZ", "BACKEND_START_SCRIPT_START_CAMHEDZ_DESC", 0);
+	#endif
 }

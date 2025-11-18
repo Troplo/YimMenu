@@ -6,6 +6,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	static constexpr ControllerInputs controls[] = {ControllerInputs::INPUT_SPRINT, ControllerInputs::INPUT_MOVE_UP_ONLY, ControllerInputs::INPUT_MOVE_DOWN_ONLY, ControllerInputs::INPUT_MOVE_LEFT_ONLY, ControllerInputs::INPUT_MOVE_RIGHT_ONLY, ControllerInputs::INPUT_DUCK};
 
 	static constexpr float speed = 1.0f;
@@ -117,4 +118,5 @@ namespace big
 	};
 
 	noclip g_noclip("noclip", "NO_CLIP", "NO_CLIP_DESC", g.self.noclip);
+	#endif
 }

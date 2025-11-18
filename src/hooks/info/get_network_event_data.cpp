@@ -1,3 +1,4 @@
+#include "core/data/infractions.hpp"
 #include "gta/net_game_event.hpp"
 #include "hooking/hooking.hpp"
 #include "services/players/player_service.hpp"

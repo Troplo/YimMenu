@@ -4,6 +4,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
         class repairpv : command
         {
                 using command::command;
@@ -13,4 +14,5 @@ namespace big
                 }
         };
         repairpv g_repairpv("repairpv", "REPAIR_PV", "REPAIR_PV_DESC", 0);
+	#endif
 }

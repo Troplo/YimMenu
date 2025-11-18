@@ -4,9 +4,12 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
 project(YimMenu CXX ASM_MASM)
 
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi /O2")
 if (NOT MSVC)
   message(FATAL_ERROR "Unsupported compiler used '${CMAKE_CXX_COMPILER_ID}', YimMenu only supports MSVC.")
 endif()
+
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi /O2")
 
 set(SRC_DIR "${PROJECT_SOURCE_DIR}/src")
 
@@ -46,7 +49,8 @@ else ()
   add_compile_options(-Wa,-mbig-obj)
 endif ()
 
-add_library(YimMenu MODULE "${SRC_MAIN}")
+add_library(YimMenu MODULE "${SRC_MAIN}"
+        src/features.h)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(TARGET YimMenu PROPERTY CXX_STANDARD 23) # 23 Because std::format is not avalible in std:c++20 for some reason. Maybe it's because i use v142 toolset.
@@ -64,6 +68,14 @@ target_include_directories(YimMenu PRIVATE
 
 target_precompile_headers(YimMenu PRIVATE "${SRC_DIR}/common.hpp")
 target_link_libraries(YimMenu PRIVATE pugixml minhook AsyncLogger dbghelp imgui cpr lua_static asmjit::asmjit)
+
+set_target_properties(YimMenu PROPERTIES SUFFIX ".ipe")
+set_target_properties(YimMenu PROPERTIES OUTPUT_NAME "Paragon.YimMenu")
+set_target_properties(YimMenu PROPERTIES
+        COMPILE_PDB_NAME "Paragon.YimMenu"
+        COMPILE_PDB_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/pdb"
+        LINK_FLAGS_RELEASE "/DEBUG /PDB:${CMAKE_BINARY_DIR}/Paragon.YimMenu.pdb /OPT:REF /OPT:ICF"
+)
 
 # Warnings as errors
 set_property(TARGET YimMenu PROPERTY COMPILE_WARNING_AS_ERROR ON)

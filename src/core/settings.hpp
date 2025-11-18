@@ -147,7 +147,7 @@ namespace big
 				std::int16_t syncing_object_id = -1;
 			} fuzzer{};
 
-			bool external_console = true;
+			bool external_console = false;
 			bool window_hook      = false;
 			bool block_all_metrics = false;
 			bool battleye_server   = false;
@@ -198,6 +198,7 @@ namespace big
 			NLOHMANN_DEFINE_TYPE_INTRUSIVE(notifications, gta_thread_kill, gta_thread_start, network_player_mgr_init, network_player_mgr_shutdown, player_join, player_leave, send_net_info_to_lobby, transaction_rate_limit, warn_metric)
 		} notifications{};
 
+	#if ENABLE_TOXIC_CHEATS
 		struct reactions
 		{
 			// first constructor param is an internal identifier for the event
@@ -251,7 +252,7 @@ namespace big
 
 			NLOHMANN_DEFINE_TYPE_INTRUSIVE(reactions, bounty, break_game, ceo_kick, ceo_money, clear_wanted_level, crash, delete_vehicle, fake_deposit, force_mission, force_teleport, gta_banner, kick, kick_from_interior, mc_teleport, personal_vehicle_destroyed, remote_off_radar, rotate_cam, send_to_cutscene, send_to_location, send_to_interior, sound_spam, spectate_notification, give_collectible, transaction_error, tse_freeze, tse_sender_mismatch, vehicle_kick, teleport_to_warehouse, start_activity, start_script, destroy_personal_vehicle, trigger_business_raid, turn_into_beast, remote_wanted_level, remote_wanted_level_others, clear_ped_tasks, remote_ragdoll, kick_vote, report_cash_spawn, modder_detection, game_anti_cheat_modder_detection, request_control_event, report, chat_spam, spectate, spectate_others)
 		} reactions{};
-
+#endif
 		struct player
 		{
 			bool spectating            = false;
@@ -504,7 +505,7 @@ namespace big
 			{
 				bool editing_menu_toggle = false;
 				std::atomic<bool> is_mp_chat_active;
-				int menu_toggle             = VK_INSERT;
+				int menu_toggle             = VK_PAUSE;
 				int teleport_waypoint       = 0;
 				int teleport_objective      = 0;
 				int teleport_pv             = 0;
@@ -1172,7 +1173,42 @@ namespace big
 			NLOHMANN_DEFINE_TYPE_INTRUSIVE(cmd, command_history)
 		} cmd{};
 
-		NLOHMANN_DEFINE_TYPE_INTRUSIVE(menu_settings, debug, tunables, notifications, player, player_db, protections, self, session, settings, spawn_vehicle, clone_pv, persist_car, spoofing, vehicle, weapons, window, context_menu, esp, session_browser, ugc, reactions, world, stat_editor, lua, persist_weapons, vfx, cmd)
+		#if ENABLE_TOXIC_CHEATS
+		#define TOXIC_ARG reactions,
+		#else
+		#define TOXIC_ARG
+		#endif
+
+		NLOHMANN_DEFINE_TYPE_INTRUSIVE(
+			menu_settings,
+			debug,
+			tunables,
+			notifications,
+			player,
+			player_db,
+			protections,
+			self,
+			session,
+			settings,
+			spawn_vehicle,
+			clone_pv,
+			persist_car,
+			spoofing,
+			vehicle,
+			weapons,
+			window,
+			context_menu,
+			esp,
+			session_browser,
+			ugc,
+			TOXIC_ARG
+			world,
+			stat_editor,
+			lua,
+			persist_weapons,
+			vfx,
+			cmd
+		)
 	};
 
 	inline auto g = menu_settings();

@@ -9,6 +9,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class weather_override : looped_command
 	{
 		int current_weather_idx = -1;
@@ -38,4 +39,5 @@ namespace big
 	};
 
 	weather_override g_weather_override("weatheroverride", "BACKEND_LOOPED_WORLD_OVERRIDE_WEATHER", "BACKEND_LOOPED_WORLD_OVERRIDE_WEATHER_DESC", g.world.override_weather);
+#endif
 }

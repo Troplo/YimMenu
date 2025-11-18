@@ -5,6 +5,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class bring_personal_vehicle : command
 	{
 		using command::command;
@@ -17,4 +18,5 @@ namespace big
 	};
 
 	bring_personal_vehicle g_bring_personal_vehicle("bringpv", "BRING_PV", "BACKEND_BRING_PERSONAL_VEHICLE_DESC", 0);
+	#endif
 }

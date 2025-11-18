@@ -8,6 +8,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class toggle_passive : looped_command
 	{
 		using looped_command::looped_command;
@@ -39,4 +40,5 @@ namespace big
 	};
 
 	toggle_passive g_toggle_passive("passive", "PASSIVE", "PASSIVE_DESC", g.self.passive);
+	#endif
 }

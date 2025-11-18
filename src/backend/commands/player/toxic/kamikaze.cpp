@@ -8,6 +8,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	enum class eKamikazeType
 	{
 		REGULAR,
@@ -178,4 +179,5 @@ namespace big
 	};
 
 	kamikaze g_kamikaze("kamikaze", "KAMIKAZE", "KAMIKAZE_DESC", 2);
+	#endif
 }

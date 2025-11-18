@@ -54,6 +54,7 @@ namespace big
 	}
 
 	// Returns true if bad event
+#if ENABLE_TOXIC_CHEATS
 	bool scan_weapon_damage_event(rage::netEventMgr* event_manager, CNetGamePlayer* player, CNetGamePlayer* target_player, int event_index, int event_handled_bitset, rage::datBitBuffer* buffer)
 	{
 		uint8_t damageType;
@@ -508,6 +509,7 @@ namespace big
 		return should_block;
 	}
 
+
 	void hooks::received_event(rage::netEventMgr* event_manager, CNetGamePlayer* source_player, CNetGamePlayer* target_player, uint16_t event_id, int event_index, int event_handled_bitset, int buffer_size, rage::datBitBuffer* buffer)
 	{
 		if (event_id > 91u) [[unlikely]]
@@ -944,4 +946,5 @@ namespace big
 
 		return g_hooking->get_original<received_event>()(event_manager, source_player, target_player, event_id, event_index, event_handled_bitset, buffer_size, buffer);
 	}
+	#endif
 }

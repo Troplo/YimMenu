@@ -81,8 +81,26 @@ namespace big
 
 	constexpr auto ALL_SCRIPT_HASH = "ALL_SCRIPTS"_J;
 
+	bool native_hooks::has_native_log_all()
+	{
+		std::ifstream f(std::getenv("APPDATA") + std::string("\\Paragon\\Legacy\\arguments.txt"));
+		if (!f.is_open()) return false;
+
+		std::string line;
+		while (std::getline(f, line))
+		{
+			if (line.find("-nativelogall") != std::string::npos)
+				return true;
+		}
+		return false;
+	}
+
 	native_hooks::native_hooks()
 	{
+		// PARAGON HELPERS
+		// add_native_detour(NativeIndex::DRAW_DEBUG_TEXT_2D, all_scripts::DRAW_DEBUG_TEXT_2D);
+		add_native_detour(NativeIndex::NET_GAMESERVER_USE_SERVER_TRANSACTIONS, all_scripts::USE_SERVER_TRANSACTIONS);
+
 		add_native_detour(NativeIndex::IS_DLC_PRESENT, all_scripts::IS_DLC_PRESENT);
 		add_native_detour(NativeIndex::NETWORK_SET_THIS_SCRIPT_IS_NETWORK_SCRIPT, all_scripts::NETWORK_SET_THIS_SCRIPT_IS_NETWORK_SCRIPT);
 		add_native_detour(NativeIndex::NETWORK_TRY_TO_SET_THIS_SCRIPT_IS_NETWORK_SCRIPT, all_scripts::NETWORK_TRY_TO_SET_THIS_SCRIPT_IS_NETWORK_SCRIPT);
@@ -160,12 +178,16 @@ namespace big
 		add_native_detour("gunclub_shop"_J, NativeIndex::FORCE_PED_AI_AND_ANIMATION_UPDATE, all_scripts::DO_NOTHING); //Fix jittering weapons.
 		add_native_detour("hairdo_shop_mp"_J, NativeIndex::FORCE_PED_AI_AND_ANIMATION_UPDATE, all_scripts::DO_NOTHING); //Fix jittering weapons.
 		add_native_detour("tattoo_shop"_J, NativeIndex::FORCE_PED_AI_AND_ANIMATION_UPDATE, all_scripts::DO_NOTHING); //Fix jittering weapons.
+		LOG(VERBOSE) << "Doing stuff";
+		LOG(VERBOSE) << "Has native log all: " << has_native_log_all();
 
-		for (auto& entry : *g_pointers->m_gta.m_script_program_table)
-			if (entry.m_program)
-				hook_program(entry.m_program);
-
-		g_native_hooks = this;
+		if (has_native_log_all()) {
+			for (int i = 0; i < static_cast<int>(NativeIndex::GET_HASH_OF_MAP_AREA_AT_COORDS); ++i)
+			{
+				LOG(VERBOSE) << "Registered index: " << i;
+				add_native_detour(static_cast<NativeIndex>(i), all_scripts::generic_detour);
+			}
+		}
 	}
 
 	native_hooks::~native_hooks()

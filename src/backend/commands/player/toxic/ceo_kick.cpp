@@ -6,6 +6,7 @@
 
 namespace big
 {
+#if ENABLE_TOXIC_CHEATS
 	class ceo_kick : player_command
 	{
 		using player_command::player_command;
@@ -46,4 +47,5 @@ namespace big
 	};
 
 	ceo_kick g_ceo_kick("ceokick", "CEO_KICK", "CEO_KICK_DESC", 0);
+#endif
 }

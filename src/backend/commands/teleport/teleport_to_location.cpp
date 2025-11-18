@@ -8,6 +8,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class teleport_to_location : command
 	{
 		using command::command;
@@ -79,4 +80,5 @@ namespace big
 	};
 
 	teleport_to_location g_teleport_to_location("location", "Teleport To Location", "TELEPORT_TO_LOCATION_DESC", 1);
+	#endif
 }

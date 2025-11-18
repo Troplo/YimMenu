@@ -3,6 +3,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class clear_wanted_level : player_command
 	{
 		using player_command::player_command;
@@ -19,4 +20,5 @@ namespace big
 	};
 
 	clear_wanted_level g_clear_wanted_level("clearwanted", "CLEAR_WANTED_LEVEL", "CLEAR_WANTED_LEVEL_DESC", 0);
+	#endif
 }

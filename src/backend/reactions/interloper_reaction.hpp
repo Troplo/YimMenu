@@ -3,6 +3,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class interloper_reaction : public reaction
 	{
 	public:
@@ -18,4 +19,5 @@ namespace big
 
 		virtual void process(player_ptr attacker, player_ptr victim);
 	};
+	#endif
 }

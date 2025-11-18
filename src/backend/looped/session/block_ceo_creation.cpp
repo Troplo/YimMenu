@@ -9,6 +9,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class block_ceo_creation : looped_command
 	{
 		using looped_command::looped_command;
@@ -43,4 +44,5 @@ namespace big
 	};
 
 	block_ceo_creation g_block_ceo_creation("blockceos", "BLOCK_CEO_CREATION", "BLOCK_CEO_CREATION_DESC", g.session.block_ceo_creation);
+	#endif
 }

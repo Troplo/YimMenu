@@ -2007,60 +2007,60 @@ namespace big
 	{
 		// clang-format off
 
-        constexpr auto batch_and_hash = memory::make_batch<
+        // constexpr auto batch_and_hash = memory::make_batch<
         // Presence Data
         // Update instructions: Scan 48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 18 57 41 56 41 57 48 83 EC 40 41 8B E9 and xref it to get to the vtable. Xref the vtable and generate a new signature
-        {
-            "PD",
-            "48 8D 05 ? ? ? ? 48 8B F9 48 89 01 48 83 C1 08 E8 ? ? ? ? 33 C0",
-            [](memory::handle ptr)
-            {
-                auto presence_data_vft             = ptr.add(3).rip().as<PVOID*>();
-                g_pointers->m_sc.m_update_presence_attribute_int    = (functions::update_presence_attribute_int)presence_data_vft[1];
-                g_pointers->m_sc.m_update_presence_attribute_string = (functions::update_presence_attribute_string)presence_data_vft[3];
-            }
-        },
-        // Start Get Presence Attributes
-        {
-            "SGPA",
-            "48 8B C4 48 89 58 08 48 89 68 10 48 89 70 18 48 89 78 20 41 54 41 56 41 57 48 83 EC 40 33 DB 49",
-            [](memory::handle ptr)
-            {
-                g_pointers->m_sc.m_start_get_presence_attributes = ptr.as<functions::start_get_presence_attributes>();
-            }
-        },
-        // SGPA Num Handles Patch
-        {
-            "NHP",
-            "83 FD 20 0F 87 54 02 00 00",
-            [](memory::handle ptr)
-            {
-                g_pointers->m_sc.m_num_handles_patch = ptr.add(2).as<PVOID>();
-            }
-        },
-        // Read Attribute Patch
-        {
-            "RAP",
-            "75 70 EB 23",
-            [](memory::handle ptr)
-            {
-                g_pointers->m_sc.m_read_attribute_patch = ptr.as<PVOID>();
-            }
-        },
-        // Read Attribute Patch 2
-        {
-            "RAP2",
-            "32 C0 EB ? C7 83",
-            [](memory::handle ptr)
-            {
-                g_pointers->m_sc.m_read_attribute_patch_2 = ptr.as<PVOID>();
-            }
-        }
-        >();
+        // {
+        //     "PD",
+        //     "48 8D 05 ? ? ? ? 48 8B F9 48 89 01 48 83 C1 08 E8 ? ? ? ? 33 C0",
+        //     [](memory::handle ptr)
+        //     {
+        //         auto presence_data_vft             = ptr.add(3).rip().as<PVOID*>();
+        //         g_pointers->m_sc.m_update_presence_attribute_int    = (functions::update_presence_attribute_int)presence_data_vft[1];
+        //         g_pointers->m_sc.m_update_presence_attribute_string = (functions::update_presence_attribute_string)presence_data_vft[3];
+        //     }
+        // },
+        // // Start Get Presence Attributes
+        // {
+        //     "SGPA",
+        //     "48 8B C4 48 89 58 08 48 89 68 10 48 89 70 18 48 89 78 20 41 54 41 56 41 57 48 83 EC 40 33 DB 49",
+        //     [](memory::handle ptr)
+        //     {
+        //         g_pointers->m_sc.m_start_get_presence_attributes = ptr.as<functions::start_get_presence_attributes>();
+        //     }
+        // },
+        // // SGPA Num Handles Patch
+        // {
+        //     "NHP",
+        //     "83 FD 20 0F 87 54 02 00 00",
+        //     [](memory::handle ptr)
+        //     {
+        //         g_pointers->m_sc.m_num_handles_patch = ptr.add(2).as<PVOID>();
+        //     }
+        // },
+        // // Read Attribute Patch
+        // {
+        //     "RAP",
+        //     "75 70 EB 23",
+        //     [](memory::handle ptr)
+        //     {
+        //         g_pointers->m_sc.m_read_attribute_patch = ptr.as<PVOID>();
+        //     }
+        // },
+        // // Read Attribute Patch 2
+        // {
+        //     "RAP2",
+        //     "32 C0 EB ? C7 83",
+        //     [](memory::handle ptr)
+        //     {
+        //         g_pointers->m_sc.m_read_attribute_patch_2 = ptr.as<PVOID>();
+        //     }
+        // }
+        // >();
 
 		// clang-format on
 
-		return batch_and_hash;
+		// return batch_and_hash;
 	}
 
 	void pointers::load_pointers_from_cache(const cache_file& cache_file, const uintptr_t pointer_to_cacheable_data_start, const memory::module& mem_region)
@@ -2104,29 +2104,32 @@ namespace big
 	{
 		g_pointers = this;
 
-		const auto mem_region = memory::module("GTA5.exe");
-
-		constexpr auto gta_batch_and_hash = pointers::get_gta_batch();
-		constexpr cstxpr_str gta_batch_name{"GTA5"};
-		write_to_cache_or_read_from_cache<gta_batch_name,
-		    gta_batch_and_hash.m_hash,
-		    gta_pointers_layout_info::offset_of_cache_begin_field,
-		    gta_pointers_layout_info::offset_of_cache_end_field,
-		    gta_batch_and_hash.m_batch>(m_gta_pointers_cache, mem_region);
-
-		auto sc_module = memory::module("socialclub.dll");
+		const auto mem_region = memory::module("Paragon_Legacy.exe");
+		auto sc_module = memory::module("Paragon.Sdk.dll");
 		if (sc_module.wait_for_module())
 		{
-			constexpr auto sc_batch_and_hash = pointers::get_sc_batch();
-			constexpr cstxpr_str sc_batch_name{"Social Club"};
-			write_to_cache_or_read_from_cache<sc_batch_name,
-			    sc_batch_and_hash.m_hash,
-			    sc_pointers_layout_info::offset_of_cache_begin_field,
-			    sc_pointers_layout_info::offset_of_cache_end_field,
-			    sc_batch_and_hash.m_batch>(m_sc_pointers_cache, sc_module);
+			constexpr auto gta_batch_and_hash = pointers::get_gta_batch();
+			constexpr cstxpr_str gta_batch_name{"GTA5"};
+			write_to_cache_or_read_from_cache<gta_batch_name,
+				gta_batch_and_hash.m_hash,
+				gta_pointers_layout_info::offset_of_cache_begin_field,
+				gta_pointers_layout_info::offset_of_cache_end_field,
+				gta_batch_and_hash.m_batch>(m_gta_pointers_cache, mem_region);
 		}
-		else
-			LOG(WARNING) << "socialclub.dll module was not loaded within the time limit.";
+
+		// auto sc_module = memory::module("socialclub.dll");
+		// if (sc_module.wait_for_module())
+		// {
+			// constexpr auto sc_batch_and_hash = pointers::get_sc_batch();
+			// constexpr cstxpr_str sc_batch_name{"Social Club"};
+			// write_to_cache_or_read_from_cache<sc_batch_name,
+			    // sc_batch_and_hash.m_hash,
+			    // sc_pointers_layout_info::offset_of_cache_begin_field,
+			    // sc_pointers_layout_info::offset_of_cache_end_field,
+			    // sc_batch_and_hash.m_batch>(m_sc_pointers_cache, sc_module);
+		// }
+		// else
+			// LOG(WARNING) << "socialclub.dll module was not loaded within the time limit.";
 
 		m_hwnd = FindWindowW(L"grcWindow", nullptr);
 

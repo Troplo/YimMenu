@@ -4,6 +4,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class harass_players : looped_command
 	{
 		using looped_command::looped_command;
@@ -20,4 +21,5 @@ namespace big
 	};
 
 	harass_players g_harass_players("harass", "HARASS_PLAYERS", "HARASS_PLAYERS_DESC", g.session.harass_players);
+	#endif
 }

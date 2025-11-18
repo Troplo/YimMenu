@@ -39,11 +39,11 @@ namespace big
 
 		register_script_patches();
 
-		g_squad_spawner_service.fetch_squads();
-		g_xml_vehicles_service->fetch_xml_files();
-		g_xml_map_service->fetch_xml_files();
-		g_custom_teleport_service.fetch_saved_locations();
-		g_ped_animation_service.fetch_saved_animations();
+//		g_squad_spawner_service.fetch_squads();
+//		g_xml_vehicles_service->fetch_xml_files();
+//		g_xml_map_service->fetch_xml_files();
+//		g_custom_teleport_service.fetch_saved_locations();
+//		g_ped_animation_service.fetch_saved_animations();
 
 		while (g_running)
 		{
@@ -52,9 +52,10 @@ namespace big
 			looped::system_self_globals();
 			looped::system_update_pointers();
 			looped::system_update_desync_kick();
+			#if ENABLE_TOXIC_CHEATS
 			looped::system_spoofing();
 			looped::system_mission_creator();
-
+			#endif
 			for (auto command : g_looped_commands)
 				if (command->is_enabled())
 					command->on_tick();
@@ -69,7 +70,9 @@ namespace big
 
 		while (g_running)
 		{
+			#if ENABLE_TOXIC_CHEATS
 			looped::self_wanted();
+			#endif
 			looped::self_hud();
 			looped::self_persist_outfit();
 
@@ -86,6 +89,7 @@ namespace big
 			script::get_current()->yield();
 		}
 	}
+#if ENABLE_TOXIC_CHEATS
 
 	void backend::weapons_loop()
 	{
@@ -125,7 +129,7 @@ namespace big
 			script::get_current()->yield();
 		}
 	}
-
+#endif
 	void backend::misc_loop()
 	{
 		LOG(INFO) << "Starting script: Miscellaneous";
@@ -135,6 +139,7 @@ namespace big
 			looped::hud_transition_state();
 			looped::hud_disable_input();
 			looped::session_pop_multiplier_areas();
+#if ENABLE_TOXIC_CHEATS
 			looped::session_force_thunder();
 			looped::session_randomize_ceo_colors();
 			looped::session_auto_kick_host();
@@ -142,7 +147,7 @@ namespace big
 			looped::session_block_jobs();
 			looped::session_chat_translator();
 			looped::session_modder_detection();
-
+#endif
 			if (g_script_connection_service)
 				g_script_connection_service->on_tick();
 
@@ -156,15 +161,17 @@ namespace big
 
 		while (g_running)
 		{
+			#if ENABLE_TOXIC_CHEATS
 			looped::player_good_options();
 			looped::player_toxic_options();
 			looped::player_spectate();
+			#endif
 			looped::player_remote_control_vehicle();
 
 			script::get_current()->yield();
 		}
 	}
-
+	#if ENABLE_TOXIC_CHEATS
 	void backend::rainbowpaint_loop()
 	{
 		LOG(INFO) << "Starting script: Rainbow Paint";
@@ -176,6 +183,7 @@ namespace big
 			script::get_current()->yield();
 		}
 	}
+	#endif
 
 	void backend::disable_control_action_loop()
 	{
@@ -183,13 +191,16 @@ namespace big
 
 		while (g_running)
 		{
+			#if ENABLE_TOXIC_CHEATS
 			looped::custom_gun_disable_control_action();
+			#endif
 			context_menu_service::disable_control_action_loop();
 
 			script::get_current()->yield();
 		}
 	}
 
+	#if ENABLE_TOXIC_CHEATS
 	void backend::world_loop()
 	{
 		LOG(INFO) << "Starting script: World";
@@ -200,7 +211,6 @@ namespace big
 			script::get_current()->yield();
 		}
 	}
-
 	void backend::orbital_drone()
 	{
 		while (true)
@@ -218,7 +228,7 @@ namespace big
 			script::get_current()->yield();
 		}
 	}
-
+	#endif
 	void backend::vehicle_control()
 	{
 		while (true)
@@ -234,6 +244,7 @@ namespace big
 		g_tunables_service->run_script();
 	}
 
+	#if ENABLE_TOXIC_CHEATS
 	void backend::squad_spawner()
 	{
 		while (true)
@@ -243,4 +254,5 @@ namespace big
 			script::get_current()->yield();
 		}
 	}
+	#endif
 }

@@ -5,6 +5,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class empty_session : command
 	{
 		using command::command;
@@ -19,4 +20,5 @@ namespace big
 		}
 	};
 	empty_session g_empty_session("emptysession", "EMPTY_SESSION", "BACKEND_WIPE_SESSION_DESC", 0);
+	#endif
 }

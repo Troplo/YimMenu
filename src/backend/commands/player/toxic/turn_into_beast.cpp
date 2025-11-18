@@ -5,6 +5,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class turn_into_beast : player_command
 	{
 		using player_command::player_command;
@@ -147,4 +148,5 @@ namespace big
 
 	turn_into_beast g_turn_into_beast("beast", "TURN_INTO_BEAST", "TURN_INTO_BEAST_DESC", 0, false);
 	turn_into_beast_all g_turn_into_beast_all("beastall", "TURN_INTO_BEAST_ALL", "TURN_INTO_BEAST_ALL_DESC", 0);
+#endif
 }

@@ -5,6 +5,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class high_alert : looped_command
 	{
 		using looped_command::looped_command;
@@ -22,5 +23,5 @@ namespace big
 	};
 
 	high_alert g_high_alert("highalert", "BACKEND_LOOPED_WORLD_NEARBY_HIGH_ALERT", "BACKEND_LOOPED_WORLD_NEARBY_HIGH_ALERT_DESC", g.world.nearby.high_alert);
-
+#endif
 }

@@ -6,6 +6,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class show_transaction_error : player_command
 	{
 		using player_command::player_command;
@@ -33,4 +34,5 @@ namespace big
 	};
 
 	show_transaction_error g_show_transaction_error("error", "SHOW_TRANSACTION_ERROR", "SHOW_TRANSACTION_ERROR_DESC", 0);
+	#endif
 }

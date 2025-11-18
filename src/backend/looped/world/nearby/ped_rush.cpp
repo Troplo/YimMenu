@@ -5,7 +5,7 @@
 
 namespace big
 {
-
+	#if ENABLE_TOXIC_CHEATS
 	class ped_rush : looped_command
 	{
 		using looped_command::looped_command;
@@ -28,4 +28,5 @@ namespace big
 	};
 
 	ped_rush g_ped_rush("pedrush", "BACKEND_LOOPED_WORLD_PED_RUSH", "BACKEND_LOOPED_WORLD_PED_RUSH_DESC", g.world.nearby.ped_rush);
+	#endif
 }

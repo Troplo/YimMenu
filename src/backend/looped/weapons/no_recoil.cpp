@@ -4,6 +4,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class no_recoil : looped_command
 	{
 		using looped_command::looped_command;
@@ -85,4 +86,5 @@ namespace big
 
 	no_recoil
 	    g_no_recoil("norecoil", "BACKEND_LOOPED_WEAPONS_NO_RECOIL", "BACKEND_LOOPED_WEAPONS_NO_RECOIL_DESC", g.weapons.no_recoil);
+	#endif
 }

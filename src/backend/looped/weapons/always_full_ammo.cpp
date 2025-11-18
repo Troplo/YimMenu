@@ -3,6 +3,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class always_full_ammo : looped_command
 	{
 		using looped_command::looped_command;
@@ -18,4 +19,5 @@ namespace big
 	};
 
 	always_full_ammo g_always_full_ammo("alwaysfullammo", "BACKEND_LOOPED_WEAPONS_ALWAYS_FULL_AMMO", "BACKEND_LOOPED_WEAPONS_ALWAYS_FULL_AMMO_DESC", g.weapons.always_full_ammo);
+	#endif
 }

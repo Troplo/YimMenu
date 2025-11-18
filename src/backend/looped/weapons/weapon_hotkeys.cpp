@@ -6,6 +6,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	constexpr int input_array[6] = {(int)ControllerInputs::INPUT_SELECT_WEAPON_UNARMED, (int)ControllerInputs::INPUT_SELECT_WEAPON_MELEE, (int)ControllerInputs::INPUT_SELECT_WEAPON_SHOTGUN, (int)ControllerInputs::INPUT_SELECT_WEAPON_HEAVY, (int)ControllerInputs::INPUT_SELECT_WEAPON_SPECIAL, (int)ControllerInputs::INPUT_SELECT_WEAPON_HANDGUN};
 
 	static void resolve_weapon_hotkey(Hash weapon)
@@ -61,4 +62,5 @@ namespace big
 			}
 		}
 	}
+	#endif
 }

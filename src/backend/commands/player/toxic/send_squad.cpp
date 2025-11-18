@@ -3,6 +3,8 @@
 
 namespace big
 {
+#if ENABLE_TOXIC_CHEATS
+
 	class send_squad : player_command
 	{
 		using player_command::player_command;
@@ -111,4 +113,5 @@ namespace big
 	};
 
 	send_squad g_send_squad("squad", "SEND_SQUAD", "SEND_SQUAD_DESC", 1);
+	#endif
 }

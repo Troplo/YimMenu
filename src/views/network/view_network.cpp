@@ -138,6 +138,7 @@ namespace big
 		ImGui::SeparatorText("PLAYER_TOGGLES"_T.data());
 
 		ImGui::BeginGroup();
+		#if ENABLE_TOXIC_CHEATS
 		components::command_checkbox<"trustfriends">();
 		components::command_checkbox<"trustsession">();
 		components::script_patch_checkbox("REVEAL_OTR_PLAYERS"_T,
@@ -166,8 +167,12 @@ namespace big
 		ImGui::BeginGroup();
 		ImGui::Checkbox("EXPLOSION_KARMA"_T.data(), &g.session.explosion_karma);
 		ImGui::Checkbox("DAMAGE_KARMA"_T.data(), &g.session.damage_karma);
+		ImGui::EndGroup();
+		#endif
+		ImGui::BeginGroup();
 		ImGui::Checkbox("DISABLE_PEDS"_T.data(), &g.session.disable_peds);
 		ImGui::Checkbox("DISABLE_TRAFFIC"_T.data(), &g.session.disable_traffic);
+		#if ENABLE_TOXIC_CHEATS
 		ImGui::Checkbox("FORCE_THUNDER"_T.data(), &g.session.force_thunder);
 		ImGui::Checkbox("LOBBY_LOCK"_T.data(), &g.session.lock_session);
 		if (g.session.lock_session)
@@ -178,6 +183,7 @@ namespace big
 		}
 		if (ImGui::IsItemHovered())
 			ImGui::SetTooltip("LOBBY_LOCK_DESC"_T.data());
+		#endif
 		ImGui::EndGroup();
 	}
 
@@ -286,8 +292,10 @@ namespace big
 
 	void view::network()
 	{
+#if ENABLE_TOXIC_CHEATS
 		render_join_game();
-		render_general_options();
 		render_teleport_options();
+#endif
+		render_general_options();
 	}
 }

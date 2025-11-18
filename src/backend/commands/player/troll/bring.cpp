@@ -4,6 +4,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class bring : player_command
 	{
 		using player_command::player_command;
@@ -29,4 +30,5 @@ namespace big
 
 	bring g_bring("bring", "BRING", "BRING_DESC", 0, false);
 	bring_all g_bring_all("bringall", "BRING_ALL", "BRING_ALL_DESC", 0, false);
+	#endif
 }

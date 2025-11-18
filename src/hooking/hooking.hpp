@@ -175,7 +175,7 @@ namespace big
 
 		static bool read_bits_single(void* data, int* out_value, int size, int offset);
 
-		static void received_clone_remove(CNetworkObjectMgr* mgr, CNetGamePlayer* src, CNetGamePlayer* dst, int16_t object_id, uint32_t ownership_token);
+		//static void received_clone_remove(CNetworkObjectMgr* mgr, CNetGamePlayer* src, CNetGamePlayer* dst, int16_t object_id, uint32_t ownership_token);
 
 		static bool sync_reader_serialize_dword(void* _this, uint32_t* dword, int size);
 		static bool sync_reader_serialize_word(void* _this, uint16_t* word, int size);

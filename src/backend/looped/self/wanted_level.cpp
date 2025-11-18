@@ -8,6 +8,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	bool user_updated_wanted_level = false;
 
 	class clear_wanted : command
@@ -104,4 +105,5 @@ namespace big
 			}
 		}
 	}
+	#endif
 }

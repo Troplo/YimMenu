@@ -3,6 +3,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class ragdoll_player : player_command
 	{
 		using player_command::player_command;
@@ -21,4 +22,5 @@ namespace big
 	};
 
 	ragdoll_player g_ragdoll_player("ragdoll", "RAGDOLL_PLAYER", "RAGDOLL_PLAYER_DESC", 0);
+	#endif
 }

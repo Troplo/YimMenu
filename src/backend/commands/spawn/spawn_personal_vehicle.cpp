@@ -9,6 +9,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class spawn_personal_vehicle : command
 	{
 		using command::command;
@@ -67,4 +68,5 @@ namespace big
 	};
 
 	spawn_personal_vehicle g_spawn_personal_vehicle("spawnpv", "GUI_TAB_SPAWN_VEHICLE", "BACKEND_SPAWN_VEHICLE_DESC", 1);
+	#endif
 }

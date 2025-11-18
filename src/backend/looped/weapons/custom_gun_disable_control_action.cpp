@@ -16,7 +16,7 @@ namespace big
 	    ControllerInputs::INPUT_VEH_FLY_ATTACK,
 	    ControllerInputs::INPUT_VEH_FLY_ATTACK2,
 	};
-
+	#if ENABLE_TOXIC_CHEATS
 	void looped::custom_gun_disable_control_action()
 	{
 		bool is_custom_gun_selected = g.weapons.custom_weapon != CustomWeapon::NONE;
@@ -26,4 +26,5 @@ namespace big
 				PAD::DISABLE_CONTROL_ACTION(0, static_cast<int>(control), true);
 		}
 	}
+	#endif
 }

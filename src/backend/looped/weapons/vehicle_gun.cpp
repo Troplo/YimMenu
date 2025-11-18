@@ -7,6 +7,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	static auto last_time = std::chrono::steady_clock::now();
 
 	void looped::weapons_vehicle_gun()
@@ -49,5 +50,5 @@ namespace big
 			last_time = time_now;
 		}
 	}
-
+#endif
 }

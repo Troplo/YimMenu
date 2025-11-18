@@ -2,6 +2,7 @@
 #include "pointers.hpp"
 #include <game_files/GameDataHash.hpp>
 
+#if ENABLE_TOXIC_CHEATS
 namespace
 {
 	static std::array<std::uint32_t, 16> orig_hash;
@@ -67,3 +68,4 @@ namespace big
 	spoof_game_data_hash g_spoof_game_data_hash("spoofdatahash", "SPOOF_GAME_DATA_HASH", "SPOOF_GAME_DATA_HASH_DESC", g.spoofing.spoof_game_data_hash);
 	copy_current_game_data_hash g_copy_current_game_data_hash("storecurrenthash", "COPY_CURRENT_GAME_DATA_HASH", "COPY_CURRENT_GAME_DATA_HASH_DESC", 0);
 }
+#endif

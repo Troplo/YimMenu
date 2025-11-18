@@ -4,6 +4,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class invisibility : looped_command
 	{
 		using looped_command::looped_command;
@@ -30,4 +31,5 @@ namespace big
 
 	invisibility g_invisibility("invis", "INVISIBILITY", "INVISIBILITY_DESC", g.self.invisibility);
 	bool_command g_local_visibility("localvis", "LOCAL_VISIBILITY", "LOCAL_VISIBILITY_DESC", g.self.local_visibility);
+	#endif
 }

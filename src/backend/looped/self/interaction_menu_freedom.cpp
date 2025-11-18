@@ -3,6 +3,7 @@
 
 namespace big
 {
+	#if ENABLE_TOXIC_CHEATS
 	class interaction_menu_freedom : looped_command
 	{
 		using looped_command::looped_command;
@@ -14,4 +15,5 @@ namespace big
 	};
 
 	interaction_menu_freedom g_interaction_menu_freedom("interactionmenufreedom", "INTERACTION_MENU_FREEDOM", "INTERACTION_MENU_FREEDOM_DESC", g.self.interaction_menu_freedom);
+	#endif
 }
