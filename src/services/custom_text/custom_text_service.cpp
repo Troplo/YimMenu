@@ -9,7 +9,11 @@ namespace big
 		//add_callback_for_labels({"RESPAWN_W"_J, "RESPAWN_W_MP"_J}, respawn_label_callback);
 		//add_callback_for_labels({"FMMC_KEY_TIP15"_J, "FMMC_MCK_TIP15"_J}, do_ceo_name_resize);
 		//add_label_overwrite("GC_OTR_TMR"_J, "HIDING FROM CLOWNS");
-		add_callback_for_labels({"HUD_ROSBANPERM"_J, "HUD_ROSBANPERM"_J}, paragon_banned_ros);
+		add_label_overwrite({"HUD_ROSBANPERM"_J}, paragon_banned_ros());
+		add_label_overwrite({"ACTIVATION_ERROR"_J}, paragon_activation_header());
+		add_label_overwrite({"ACTIVATION_ERROR_NO_OFFLINE"_J}, paragon_activation_description());
+		add_label_overwrite({"GAME_BUILD"_J}, paragon_game_build());
+		add_callback_for_labels({"ONLINE_BUILD"_J}, paragon_online_build);
 		// add_label_overwrite("TICK_LEFTCHEAT"_J, "~a~~HUD_COLOUR_WHITE~ has been swatted by Rockstar.");
 
 		g_custom_text_service = this;

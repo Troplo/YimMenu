@@ -50,7 +50,13 @@ else ()
 endif ()
 
 add_library(YimMenu MODULE "${SRC_MAIN}"
-        src/features.h)
+        src/features.h
+        src/rgsc/rlpc.h
+        src/services/paragon/rgsc/RgscRegistration.cpp
+        src/services/paragon/rgsc/RgscRegistration.hpp
+        src/rage/CExtraContentManager.hpp
+        src/hooks/misc/fipackfile_open_archive.cpp
+        src/util/current_module.hpp)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(TARGET YimMenu PROPERTY CXX_STANDARD 23) # 23 Because std::format is not avalible in std:c++20 for some reason. Maybe it's because i use v142 toolset.
@@ -67,6 +73,7 @@ target_include_directories(YimMenu PRIVATE
 )
 
 target_precompile_headers(YimMenu PRIVATE "${SRC_DIR}/common.hpp")
+target_compile_options(YimMenu PRIVATE /FI${SRC_DIR}/features.h)
 target_link_libraries(YimMenu PRIVATE pugixml minhook AsyncLogger dbghelp imgui cpr lua_static asmjit::asmjit)
 
 set_target_properties(YimMenu PROPERTIES SUFFIX ".ipe")

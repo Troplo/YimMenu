@@ -4,6 +4,7 @@
 #include "memory/module.hpp"
 #include "memory/pattern.hpp"
 #include "pointers.hpp"
+#include "util/current_module.hpp"
 
 namespace lua::memory
 {
@@ -79,7 +80,7 @@ namespace lua::memory
 	// Scans the specified memory pattern within the "Paragon_Legacy.exe" module and returns a pointer to the found address.
 	static pointer scan_pattern(const std::string& pattern)
 	{
-		return pointer(::memory::module("Paragon_Legacy.exe").scan(::memory::pattern(pattern)).value().as<uint64_t>());
+		return pointer(::memory::module(GetCurrentModule()).scan(::memory::pattern(pattern)).value().as<uint64_t>());
 	}
 
 	// Lua API: Function

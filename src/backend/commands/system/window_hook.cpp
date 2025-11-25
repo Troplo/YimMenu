@@ -1,6 +1,7 @@
 #include "backend/bool_command.hpp"
 #include "memory/byte_patch.hpp"
 #include "pointers.hpp"
+#include "util/current_module.hpp"
 
 namespace big
 {
@@ -19,7 +20,7 @@ namespace big
 			}
 			else
 			{
-				SetWindowsHookExA(13, g_pointers->m_gta.m_window_hook.add(18).rip().as<HOOKPROC>(), GetModuleHandleA("Paragon_Legacy.exe"), 0);
+				SetWindowsHookExA(13, g_pointers->m_gta.m_window_hook.add(18).rip().as<HOOKPROC>(), GetModuleHandleA(GetCurrentModule().c_str()), 0);
 				window_hook_patch->restore();
 			}
 		}

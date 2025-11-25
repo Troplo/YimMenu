@@ -5,6 +5,9 @@
 #include "am_pi_menu.hpp"
 #include "creator.hpp"
 #include "freemode.hpp"
+#if ENABLE_PARAGON_DEBUGGING
+#include "log_all.hpp"
+#endif
 #include "network_session_host.hpp"
 #include "shop_controller.hpp"
 #include "tunables.hpp"
@@ -178,16 +181,18 @@ namespace big
 		add_native_detour("gunclub_shop"_J, NativeIndex::FORCE_PED_AI_AND_ANIMATION_UPDATE, all_scripts::DO_NOTHING); //Fix jittering weapons.
 		add_native_detour("hairdo_shop_mp"_J, NativeIndex::FORCE_PED_AI_AND_ANIMATION_UPDATE, all_scripts::DO_NOTHING); //Fix jittering weapons.
 		add_native_detour("tattoo_shop"_J, NativeIndex::FORCE_PED_AI_AND_ANIMATION_UPDATE, all_scripts::DO_NOTHING); //Fix jittering weapons.
-		LOG(VERBOSE) << "Doing stuff";
+#if ENABLE_PARAGON_DEBUGGING
 		LOG(VERBOSE) << "Has native log all: " << has_native_log_all();
-
-		if (has_native_log_all()) {
-			for (int i = 0; i < static_cast<int>(NativeIndex::GET_HASH_OF_MAP_AREA_AT_COORDS); ++i)
-			{
-				LOG(VERBOSE) << "Registered index: " << i;
-				add_native_detour(static_cast<NativeIndex>(i), all_scripts::generic_detour);
-			}
+		if (has_native_log_all())
+		{
+			init_native_hooks_logs(this);
 		}
+#endif
+		for (auto& entry : *g_pointers->m_gta.m_script_program_table)
+			if (entry.m_program)
+				hook_program(entry.m_program);
+
+		g_native_hooks = this;
 	}
 
 	native_hooks::~native_hooks()

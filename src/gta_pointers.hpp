@@ -4,6 +4,8 @@
 
 #include <memory/handle.hpp>
 
+
+class rlPc;
 class CCommunications;
 class FriendRegistry;
 class CNetworkPlayerMgr;
@@ -421,6 +423,8 @@ namespace big
 		PVOID m_network_can_access_multiplayer;
 
 		PVOID m_send_clone_create;
+
+		rlPc* m_rlpc;
 	};
 #pragma pack(pop)
 	static_assert(sizeof(gta_pointers) % 8 == 0, "Pointers are not properly aligned");

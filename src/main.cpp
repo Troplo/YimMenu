@@ -1,3 +1,4 @@
+#include "features.h"
 #include "backend/backend.hpp"
 #include "byte_patch_manager.hpp"
 #include "common.hpp"
@@ -22,6 +23,7 @@
 #include "services/mobile/mobile_service.hpp"
 #include "services/model_preview/model_preview_service.hpp"
 #include "services/notifications/notification_service.hpp"
+#include "services/paragon/rgsc/RgscRegistration.hpp"
 #include "services/pickups/pickup_service.hpp"
 #include "services/player_database/player_database_service.hpp"
 #include "services/players/player_service.hpp"
@@ -138,10 +140,10 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 		    nullptr,
 		    0,
 		    [](PVOID) -> DWORD {
-		    	auto sc_module = memory::module("Paragon.Sdk.dll");
-		    	sc_module.wait_for_module();
-		    	std::this_thread::sleep_for(5000ms);
-		    	auto handler = exception_handler();
+			    auto sc_module = memory::module("Paragon.Sdk.dll");
+				sc_module.wait_for_module();
+				std::this_thread::sleep_for(5000ms);
+				auto handler = exception_handler();
 				std::srand(std::chrono::system_clock::now().time_since_epoch().count());
 
 				while (!FindWindow("grcWindow", nullptr))
@@ -181,13 +183,14 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 				auto pointers_instance = std::make_unique<pointers>();
 				LOG(INFO) << "Pointers initialized.";
 
-				while (!disable_anticheat_skeleton())
-				{
-					LOG(WARNING) << "Failed patching anticheat gameskeleton (injected too early?). Waiting 100ms and trying again";
-					std::this_thread::sleep_for(100ms);
-				}
-				LOG(INFO) << "Disabled anticheat gameskeleton.";
-
+				if (strcmp(g_pointers->m_gta.m_online_version, "1.61") != 0) {
+					while (!disable_anticheat_skeleton())
+					{
+						LOG(WARNING) << "Failed patching anticheat gameskeleton (injected too early?). Waiting 100ms and trying again";
+						std::this_thread::sleep_for(100ms);
+					}
+					LOG(INFO) << "Disabled anticheat gameskeleton.";
+			    }
 				auto byte_patch_manager_instance = std::make_unique<byte_patch_manager>();
 				LOG(INFO) << "Byte Patch Manager initialized.";
 
@@ -269,6 +272,8 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 					std::make_unique<lua_manager>(g_file_manager.get_project_folder("scripts"), g_file_manager.get_project_folder("scripts_config"));
 				LOG(INFO) << "Lua manager initialized.";
 
+		    	RgscRegistration();
+		    	LOG(INFO) << "Rgsc registration complete";
 				g_running = true;
 
 				while (g_running)

@@ -32,7 +32,8 @@ namespace big
 
 	void backend::loop()
 	{
-		bypass_battleye();
+		bool is169 = strcmp(g_pointers->m_gta.m_online_version, "1.61") != 0;
+		if (is169) bypass_battleye();
 
 		for (auto& command : g_bool_commands)
 			command->refresh();
@@ -47,7 +48,7 @@ namespace big
 
 		while (g_running)
 		{
-			bypass_battleye();
+			if (is169) bypass_battleye();
 
 			looped::system_self_globals();
 			looped::system_update_pointers();

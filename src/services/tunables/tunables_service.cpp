@@ -7,6 +7,7 @@
 #include "services/script_connection/script_connection_service.hpp" // for the stack size
 #include "services/script_patcher/script_patcher_service.hpp"
 #include "thread_pool.hpp"
+#include "util/current_module.hpp"
 #include "util/scripts.hpp"
 
 namespace big
@@ -25,13 +26,14 @@ namespace big
 
 	void tunables_service::run_script()
 	{
+		return;
 		while (true)
 		{
 			script::get_current()->yield();
 
 			m_cache_file.load();
 
-			if (m_cache_file.up_to_date(memory::module("Paragon_Legacy.exe").timestamp()))
+			if (m_cache_file.up_to_date(memory::module(GetCurrentModule()).timestamp()))
 			{
 				LOG(INFO) << "Loading tunables from cache";
 				m_loading = true;
@@ -119,7 +121,7 @@ namespace big
 			data_ptr += sizeof(tunable_save_struct);
 		}
 
-		m_cache_file.set_header_version(memory::module("Paragon_Legacy.exe").timestamp());
+		m_cache_file.set_header_version(memory::module(GetCurrentModule()).timestamp());
 		m_cache_file.set_data(std::move(data), data_size);
 		m_cache_file.write();
 	}

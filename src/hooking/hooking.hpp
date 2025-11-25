@@ -1,9 +1,10 @@
 #pragma once
 #include "MinHook.h"
+#include "call_hook.hpp"
 #include "detour_hook.hpp"
+#include "gta/fidevice.hpp"
 #include "vmt_hook.hpp"
 #include "vtable_hook.hpp"
-#include "call_hook.hpp"
 
 #include <gta/enums.hpp>
 #include <network/netConnection.hpp> // cannot stub this
@@ -217,6 +218,9 @@ namespace big
 		static bool network_can_access_multiplayer(void* a1, int* error);
 
 		static void send_clone_create(CNetworkObjectMgr* _this, rage::netObject* object, CNetGamePlayer* player, rage::datBitBuffer* buffer);
+
+		// Paragon
+		static bool fipackfile_open_archive(rage::fiPackfile* this_, const char* archive, bool b_true, int type, intptr_t very_false);
 	};
 
 	class minhook_keepalive

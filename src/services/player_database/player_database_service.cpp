@@ -93,6 +93,7 @@ namespace big
 
 	void player_database_service::handle_join_redirect()
 	{
+		return;
 		if (!*g_pointers->m_gta.m_presence_data)
 			return;
 
@@ -138,7 +139,7 @@ namespace big
 	{
 		load();
 
-		start_update_loop();
+		// start_update_loop();
 
 		g_player_database_service = this;
 	}
@@ -220,6 +221,7 @@ namespace big
 
 	void player_database_service::remove_filtered_players(bool filter_modder, bool filter_trust, bool filter_block_join, bool filter_track_player)
 	{
+		return;
 		for (auto it = m_players.begin(); it != m_players.end();)
 		{
 			auto player = it->second;
@@ -251,6 +253,7 @@ namespace big
 
 	std::shared_ptr<persistent_player> player_database_service::get_player_by_rockstar_id(uint64_t rockstar_id)
 	{
+		return nullptr;
 		if (m_players.contains(rockstar_id))
 			return m_players[rockstar_id];
 		return nullptr;
@@ -303,6 +306,7 @@ namespace big
 
 	void player_database_service::start_update_loop()
 	{
+		return;
 		// So that it doesnt immediately exit the first time.
 		static bool first_time = true;
 
@@ -345,6 +349,7 @@ namespace big
 
 	void player_database_service::update_player_states(bool tracked_only)
 	{
+		return;
 		constexpr auto bucket_size = 100;
 
 		std::vector<std::vector<rage::rlScHandle>> gamer_handle_buckets{};

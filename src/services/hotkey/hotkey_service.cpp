@@ -12,6 +12,7 @@ namespace big
 {
 	hotkey_service::hotkey_service()
 	{
+		return;
 		// ordered alphabetically to more easily see if a certain hotkey is present
 		// register_hotkey("beastjump", g.settings.hotkeys.beastjump, "beastjump"_J);
 		// register_hotkey("bringpv", g.settings.hotkeys.bringvehicle, "bringpv"_J);
@@ -82,6 +83,7 @@ namespace big
 
 	void hotkey_service::wndproc(eKeyState state, key_t key)
 	{
+		return;
 		if (const auto chat_data = *g_pointers->m_gta.m_chat_data; chat_data && (chat_data->m_chat_open || chat_data->m_timer_two))
 			return;
 
