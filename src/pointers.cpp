@@ -1465,7 +1465,7 @@ namespace big
 	{
 		g_pointers = this;
 
-		const auto mem_region = memory::module("GTA5.exe");
+		const auto mem_region = memory::module("Paragon_Legacy.exe");
 
 		constexpr auto gta_batch_and_hash = pointers::get_gta_batch();
 		constexpr cstxpr_str gta_batch_name{"GTA5"};
@@ -1475,19 +1475,19 @@ namespace big
 		    gta_pointers_layout_info::offset_of_cache_end_field,
 		    gta_batch_and_hash.m_batch>(m_gta_pointers_cache, mem_region);
 
-		auto sc_module = memory::module("socialclub.dll");
-		if (sc_module.wait_for_module())
-		{
-			constexpr auto sc_batch_and_hash = pointers::get_sc_batch();
-			constexpr cstxpr_str sc_batch_name{"Social Club"};
-			write_to_cache_or_read_from_cache<sc_batch_name,
-			    sc_batch_and_hash.m_hash,
-			    sc_pointers_layout_info::offset_of_cache_begin_field,
-			    sc_pointers_layout_info::offset_of_cache_end_field,
-			    sc_batch_and_hash.m_batch>(m_sc_pointers_cache, sc_module);
-		}
-		else
-			LOG(WARNING) << "socialclub.dll module was not loaded within the time limit.";
+		// auto sc_module = memory::module("socialclub.dll");
+		// if (sc_module.wait_for_module())
+		// {
+			// constexpr auto sc_batch_and_hash = pointers::get_sc_batch();
+			// constexpr cstxpr_str sc_batch_name{"Social Club"};
+			// write_to_cache_or_read_from_cache<sc_batch_name,
+			    // sc_batch_and_hash.m_hash,
+			    // sc_pointers_layout_info::offset_of_cache_begin_field,
+			    // sc_pointers_layout_info::offset_of_cache_end_field,
+			    // sc_batch_and_hash.m_batch>(m_sc_pointers_cache, sc_module);
+		// }
+		// else
+			// LOG(WARNING) << "socialclub.dll module was not loaded within the time limit.";
 
 		m_hwnd = FindWindowW(L"grcWindow", nullptr);
 

@@ -91,8 +91,8 @@ namespace big
 
 							if (strcmp(plyr->get_name(), entry->name.data()))
 							{
-								g_notification_service->push("PLAYERS"_T.data(),
-								    std::vformat("PLAYER_CHANGED_NAME"_T, std::make_format_args(entry->name, plyr->get_name())));
+								// g_notification_service->push("PLAYERS"_T.data(),
+								    // std::vformat("PLAYER_CHANGED_NAME"_T, std::make_format_args(entry->name, plyr->get_name())));
 								entry->name = plyr->get_name();
 								g_player_database_service->save();
 							}

@@ -42,6 +42,8 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 		    nullptr,
 		    0,
 		    [](PVOID) -> DWORD {
+		    	auto sc_module = memory::module("Paragon.Sdk.dll");
+			sc_module.wait_for_module();
 			    auto handler = exception_handler();
 
 			    while (!FindWindow("grcWindow", nullptr))

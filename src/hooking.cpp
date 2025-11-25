@@ -53,7 +53,7 @@ namespace big
 
 		detour_hook_helper::add<hooks::received_clone_create>("RCC", g_pointers->m_gta.m_received_clone_create);
 		detour_hook_helper::add<hooks::received_clone_sync>("RCS", g_pointers->m_gta.m_received_clone_sync);
-		detour_hook_helper::add<hooks::can_apply_data>("CAD", g_pointers->m_gta.m_can_apply_data);
+		// detour_hook_helper::add<hooks::can_apply_data>("CAD", g_pointers->m_gta.m_can_apply_data);
 
 		detour_hook_helper::add<hooks::get_network_event_data>("GNED", g_pointers->m_gta.m_get_network_event_data);
 		detour_hook_helper::add<hooks::write_player_gamer_data_node>("WPGDN", g_pointers->m_gta.m_write_player_gamer_data_node);
@@ -63,8 +63,8 @@ namespace big
 		detour_hook_helper::add<hooks::invalid_decal>("IDC", g_pointers->m_gta.m_invalid_decal_crash);
 		detour_hook_helper::add<hooks::task_parachute_object_0x270>("TPO270", g_pointers->m_gta.m_task_parachute_object_0x270);
 
-		detour_hook_helper::add<hooks::update_presence_attribute_int>("UPAI", g_pointers->m_sc.m_update_presence_attribute_int);
-		detour_hook_helper::add<hooks::update_presence_attribute_string>("UPAS", g_pointers->m_sc.m_update_presence_attribute_string);
+		// detour_hook_helper::add<hooks::update_presence_attribute_int>("UPAI", g_pointers->m_sc.m_update_presence_attribute_int);
+		// detour_hook_helper::add<hooks::update_presence_attribute_string>("UPAS", g_pointers->m_sc.m_update_presence_attribute_string);
 
 		detour_hook_helper::add<hooks::serialize_ped_inventory_data_node>("SPIDN", g_pointers->m_gta.m_serialize_ped_inventory_data_node);
 		detour_hook_helper::add<hooks::serialize_vehicle_gadget_data_node>("SVGDN", g_pointers->m_gta.m_serialize_vehicle_gadget_data_node);

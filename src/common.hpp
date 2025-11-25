@@ -65,22 +65,22 @@
 
 namespace big
 {
-	using namespace std::chrono_literals;
+using namespace std::chrono_literals;
 
-	inline HMODULE g_hmodule{};
-	inline HANDLE g_main_thread{};
-	inline DWORD g_main_thread_id{};
-	inline std::atomic_bool g_running{false};
+inline HMODULE g_hmodule{};
+inline HANDLE g_main_thread{};
+inline DWORD g_main_thread_id{};
+inline std::atomic_bool g_running{false};
 
-	inline CPed* g_local_player;
+inline CPed* g_local_player;
 }
 
 namespace self
 {
-	inline Ped ped;
-	inline Player id;
-	inline Vector3 pos;
-	inline Vehicle veh;
+inline Ped ped;
+inline Player id;
+inline Vector3 pos;
+inline Vehicle veh;
 }
 
 template<size_t N>

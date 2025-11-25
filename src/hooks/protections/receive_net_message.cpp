@@ -137,8 +137,8 @@ namespace big
 					if (player->m_host_migration_rate_limit.exceeded_last_process())
 					{
 						session::add_infraction(player, Infraction::TRIED_KICK_PLAYER);
-						g_notification_service->push_error("PROTECTIONS"_T.data(),
-						    std::vformat("OOM_KICK"_T, std::make_format_args(player->get_name())));
+						// g_notification_service->push_error("PROTECTIONS"_T.data(),
+						    // std::vformat("OOM_KICK"_T, std::make_format_args(player->get_name())));
 					}
 					return true;
 				}
@@ -213,8 +213,8 @@ namespace big
 			{
 				if (player->block_join)
 				{
-					g_notification_service->push("BLOCK_JOIN"_T.data(),
-					    std::vformat("BLOCK_JOIN_PREVENT_PLAYER_JOIN"_T, std::make_format_args(player->get_name())));
+					// g_notification_service->push("BLOCK_JOIN"_T.data(),
+					    // std::vformat("BLOCK_JOIN_PREVENT_PLAYER_JOIN"_T, std::make_format_args(player->get_name())));
 					return true;
 				}
 				break;
