@@ -8,6 +8,7 @@ namespace big
 {
 	void view::vehicle()
 	{
+#if ENABLE_TOXIC_CHEATS
 		components::button("MORS_FIX_ALL"_T, [] {
 			int amount_fixed = mobile::mors_mutual::fix_all();
 			// g_notification_service->push("MOBILE"_T.data(),
@@ -218,5 +219,6 @@ namespace big
 		{
 			g.vehicle.proof_mask |= static_cast<int>(eEntityProofs::WATER);
 		}
+#endif
 	}
 }

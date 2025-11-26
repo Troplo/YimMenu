@@ -49,7 +49,9 @@ namespace big
 		if (ImGui::Button(plyr->get_name(), {300.0f - ImGui::GetStyle().ScrollbarSize, 0.f}))
 		{
 			g_player_service->set_selected(plyr);
+#if ENABLE_TOXIC_CHEATS
 			g_gui_service->set_selected(tabs::PLAYER);
+#endif
 			g.window.switched_view = true;
 		}
 		ImGui::PopID();

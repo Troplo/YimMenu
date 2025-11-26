@@ -20,6 +20,7 @@ namespace big
 
 	void esp::draw_player(const player_ptr& plyr, ImDrawList* const draw_list)
 	{
+#if ENABLE_TOXIC_CHEATS
 		if (!plyr->is_valid() || !plyr->get_ped() || !plyr->get_ped()->m_navigation)
 			return;
 		if (g.esp.hide_self && plyr->is_valid() && plyr->id() == g_player_service->get_self()->id())
@@ -165,10 +166,12 @@ namespace big
 				}
 			}
 		}
+#endif
 	}
 
 	void esp::draw()
 	{
+#if ENABLE_TOXIC_CHEATS
 		if (!g.esp.enabled)
 			return;
 
@@ -181,5 +184,6 @@ namespace big
 				draw_player(plyr, draw_list);
 			}
 		}
+#endif
 	}
 }

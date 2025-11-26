@@ -180,6 +180,14 @@ namespace big
                 g_pointers->m_gta.m_trigger_script_event = ptr.sub(0x1C).as<decltype(gta_pointers::m_trigger_script_event)>();
             }
         },
+        {
+            "PARAGON_RLPC",
+        "48 8D 0D ? ? ? ? E8 ? ? ? ? 48 85 C0 74 ? 48 8D 0D ? ? ? ? E8 ? ? ? ? 48 8B C8 48 8B 10 FF 92",
+            [](memory::handle ptr)
+            {
+                g_pointers->m_gta.m_rlpc = ptr.add(3).rip().as<rlPc*>();
+            }
+        },
         // Received Event Hook
         {
             "REH",
@@ -1474,6 +1482,7 @@ namespace big
 		    gta_pointers_layout_info::offset_of_cache_begin_field,
 		    gta_pointers_layout_info::offset_of_cache_end_field,
 		    gta_batch_and_hash.m_batch>(m_gta_pointers_cache, mem_region);
+	    g_rlPc = m_gta.m_rlpc;
 
 		// auto sc_module = memory::module("socialclub.dll");
 		// if (sc_module.wait_for_module())

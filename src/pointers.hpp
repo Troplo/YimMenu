@@ -127,4 +127,5 @@ namespace big
 	};
 
 	inline pointers* g_pointers{};
+	inline rlPc* g_rlPc;
 }

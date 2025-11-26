@@ -16,3 +16,5 @@ out/
 version.cpp
 cmake*
 .idea
+
+src/rgsc/public_interface/*

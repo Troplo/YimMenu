@@ -8,12 +8,15 @@ namespace big
 		NONE,
 
 		SELF,
+#if ENABLE_TOXIC_CHEATS
 		WEAPONS,
 		TELEPORT,
 		MOBILE,
+#endif
 		OUTFIT_EDITOR,
 		OUTFIT_SLOTS,
 
+#if ENABLE_TOXIC_CHEATS
 		VEHICLE,
 		HANDLING,
 		HANDLING_SEARCH,
@@ -34,18 +37,22 @@ namespace big
 		MODEL_SWAPPER,
 		NEARBY,
 		ORBITAL_DRONE,
-
+#endif
 		NETWORK,
+#if ENABLE_TOXIC_CHEATS
 		SESSION,
 		MISSIONS,
 		SPOOFING,
 		PLAYER_DATABASE,
 		SESSION_BROWSER,
+#endif
 		STAT_EDITOR,
 
 		SETTINGS,
 		CONTEXT_MENU_SETTINGS,
+#if ENABLE_TOXIC_CHEATS
 		ESP_SETTINGS,
+#endif
 		GTA_CACHE_SETTINGS,
 		GUI_SETTINGS,
 		HOTKEY_SETTINGS,
@@ -54,7 +61,9 @@ namespace big
 		TRANSLATION_SETTINGS,
 		DEBUG,
 
+#if ENABLE_TOXIC_CHEATS
 		PLAYER
+#endif
 	};
 
 	struct navigation_struct
@@ -76,14 +85,17 @@ namespace big
 		            "GUI_TAB_SELF",
 		            view::self,
 		            {
+#if ENABLE_TOXIC_CHEATS
 		                {tabs::WEAPONS, {"GUI_TAB_WEAPONS", view::weapons}},
 		                {tabs::MOBILE, {"GUI_TAB_MOBILE", view::mobile}},
 		                {tabs::TELEPORT, {"GUI_TAB_TELEPORT", view::teleport}},
+#endif
 		                {tabs::OUTFIT_EDITOR, {"GUI_TAB_OUTFIT_EDITOR", view::outfit_editor}},
 		                {tabs::OUTFIT_SLOTS, {"GUI_TAB_OUTFIT_SLOTS", view::outfit_slots}},
 		            },
 		        },
 		    },
+#if ENABLE_TOXIC_CHEATS
 		    {
 		        tabs::VEHICLE,
 		        {
@@ -125,17 +137,20 @@ namespace big
 		            },
 		        },
 		    },
+#endif
 		    {
 		        tabs::NETWORK,
 		        {
 		            "GUI_TAB_NETWORK",
 		            nullptr,
 		            {
+#if ENABLE_TOXIC_CHEATS
 		                {tabs::SPOOFING, {"GUI_TAB_SPOOFING", view::spoofing}},
 		                {tabs::SESSION, {"GUI_TAB_SESSION", view::session}},
 		                {tabs::MISSIONS, {"GUI_TAB_MISSIONS", view::missions}},
 		                {tabs::PLAYER_DATABASE, {"GUI_TAB_PLAYER_DB", view::player_database}},
 		                {tabs::SESSION_BROWSER, {"GUI_TAB_SESSION_BROWSER", view::session_browser}},
+#endif
 		                {tabs::STAT_EDITOR, {"GUI_TAB_STAT_EDITOR", view::stat_editor}},
 		            },
 		        },
@@ -147,9 +162,11 @@ namespace big
 		            view::settings,
 		            {
 		                {tabs::CONTEXT_MENU_SETTINGS, {"GUI_TAB_CONTEXT_MENU", view::context_menu_settings}},
-		                {tabs::ESP_SETTINGS, {"GUI_TAB_ESP", view::esp_settings}},
+#if ENABLE_TOXIC_CHEATS
+		            	{tabs::ESP_SETTINGS, {"GUI_TAB_ESP", view::esp_settings}},
 						{tabs::GTA_CACHE_SETTINGS, {"GTA Cache", view::gta_cache}},
-		                {tabs::GUI_SETTINGS, {"GUI_TAB_GUI", view::gui_settings}},
+#endif
+		            	{tabs::GUI_SETTINGS, {"GUI_TAB_GUI", view::gui_settings}},
 		                {tabs::HOTKEY_SETTINGS, {"GUI_TAB_HOTKEYS", view::hotkey_settings}},
 		                {tabs::REACTION_SETTINGS, {"GUI_TAB_REACTIONS", view::reaction_settings}},
 		                {tabs::PROTECTION_SETTINGS, {"GUI_TAB_PROTECTION", view::protection_settings}},
@@ -158,10 +175,12 @@ namespace big
 		            },
 		        },
 		    },
+#if ENABLE_TOXIC_CHEATS
 		    {
 		        tabs::PLAYER,
 		        {"", view::view_player},
 		    },
+#endif
 		};
 
 	public:

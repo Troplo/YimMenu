@@ -11,6 +11,7 @@ namespace big
 {
 	void view::self()
 	{
+#if ENABLE_TOXIC_CHEATS
 		components::command_button<"suicide">();
 		ImGui::SameLine();
 		components::command_button<"heal">();
@@ -22,11 +23,12 @@ namespace big
 		components::command_button<"clean">();
 		ImGui::SameLine();
 		components::command_button<"fillammo">();
-
 		ImGui::Separator();
+#endif
 
 		components::sub_title("GENERAL"_T);
 
+#if ENABLE_TOXIC_CHEATS
 		ImGui::BeginGroup();
 
 		components::command_checkbox<"godmode">();
@@ -37,13 +39,17 @@ namespace big
 		components::command_checkbox<"fastrespawn">();
 
 		ImGui::EndGroup();
+#endif
 		ImGui::SameLine();
 		ImGui::BeginGroup();
 
+#if ENABLE_TOXIC_CHEATS
 		components::command_checkbox<"noclip">();
 		components::command_checkbox<"noragdoll">();
 		components::command_checkbox<"fastrun">();
+#endif
 		ImGui::Checkbox("NO_IDLE_KICK"_T.data(), &g.tunables.no_idle_kick);
+#if ENABLE_TOXIC_CHEATS
 		components::command_checkbox<"walkunder">();
 		if (!g.self.super_jump)
 			components::command_checkbox<"beastjump">();
@@ -60,11 +66,12 @@ namespace big
 		components::command_checkbox<"nocollision">();
 		components::command_checkbox<"mobileradio">();
 		components::command_checkbox<"superman">();
-
+#endif
 		ImGui::Checkbox("DANCE_MODE"_T.data(), &g.self.dance_mode);
 
 		ImGui::EndGroup();
 
+#if ENABLE_TOXIC_CHEATS
 		components::sub_title("PTFX Styles");
 
 		components::command_checkbox<"ptfx">();
@@ -104,9 +111,10 @@ namespace big
 			}
 		}
 
-
+#endif
 		ImGui::Separator();
 
+#if ENABLE_TOXIC_CHEATS
 		components::sub_title("PROOFS"_T);
 
 		if (ImGui::Button("CHECK_ALL"_T.data()))
@@ -184,7 +192,7 @@ namespace big
 		}
 
 		ImGui::Separator();
-
+#endif
 		components::sub_title("HUD"_T);
 
 		ImGui::BeginGroup();
@@ -235,6 +243,7 @@ namespace big
 
 		ImGui::EndGroup();
 
+#if ENABLE_TOXIC_CHEATS
 		ImGui::BeginGroup();
 		components::command_checkbox<"hudcolor">();
 		static int color_select_index = 0;
@@ -322,5 +331,6 @@ namespace big
 		{
 			g.self.proof_mask |= static_cast<int>(eEntityProofs::WATER);
 		}
+#endif
 	}
 }

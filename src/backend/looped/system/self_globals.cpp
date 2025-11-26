@@ -1,4 +1,3 @@
-#if ENABLE_TOXIC_CHEATS
 #include "backend/looped/looped.hpp"
 #include "natives.hpp"
 #include "pointers.hpp"
@@ -29,4 +28,3 @@ namespace big
 		}
 	}
 }
-#endif

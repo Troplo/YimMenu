@@ -30,6 +30,7 @@
 #include "services/vehicle/vehicle_control_service.hpp"
 #include "thread_pool.hpp"
 #include "version.hpp"
+#include "rgsc/paragon/RgscRegistration.hpp"
 
 BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 {
@@ -42,15 +43,16 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 		    nullptr,
 		    0,
 		    [](PVOID) -> DWORD {
-		    	auto sc_module = memory::module("Paragon.Sdk.dll");
-			sc_module.wait_for_module();
+			    auto sc_module = memory::module("Paragon.Sdk.dll");
+			    sc_module.wait_for_module();
 			    auto handler = exception_handler();
 
 			    while (!FindWindow("grcWindow", nullptr))
 				    std::this_thread::sleep_for(100ms);
 
 			    std::filesystem::path base_dir = std::getenv("appdata");
-			    base_dir /= "BigBaseV2";
+			    base_dir /= "Paragon";
+		    	    base_dir /= "YimShim-2699";
 			    auto file_manager_instance = std::make_unique<file_manager>(base_dir);
 
 			    auto logger_instance = std::make_unique<logger>("YimMenu", file_manager_instance->get_project_file("./cout.log"));
@@ -75,8 +77,11 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 
 				    auto pointers_instance = std::make_unique<pointers>();
 				    LOG(INFO) << "Pointers initialized.";
-
-				    auto byte_patch_manager_instance = std::make_unique<byte_patch_manager>();
+#if ENABLE_PARAGON_SDK
+			    	    RgscRegistration();
+				    LOG(INFO) << "Rgsc registration complete";
+#endif
+			    	    auto byte_patch_manager_instance = std::make_unique<byte_patch_manager>();
 				    LOG(INFO) << "Byte Patch Manager initialized.";
 
 				    auto renderer_instance = std::make_unique<renderer>();

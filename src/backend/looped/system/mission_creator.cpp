@@ -1,4 +1,3 @@
-#if ENABLE_TOXIC_CHEATS
 #include "backend/looped/looped.hpp"
 #include "core/scr_globals.hpp"
 #include "fiber_pool.hpp"
@@ -38,4 +37,3 @@ namespace big
 		}
 	}
 }
-#endif

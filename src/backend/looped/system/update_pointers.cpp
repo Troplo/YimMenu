@@ -1,4 +1,3 @@
-#if ENABLE_TOXIC_CHEATS
 #include "backend/looped/looped.hpp"
 #include "gta_util.hpp"
 
@@ -9,4 +8,3 @@ namespace big
 		g_local_player = gta_util::get_local_ped();
 	}
 }
-#endif

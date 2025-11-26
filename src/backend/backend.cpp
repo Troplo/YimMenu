@@ -24,9 +24,10 @@ namespace big
 			looped::system_self_globals();
 			looped::system_update_pointers();
 			looped::system_desync_kick_protection();
+#if ENABLE_TOXIC_CHEATS
 			looped::system_spoofing();
+#endif
 			looped::system_mission_creator();
-
 			for (auto command : g_looped_commands)
 				if (command->is_enabled())
 					command->on_tick();
@@ -41,7 +42,9 @@ namespace big
 
 		while (g_running)
 		{
+#if ENABLE_TOXIC_CHEATS
 			looped::self_police();
+#endif
 			looped::self_hud();
 			looped::self_dance_mode();
 
@@ -52,7 +55,7 @@ namespace big
 	void backend::weapons_loop()
 	{
 		LOG(INFO) << "Starting script: Weapons";
-
+#if ENABLE_TOXIC_CHEATS
 		while (g_running)
 		{
 			looped::weapons_ammo_special_type();
@@ -66,12 +69,14 @@ namespace big
 
 			script::get_current()->yield();
 		}
+#endif
 	}
 
 	void backend::vehicles_loop()
 	{
 		LOG(INFO) << "Starting script: Vehicles";
 
+#if ENABLE_TOXIC_CHEATS
 		while (g_running)
 		{
 			looped::vehicle_auto_drive();
@@ -82,24 +87,27 @@ namespace big
 
 			script::get_current()->yield();
 		}
+#endif
 	}
 
 	void backend::turnsignal_loop()
 	{
 		LOG(INFO) << "Starting script: turnsignal";
-
+#if ENABLE_TOXIC_CHEATS
 		while (g_running)
 		{
 			looped::vehicle_turn_signals();
 
 			script::get_current()->yield();
 		}
+#endif
 	}
 
 	void backend::misc_loop()
 	{
 		LOG(INFO) << "Starting script: Miscellaneous";
 
+#if ENABLE_TOXIC_CHEATS
 		while (g_running)
 		{
 			looped::hud_transition_state();
@@ -112,12 +120,14 @@ namespace big
 
 			script::get_current()->yield();
 		}
+#endif
 	}
 
 	void backend::remote_loop()
 	{
 		LOG(INFO) << "Starting script: Remote";
 
+#if ENABLE_TOXIC_CHEATS
 		while (g_running)
 		{
 			looped::player_good_options();
@@ -127,48 +137,56 @@ namespace big
 
 			script::get_current()->yield();
 		}
+#endif
 	}
 
 	void backend::lscustoms_loop()
 	{
 		LOG(INFO) << "Starting script: Ls customs";
 
+#if ENABLE_TOXIC_CHEATS
 		while (g_running)
 		{
 			looped::vehicle_ls_customs();
 
 			script::get_current()->yield();
 		}
+#endif
 	}
 
 	void backend::rainbowpaint_loop()
 	{
 		LOG(INFO) << "Starting script: Rainbow paint";
 
+#if ENABLE_TOXIC_CHEATS
 		while (g_running)
 		{
 			looped::vehicle_rainbow_paint();
 
 			script::get_current()->yield();
 		}
+#endif
 	}
 
 	void backend::vehiclefly_loop()
 	{
 		LOG(INFO) << "Starting script: Vehicle fly";
 
+#if ENABLE_TOXIC_CHEATS
 		while (g_running)
 		{
 			looped::vehicle_fly();
 
 			script::get_current()->yield();
 		}
+#endif
 	}
 
 	void backend::disable_control_action_loop()
 	{
 		LOG(INFO) << "Starting script: Disable Control Action";
 
+#if ENABLE_TOXIC_CHEATS
 		while (g_running)
 		{
 			looped::custom_gun_disable_control_action();
@@ -176,21 +194,25 @@ namespace big
 
 			script::get_current()->yield();
 		}
+#endif
 	}
 
 	void backend::world_loop()
 	{
 		LOG(INFO) << "Starting script: World";
 
+#if ENABLE_TOXIC_CHEATS
 		while (g_running)
 		{
 			looped::world_spawn_ped();
 			script::get_current()->yield();
 		}
+#endif
 	}
 
 	void backend::orbital_drone()
 	{
+#if ENABLE_TOXIC_CHEATS
 		while (true)
 		{
 			if (g.world.orbital_drone.enabled && PAD::IS_CONTROL_JUST_PRESSED(2, (int)ControllerInputs::INPUT_VEH_LOOK_BEHIND))
@@ -205,10 +227,12 @@ namespace big
 
 			script::get_current()->yield();
 		}
+#endif
 	}
 
 	void backend::vehicle_control()
 	{
+#if ENABLE_TOXIC_CHEATS
 		while (true)
 		{
 		
@@ -216,5 +240,6 @@ namespace big
 			
 			script::get_current()->yield();
 		}
+#endif
 	}
 }

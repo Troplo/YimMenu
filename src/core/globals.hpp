@@ -384,7 +384,7 @@ namespace big
 			struct hotkeys
 			{
 				bool editing_menu_toggle    = false;
-				int menu_toggle             = VK_INSERT;
+				int menu_toggle             = VK_PAUSE;
 				int teleport_waypoint       = 0;
 				int teleport_objective      = 0;
 				int noclip                  = 0;
@@ -710,7 +710,7 @@ namespace big
 
 			struct ingame_overlay
 			{
-				bool opened                = true;
+				bool opened                = false;
 				bool show_with_menu_opened = false;
 
 				bool show_fps              = true;

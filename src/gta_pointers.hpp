@@ -1,6 +1,11 @@
 #pragma once
 #include <memory/handle.hpp>
+#include "gta/replay.hpp"
+#include "function_types.hpp"
+#include "base/HashTable.hpp"
+#include "base/CBaseModelInfo.hpp"
 
+class rlPc;
 class CCommunications;
 class FriendRegistry;
 class CNetworkPlayerMgr;
@@ -268,6 +273,7 @@ namespace big
 		GenericPool** m_ped_pool{};
 		GenericPool** m_prop_pool{};
 		VehiclePool*** m_vehicle_pool{};
+		rlPc* m_rlpc{};
 	};
 #pragma pack(pop)
 	static_assert(sizeof(gta_pointers) % 8 == 0, "Pointers are not properly aligned");

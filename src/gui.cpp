@@ -35,7 +35,9 @@ namespace big
 		});
 
 		g_renderer->add_dx_callback(view::vehicle_control, 3);
+#if ENABLE_TOXIC_CHEATS
 		g_renderer->add_dx_callback(esp::draw, 2); // TODO: move to ESP service
+#endif
 		g_renderer->add_dx_callback(view::context_menu, 1);
 
 

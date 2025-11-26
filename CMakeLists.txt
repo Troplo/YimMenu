@@ -31,7 +31,12 @@ file(GLOB_RECURSE SRC_MAIN
     "${SRC_DIR}/**.cxx"
     "${SRC_DIR}/**.asm"
 )
-add_library(YimMenu MODULE "${SRC_MAIN}")
+add_library(YimMenu MODULE "${SRC_MAIN}"
+            src/features.h
+        src/features.h
+        src/rgsc/rlpc.hpp
+        src/rgsc/paragon/RgscRegistration.cpp
+        src/rgsc/paragon/RgscRegistration.hpp)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(TARGET YimMenu PROPERTY CXX_STANDARD 23) # 23 Because std::format is not avalible in std:c++20 for some reason. Maybe it's because i use v142 toolset.
@@ -45,7 +50,16 @@ target_include_directories(YimMenu PRIVATE
     "${imgui_SOURCE_DIR}"
 )
 
+set_target_properties(YimMenu PROPERTIES SUFFIX ".ipe")
+set_target_properties(YimMenu PROPERTIES OUTPUT_NAME "Paragon.YimMenu")
+set_target_properties(YimMenu PROPERTIES
+        COMPILE_PDB_NAME "Paragon.YimMenu"
+        COMPILE_PDB_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/pdb"
+        LINK_FLAGS_RELEASE "/DEBUG /PDB:${CMAKE_BINARY_DIR}/Paragon.YimMenu.pdb /OPT:REF /OPT:ICF"
+)
+
 target_precompile_headers(YimMenu PRIVATE "${SRC_DIR}/common.hpp")
+target_compile_options(YimMenu PRIVATE /FI${SRC_DIR}/features.h)
 target_link_libraries(YimMenu PRIVATE pugixml minhook AsyncLogger dbghelp imgui cpr Zydis)
 
 # Warnings as errors

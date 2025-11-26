@@ -9,12 +9,14 @@ namespace big
 
 		if (g_player_service->get_selected()->is_valid())
 		{
+#if ENABLE_TOXIC_CHEATS
 			view::player_info();
 			view::player_troll();
 			view::player_kick();
 			view::player_toxic();
 			view::player_misc();
 			view::player_vehicle();
+#endif
 		}
 	}
 }

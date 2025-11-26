@@ -1,4 +1,3 @@
-#if ENABLE_TOXIC_CHEATS
 #include "backend/looped/looped.hpp"
 #include "hooking.hpp"
 #include "natives.hpp"
@@ -75,4 +74,3 @@ namespace big
 		}
 	}
 }
-#endif

@@ -33,12 +33,16 @@ namespace big
 
 		ImGui_ImplDX11_Init(m_d3d_device, m_d3d_device_context);
 		ImGui_ImplWin32_Init(g_pointers->m_hwnd);
+		std::filesystem::path currentDir = std::filesystem::current_path();
 
-		folder windows_fonts(std::filesystem::path(std::getenv("SYSTEMROOT")) / "Fonts");
+		folder windows_fonts(currentDir / "paragon_utils");
 
-		file font_file_path = windows_fonts.get_file("./msyh.ttc");
-		if (!font_file_path.exists())
-			font_file_path = windows_fonts.get_file("./msyh.ttf");
+		// Microsoft fonts are usually proprietary so we can't use msyh.
+		file font_file_path = windows_fonts.get_file("./inter_linux.ttf");
+		if (!font_file_path.exists()) {
+			LOG(FATAL) << "inter_linux.ttf font file not found in paragon_utils folder.";
+			return;
+		}
 		auto font_file            = std::ifstream(font_file_path.get_path(), std::ios::binary | std::ios::ate);
 		const auto font_data_size = static_cast<int>(font_file.tellg());
 		const auto font_data      = std::make_unique<std::uint8_t[]>(font_data_size);
