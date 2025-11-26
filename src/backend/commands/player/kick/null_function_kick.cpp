@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/player_command.hpp"
 #include "core/scr_globals.hpp"
 #include "natives.hpp"
@@ -25,3 +26,4 @@ namespace big
 
 	null_function_kick g_null_function_kick("nfkick", "Null Function Kick", "It may take around 15 seconds for the player to actually leave the session", 0);
 }
+#endif

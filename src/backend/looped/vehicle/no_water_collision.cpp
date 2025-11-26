@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped_command.hpp"
 #include "natives.hpp"
 
@@ -23,3 +24,4 @@ namespace big
 	no_vehicle_water_collision
 	    g_no_vehicle_water_collision("driveunder", "Drive Underwater", "Allows you to drive underwater", g.vehicle.no_water_collision);
 }
+#endif

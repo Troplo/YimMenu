@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/player_command.hpp"
 #include "natives.hpp"
 #include "pointers.hpp"
@@ -33,3 +34,4 @@ namespace big
 
 	kill_engine g_kill_engine("killengine", "Kill Vehicle Engine", "Breaks their engine", 0);
 }
+#endif

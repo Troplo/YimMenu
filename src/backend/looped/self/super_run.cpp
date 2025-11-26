@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped_command.hpp"
 #include "gta/enums.hpp"
 #include "natives.hpp"
@@ -63,3 +64,4 @@ namespace big
 
 	super_run g_super_run("fastrun", "Super Run", "Makes you run much faster", g.self.super_run);
 }
+#endif

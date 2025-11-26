@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/player_command.hpp"
 #include "core/scr_globals.hpp"
 #include "natives.hpp"
@@ -34,3 +35,4 @@ namespace big
 
 	show_transaction_error g_show_transaction_error("error", "Show Transaction Error", "Shows a transaction error to the player", 0);
 }
+#endif

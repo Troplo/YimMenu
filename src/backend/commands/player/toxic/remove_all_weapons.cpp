@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/player_command.hpp"
 #include "natives.hpp"
 #include "pointers.hpp"
@@ -23,3 +24,4 @@ namespace big
 
 	remove_all_weapons g_remove_all_weapons("remweaps", "Remove All Weapons", "Remove all weapons from the player", 0);
 }
+#endif

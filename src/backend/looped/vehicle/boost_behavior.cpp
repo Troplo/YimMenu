@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped/looped.hpp"
 #include "core/enums.hpp"
 #include "natives.hpp"
@@ -23,3 +24,4 @@ namespace big
 		}
 	}
 }
+#endif

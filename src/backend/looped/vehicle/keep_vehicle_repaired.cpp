@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped_command.hpp"
 #include "natives.hpp"
 #include "util/vehicle.hpp"
@@ -18,3 +19,4 @@ namespace big
 	keep_vehicle_repaired g_keep_vehicle_repaired("keepfixed", "Keep Vehicle Repaired", "Keeps your vehicle free of wear and tear",
 	    g.vehicle.keep_vehicle_repaired);
 }
+#endif

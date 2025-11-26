@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/player_command.hpp"
 #include "natives.hpp"
 #include "pointers.hpp"
@@ -42,3 +43,4 @@ namespace big
 		g_flip_180("flip180", "Rotate 180", "Rotates their car around", 0)
 			;
 }
+#endif

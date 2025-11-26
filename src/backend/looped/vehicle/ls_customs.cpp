@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped/looped.hpp"
 #include "gta/enums.hpp"
 #include "gta_util.hpp"
@@ -30,8 +31,8 @@ namespace big
 					GRAPHICS::REQUEST_STREAMED_TEXTURE_DICT("ShopUI_Title_Los_Santos_Car_Meet", false);
 
 					// clang-format off
-					while (!GRAPHICS::HAS_STREAMED_TEXTURE_DICT_LOADED("CommonMenu") 
-						|| !GRAPHICS::HAS_STREAMED_TEXTURE_DICT_LOADED("MPShopSale") 
+					while (!GRAPHICS::HAS_STREAMED_TEXTURE_DICT_LOADED("CommonMenu")
+						|| !GRAPHICS::HAS_STREAMED_TEXTURE_DICT_LOADED("MPShopSale")
 						|| !GRAPHICS::HAS_STREAMED_TEXTURE_DICT_LOADED("ShopUI_Title_Los_Santos_Car_Meet"))
 						script::get_current()->yield();
 					// clang-format on
@@ -99,3 +100,4 @@ namespace big
 		}
 	}
 }
+#endif

@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/player_command.hpp"
 #include "core/scr_globals.hpp"
 #include "natives.hpp"
@@ -29,3 +30,4 @@ namespace big
 
 	send_fake_ban_message g_send_fake_ban_message("fakeban", "Send Fake Ban Message", "Sends a fake ban notification to the player", 0);
 }
+#endif

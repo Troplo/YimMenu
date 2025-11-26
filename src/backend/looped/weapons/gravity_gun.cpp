@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped/looped.hpp"
 #include "core/enums.hpp"
 #include "gta/enums.hpp"
@@ -125,3 +126,4 @@ namespace big
 		}
 	}
 }
+#endif

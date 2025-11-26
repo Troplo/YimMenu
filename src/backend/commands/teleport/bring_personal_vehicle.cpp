@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/command.hpp"
 #include "natives.hpp"
 #include "util/mobile.hpp"
@@ -18,3 +19,4 @@ namespace big
 
 	bring_personal_vehicle g_bring_personal_vehicle("bringpv", "Bring Personal Vehicle", "Teleports your PV near you", 0);
 }
+#endif

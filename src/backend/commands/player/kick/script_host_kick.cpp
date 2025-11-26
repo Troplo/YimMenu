@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/player_command.hpp"
 #include "core/scr_globals.hpp"
 #include "natives.hpp"
@@ -29,3 +30,4 @@ namespace big
 
 	script_host_kick g_script_host_kick("shkick", "Script Host Kick", "Blocked by most menus", 0, false);
 }
+#endif

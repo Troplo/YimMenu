@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/player_command.hpp"
 #include "natives.hpp"
 #include "pointers.hpp"
@@ -28,3 +29,4 @@ namespace big
 
 	remote_control_vehicle g_remote_control_vehicle("rcplayer", "Remote Control Vehicle", "Take control of the player's vehicle. Spectate the player beforehand for best results", 0, false);
 }
+#endif

@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped/looped.hpp"
 #include "backend/looped_command.hpp"
 #include "fiber_pool.hpp"
@@ -97,3 +98,4 @@ namespace big
 
 	free_cam g_free_cam("freecam", "Freecam", "Allows you to move your camera freely?", g.self.free_cam);
 }
+#endif

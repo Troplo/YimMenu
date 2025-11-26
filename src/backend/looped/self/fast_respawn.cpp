@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped/looped.hpp"
 #include "backend/looped_command.hpp"
 #include "fiber_pool.hpp"
@@ -24,3 +25,4 @@ namespace big
 
 	fast_respawn g_fast_respawn("fastrespawn", "Instant Respawn", "Makes you respawn instantly when you die", g.self.fast_respawn);
 }
+#endif

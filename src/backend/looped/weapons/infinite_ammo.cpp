@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped_command.hpp"
 #include "natives.hpp"
 
@@ -20,3 +21,4 @@ namespace big
 
 	infinite_ammo g_infinite_ammo("infammo", "Infinite Ammo", "Never run out of ammo again", g.weapons.infinite_ammo);
 }
+#endif

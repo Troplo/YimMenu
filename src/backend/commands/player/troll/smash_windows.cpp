@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/player_command.hpp"
 #include "natives.hpp"
 #include "pointers.hpp"
@@ -27,3 +28,4 @@ namespace big
 
 	smash_windows g_smash_windows("smashwindows", "Smash Vehicle Windows", "Smashes all their windows", 0);
 }
+#endif

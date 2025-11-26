@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped/looped.hpp"
 #include "natives.hpp"
 #include "services/players/player_service.hpp"
@@ -46,3 +47,4 @@ namespace big
 		bReset = false;
 	}
 }
+#endif

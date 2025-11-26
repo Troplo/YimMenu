@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/player_command.hpp"
 #include "core/scr_globals.hpp"
 #include "natives.hpp"
@@ -29,3 +30,4 @@ namespace big
 
 	bail_kick g_bail_kick("bailkick", "Bail Kick", "Blocked by most menus", 0);
 }
+#endif

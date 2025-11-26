@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/player_command.hpp"
 #include "natives.hpp"
 #include "pointers.hpp"
@@ -37,3 +38,4 @@ namespace big
 
 	burst_tyres g_burst_tyres("burstwheels", "Burst Vehicle Tyres", "Removes their tyres.", 0);
 }
+#endif

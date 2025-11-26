@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped_command.hpp"
 #include "natives.hpp"
 
@@ -23,3 +24,4 @@ namespace big
 
 	infinite_mag g_infinite_mag("infclip", "Infinite Clip", "Shoot forever without needing to reload", g.weapons.infinite_mag);
 }
+#endif

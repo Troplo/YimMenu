@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/command.hpp"
 #include "util/vehicle.hpp"
 
@@ -14,3 +15,4 @@ namespace big
         };
         repairpv g_repairpv("repairpv", "Repair PV", "Repairs your currently active personal vehicle", 0);
 }
+#endif

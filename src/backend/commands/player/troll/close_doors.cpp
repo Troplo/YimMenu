@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/player_command.hpp"
 #include "natives.hpp"
 #include "pointers.hpp"
@@ -33,3 +34,4 @@ namespace big
 
 	close_doors g_close_doors("closedoors", "Close Vehicle Doors", "Closes all vehicle doors", 0);
 }
+#endif

@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/bool_command.hpp"
 #include "backend/player_command.hpp"
 #include "core/scr_globals.hpp"
@@ -71,3 +72,4 @@ namespace big
 	bool_command g_show_cheating_message("breakupcheating", "Show Cheating Message", "Shows a \"was detected cheating and has been removed from the session\" instead of the usual leave message when the player gets kicked",
 	    g.session.show_cheating_message);
 }
+#endif

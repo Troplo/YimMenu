@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/command.hpp"
 #include "natives.hpp"
 #include "util/teleport.hpp"
@@ -20,3 +21,4 @@ namespace big
 
 	teleport_to_last_vehicle g_teleport_to_last_vehicle("lastvehtp", "Teleport To Last Vehicle", "Teleports you into your last driven vehicle", 0);
 }
+#endif

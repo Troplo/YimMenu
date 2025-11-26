@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "util/teleport.hpp"
 
 #include "backend/player_command.hpp"
@@ -18,3 +19,4 @@ namespace big
 
 	teleport_to_player g_teleport_to_player("playertp", "Teleport", "Teleports you to the player", 0, false);
 }
+#endif

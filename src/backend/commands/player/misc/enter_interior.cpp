@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/player_command.hpp"
 #include "core/scr_globals.hpp"
 #include "natives.hpp"
@@ -50,3 +51,4 @@ namespace big
 
 	enter_interior g_enter_interior("enterint", "Enter Interior", "Enters the player's interior", 0, false);
 }
+#endif

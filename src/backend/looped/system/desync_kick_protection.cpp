@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped/looped.hpp"
 #include "fiber_pool.hpp"
 #include "gta_util.hpp"
@@ -52,3 +53,4 @@ namespace big
 		gta_util::get_network()->m_game_complaint_mgr.m_host_token = old;
 	}
 }
+#endif

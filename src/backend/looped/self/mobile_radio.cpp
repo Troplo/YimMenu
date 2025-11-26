@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped_command.hpp"
 #include "natives.hpp"
 
@@ -22,3 +23,4 @@ namespace big
 
 	mobile_radio g_mobile_radio("mobileradio", "Mobile Radio", "Allows you to listen to the radio on foot", g.self.mobile_radio);
 }
+#endif

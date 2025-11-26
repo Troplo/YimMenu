@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped_command.hpp"
 #include "natives.hpp"
 #include "pointers.hpp"
@@ -34,3 +35,4 @@ namespace big
 	    g.world.nearby.veh_rain);
 
 }
+#endif

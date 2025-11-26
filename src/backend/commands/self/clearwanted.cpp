@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/command.hpp"
 #include "natives.hpp"
 
@@ -20,3 +21,4 @@ namespace big
 
 	clear_wanted g_clear_wanted("clearwantedlvl", "Clear Wanted Level", "Clears your wanted level", 0);
 }
+#endif

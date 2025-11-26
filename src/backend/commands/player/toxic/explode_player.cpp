@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/player_command.hpp"
 #include "natives.hpp"
 #include "pointers.hpp"
@@ -22,3 +23,4 @@ namespace big
 
 	explode_player g_explode_player("explode", "Explode Player", "Blows the player up", 0);
 }
+#endif

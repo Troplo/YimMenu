@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped_command.hpp"
 #include "natives.hpp"
 
@@ -19,3 +20,4 @@ namespace big
 	unlimited_oxygen
 	    g_unlimited_oxygen("infoxy", "Unlimited Oxygen", "Allows you to stay underwater without losing oxygen", g.self.unlimited_oxygen);
 }
+#endif

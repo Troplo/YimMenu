@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/player_command.hpp"
 #include "core/scr_globals.hpp"
 #include "fiber_pool.hpp"
@@ -145,3 +146,4 @@ namespace big
 
 	kick_from_interior g_kick_from_interior("intkick", "Kick From Interior", "Kicks the player from the interior they are in", 0);
 }
+#endif

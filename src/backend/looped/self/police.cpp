@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped/looped.hpp"
 #include "pointers.hpp"
 #include "util/police.hpp"
@@ -31,3 +32,4 @@ namespace big
 			g_local_player->m_player_info->m_wanted_level = g.self.wanted_level;
 	}
 }
+#endif

@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped_command.hpp"
 #include "gta/enums.hpp"
 #include "natives.hpp"
@@ -20,3 +21,4 @@ namespace big
 	vehicle_jump
 	    g_vehicle_jump("vehjump", "Vehicle Jump", "Makes the vehicle jump when you press the handbrake", g.vehicle.vehicle_jump);
 }
+#endif

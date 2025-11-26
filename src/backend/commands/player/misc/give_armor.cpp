@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/player_command.hpp"
 #include "natives.hpp"
 #include "pointers.hpp"
@@ -23,3 +24,4 @@ namespace big
 
 	give_armor g_give_armor("givearmor", "Give Armor", "Gives the player some armor", 0);
 }
+#endif

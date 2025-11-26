@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped/looped.hpp"
 #include "backend/looped_command.hpp"
 #include "fiber_pool.hpp"
@@ -42,3 +43,4 @@ namespace big
 	bool_command g_localveh_visibility("localinvisveh", "Visible Locally", "Makes your car visible to yourself, other players will still not be able to see it",
 	    g.vehicle.localveh_visibility);
 }
+#endif

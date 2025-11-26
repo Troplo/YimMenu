@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/player_command.hpp"
 #include "natives.hpp"
 #include "pointers.hpp"
@@ -25,3 +26,4 @@ namespace big
 
 	black_tint g_black_tint("blacktint", "Black Window Tint", "Makes their windows black.", 0);
 }
+#endif

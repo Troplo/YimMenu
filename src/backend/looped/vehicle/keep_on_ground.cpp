@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped_command.hpp"
 #include "natives.hpp"
 
@@ -19,3 +20,4 @@ namespace big
 	keep_on_ground g_keep_on_ground("keeponground", "Keep On Ground", "Makes it so your vehicle is always on the ground on all four wheels",
 	    g.vehicle.keep_on_ground);
 }
+#endif

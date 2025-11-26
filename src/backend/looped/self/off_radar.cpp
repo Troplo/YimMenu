@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped_command.hpp"
 #include "core/scr_globals.hpp"
 #include "natives.hpp"
@@ -22,3 +23,4 @@ namespace big
 
 	off_radar g_off_radar("otr", "Off Radar", "Hides your blip from other players", g.self.off_radar);
 }
+#endif

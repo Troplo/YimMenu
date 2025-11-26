@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/player_command.hpp"
 #include "core/scr_globals.hpp"
 #include "gta_util.hpp"
@@ -31,3 +32,4 @@ namespace big
 
 	complaint_kick g_complaint_kick("desync", "Desync Kick", "This may take around 10 seconds to kick the player. Does not work against the host", 0);// this is pretty much desync except we don't actually remove the player from CNetworkPlayerMgr
 }
+#endif

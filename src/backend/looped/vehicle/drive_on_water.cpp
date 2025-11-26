@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped/looped.hpp"
 #include "backend/looped_command.hpp"
 #include "fiber_pool.hpp"
@@ -110,3 +111,4 @@ namespace big
 
 	drive_on_water g_drive_on_water("driveonwater", "Drive On Water", "Allows you to drive on water", g.vehicle.drive_on_water);
 }
+#endif

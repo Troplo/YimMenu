@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/player_command.hpp"
 #include "natives.hpp"
 #include "pointers.hpp"
@@ -17,3 +18,4 @@ namespace big
 
 	steal_identity g_steal_identity("copymodel", "Steal Identity", "Copies the player's model to your ped", 0, false);// do we really need this?
 }
+#endif

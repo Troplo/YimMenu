@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/command.hpp"
 #include "natives.hpp"
 
@@ -15,3 +16,4 @@ namespace big
 
 	suicide g_suicide("suicide", "Suicide", "Kills you", 0);
 }
+#endif

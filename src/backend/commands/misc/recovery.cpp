@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/command.hpp"
 #include "natives.hpp"
 
@@ -23,3 +24,4 @@ namespace big
 	recovery g_drop("drop", "", "", 0);
 	recovery g_stats("stats", "", "", 0);
 }
+#endif

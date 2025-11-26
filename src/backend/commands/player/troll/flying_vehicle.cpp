@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/player_command.hpp"
 #include "natives.hpp"
 #include "pointers.hpp"
@@ -30,3 +31,4 @@ namespace big
 
 	flying_vehicle g_flying_vehicle("flyingveh", "Flying Vehicle", "Catapults their car to  the sky.", 0);
 }
+#endif

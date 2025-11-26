@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped/looped.hpp"
 #include "core/data/hud_component_names.hpp"
 #include "natives.hpp"
@@ -61,3 +62,4 @@ namespace big
 		}
 	}
 }
+#endif

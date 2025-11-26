@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/player_command.hpp"
 #include "core/scr_globals.hpp"
 #include "natives.hpp"
@@ -34,3 +35,4 @@ namespace big
 
 	send_sext g_send_sext("sext", "Send Sext", "Sends a random sext (with an image attachment) to the player", 0);
 }
+#endif

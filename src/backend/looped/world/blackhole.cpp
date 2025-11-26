@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped_command.hpp"
 #include "gta_util.hpp"
 #include "natives.hpp"
@@ -71,3 +72,4 @@ namespace big
 	bool_command g_blackhole_vehicles("blackholeincvehs", "Vehicles", "Includes all nearby vehicles in the blackholes path of destruction",
 	    g.world.blackhole.include_vehicles);
 }
+#endif

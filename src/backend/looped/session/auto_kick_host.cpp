@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped/looped.hpp"
 #include "backend/player_command.hpp"
 #include "natives.hpp"
@@ -21,3 +22,4 @@ namespace big
 		bLastKickHost = kick_host;
 	}
 }
+#endif

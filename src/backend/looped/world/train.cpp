@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "util/train.hpp"
 
 #include "backend/looped/looped.hpp"
@@ -31,3 +32,4 @@ namespace big
 			VEHICLE::SET_RENDER_TRAIN_AS_DERAILED(train, g.world.train.derail_train);
 	}
 }
+#endif

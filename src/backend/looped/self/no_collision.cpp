@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped/looped.hpp"
 #include "backend/looped_command.hpp"
 #include "fiber_pool.hpp"
@@ -31,3 +32,4 @@ namespace big
 	no_collision
 	    g_no_collision("nocollision", "No Collision", "Allows you to walk through vehicles and most obstacles", g.self.no_collision);
 }
+#endif

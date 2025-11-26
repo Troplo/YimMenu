@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped_command.hpp"
 #include "gta/enums.hpp"
 #include "natives.hpp"
@@ -41,3 +42,4 @@ namespace big
 
 	horn_boost g_horn_boost("hornboost", "Horn Boost", "Boosts your vehicle forward when you sound the horn", g.vehicle.horn_boost);
 }
+#endif

@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped/looped.hpp"
 #include "backend/looped_command.hpp"
 #include "natives.hpp"
@@ -39,3 +40,4 @@ namespace big
 	godmode_internal g_godmode_internal("$$godmode", "", "", true_ref);
 	bool_command g_godmode("godmode", "God Mode", "Prevents you from taking any form of damage", g.self.god_mode);
 }
+#endif

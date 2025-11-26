@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/command.hpp"
 #include "natives.hpp"
 #include "util/teleport.hpp"
@@ -16,3 +17,4 @@ namespace big
 
 	teleport_to_waypoint g_teleport_to_waypoint("waypointtp", "Teleport To Waypoint", "Teleports you to your waypoint", 0);
 }
+#endif

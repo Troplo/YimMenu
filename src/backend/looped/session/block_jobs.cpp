@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped/looped.hpp"
 #include "core/scr_globals.hpp"
 #include "gta_util.hpp"
@@ -33,3 +34,4 @@ namespace big
 		}
 	}
 }
+#endif

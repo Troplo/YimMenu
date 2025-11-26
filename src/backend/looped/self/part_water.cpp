@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped/looped.hpp"
 #include "backend/looped_command.hpp"
 #include "natives.hpp"
@@ -32,3 +33,4 @@ namespace big
 
 	partwater g_partwater("partwater", "Part Water", "Makes you like Moses", g.world.water.part_water);
 }
+#endif

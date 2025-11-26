@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped/looped.hpp"
 
 namespace big
@@ -77,3 +78,4 @@ namespace big
 		}
 	}
 }
+#endif

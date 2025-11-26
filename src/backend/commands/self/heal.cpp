@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/command.hpp"
 #include "natives.hpp"
 
@@ -16,3 +17,4 @@ namespace big
 
 	heal g_heal("heal", "Heal", "Restores full health and armor", 0);
 }
+#endif

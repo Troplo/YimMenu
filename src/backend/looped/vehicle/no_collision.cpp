@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped_command.hpp"
 #include "pointers.hpp"
 #include "util/vehicle.hpp"
@@ -25,3 +26,4 @@ namespace big
 	};
 	veh_no_collision g_veh_no_collision("vehnocollision", "No Collision", "Same as Ped No Collision, except this is global and also affects Ped", g.vehicle.no_collision);
 }
+#endif

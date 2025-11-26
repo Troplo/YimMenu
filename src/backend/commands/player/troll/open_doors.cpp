@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/player_command.hpp"
 #include "natives.hpp"
 #include "pointers.hpp"
@@ -37,3 +38,4 @@ namespace big
 
 	open_doors g_open_doors("opendoors", "Opens Vehicle Doors", "Opens all vehicle doors", 0);
 }
+#endif

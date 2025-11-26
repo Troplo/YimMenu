@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/command.hpp"
 #include "natives.hpp"
 #include "util/mobile.hpp"
@@ -21,3 +22,4 @@ namespace big
 
 	teleport_to_personal_vehicle g_teleport_to_personal_vehicle("pvtp", "Teleport To Personal Vehicle", "Teleports you into your PV", 0);
 }
+#endif

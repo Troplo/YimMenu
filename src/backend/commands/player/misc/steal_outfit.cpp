@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/player_command.hpp"
 #include "natives.hpp"
 #include "pointers.hpp"
@@ -17,3 +18,4 @@ namespace big
 
 	steal_outfit g_steal_outfit("copyoutfit", "Steal Outfit", "Copies the player's outfit to your ped", 0, false);
 }
+#endif

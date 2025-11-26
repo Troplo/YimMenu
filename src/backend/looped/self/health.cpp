@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "natives.hpp"
 #include "backend/looped_command.hpp"
 #include "gta/enums.hpp"
@@ -23,3 +24,4 @@ namespace big
 
 	health_regen_looped g_health_regen_looped("healthregen", "Override Health Regen", "Turn on the regen multiplier you have set.", g.self.healthregen);
 }
+#endif

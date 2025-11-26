@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/player_command.hpp"
 #include "natives.hpp"
 #include "pointers.hpp"
@@ -23,3 +24,4 @@ namespace big
 
 	ragdoll_player g_ragdoll_player("ragdoll", "Ragdoll Player", "Ragdolls the player", 0);
 }
+#endif

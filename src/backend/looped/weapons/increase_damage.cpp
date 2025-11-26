@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "natives.hpp"
 #include "backend/looped_command.hpp"
 
@@ -10,9 +11,9 @@ namespace big
 
 		virtual void on_tick() override
 		{
-			if (g.weapons.increased_damage != 1) 
+			if (g.weapons.increased_damage != 1)
 			{
-				Hash weapon{}; 
+				Hash weapon{};
 				WEAPON::GET_CURRENT_PED_WEAPON(self::ped, &weapon, 0);
 				WEAPON::SET_WEAPON_DAMAGE_MODIFIER(weapon, g.weapons.increased_damage);
 			}
@@ -20,7 +21,7 @@ namespace big
 
 		virtual void on_disable() override
 		{
-			Hash weapon{}; 
+			Hash weapon{};
 			WEAPON::GET_CURRENT_PED_WEAPON(self::ped, &weapon, 0);
 			WEAPON::SET_WEAPON_DAMAGE_MODIFIER(weapon, 1);
 		}
@@ -29,3 +30,4 @@ namespace big
 	increased_damage
 	    g_increased_damage("incrdamage", "Damage Override", "Sets your damage to whatever you want", g.weapons.increase_damage);
 }
+#endif

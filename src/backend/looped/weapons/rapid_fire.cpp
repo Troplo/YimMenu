@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped_command.hpp"
 #include "gta/enums.hpp"
 #include "gui.hpp"
@@ -29,3 +30,4 @@ namespace big
 
 	rapid_fire g_rapid_fire("rapidfire", "Rapid Fire", "Makes your weapon fire insanely fast", g.weapons.rapid_fire);
 }
+#endif

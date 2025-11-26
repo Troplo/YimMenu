@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/player_command.hpp"
 #include "natives.hpp"
 #include "pointers.hpp"
@@ -23,3 +24,4 @@ namespace big
 
 	give_health g_give_health("givehealth", "Give Health", "Gives the player some health", 0);
 }
+#endif

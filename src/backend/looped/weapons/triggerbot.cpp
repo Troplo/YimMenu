@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped_command.hpp"
 #include "gta/enums.hpp"
 #include "natives.hpp"
@@ -28,3 +29,4 @@ namespace big
 
 	triggerbot g_triggerbot("triggerbot", "Triggerbot", "Shoots at a ped with fast ease", g.weapons.triggerbot);
 }
+#endif

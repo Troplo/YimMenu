@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/player_command.hpp"
 #include "natives.hpp"
 #include "pointers.hpp"
@@ -24,3 +25,4 @@ namespace big
 
 	trigger_ceo_raid g_trigger_ceo_raid("ceoraid", "Trigger Special Cargo Raid", "The player has to be in a CEO for this to work", 0);
 }
+#endif

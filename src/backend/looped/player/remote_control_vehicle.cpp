@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped/looped.hpp"
 #include "fiber_pool.hpp"
 #include "natives.hpp"
@@ -47,3 +48,4 @@ namespace big
 		}
 	}
 };
+#endif

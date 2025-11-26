@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/player_command.hpp"
 #include "core/scr_globals.hpp"
 #include "natives.hpp"
@@ -54,3 +55,4 @@ namespace big
 	start_script<217> g_start_qub3d("qub3d", "Start Qub3D", "Starts the arcade game Qub3D in fullscreen", 0);
 	start_script<218> g_start_camhedz("camhedz", "Start Camhedz", "Starts the arcade game Camhedz in fullscreen", 0);
 }
+#endif

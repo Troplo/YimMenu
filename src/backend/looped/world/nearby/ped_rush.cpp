@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped_command.hpp"
 #include "natives.hpp"
 #include "pointers.hpp"
@@ -30,3 +31,4 @@ namespace big
 	ped_rush g_ped_rush("pedrush", "Ped Rush", "Makes the nearby peds move with a purpose.", g.world.nearby.ped_rush);
 
 }
+#endif

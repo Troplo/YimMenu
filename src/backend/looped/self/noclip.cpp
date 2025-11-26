@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped/looped.hpp"
 #include "backend/looped_command.hpp"
 #include "fiber_pool.hpp"
@@ -96,3 +97,4 @@ namespace big
 
 	noclip g_noclip("noclip", "No Clip", "Allows you to fly through the map", g.self.noclip);
 }
+#endif

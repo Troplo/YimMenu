@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/player_command.hpp"
 #include "core/scr_globals.hpp"
 #include "natives.hpp"
@@ -28,3 +29,4 @@ namespace big
 
 	send_to_island g_send_to_island("cayotp", "TP To Cayo Perico", "Teleports the player to Cayo Perico", 0);
 }
+#endif

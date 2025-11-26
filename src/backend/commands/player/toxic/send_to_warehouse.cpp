@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/player_command.hpp"
 #include "core/scr_globals.hpp"
 #include "natives.hpp"
@@ -30,3 +31,4 @@ namespace big
 
 	send_to_warehouse g_send_to_warehouse("warehousetp", "TP To Warehouse", "Teleports the player to the specified warehouse index", 1);
 }
+#endif

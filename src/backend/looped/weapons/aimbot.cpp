@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped_command.hpp"
 #include "gta/enums.hpp"
 #include "natives.hpp"
@@ -147,3 +148,4 @@ namespace big
 	bool_command
 	    g_aimbot_on_enemy("aimatenemy", "Enemy", "Eliminate your enemies, and win your missions", g.weapons.aimbot.on_enemy);
 }
+#endif

@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped_command.hpp"
 #include "natives.hpp"
 #include "util/teleport.hpp"
@@ -21,3 +22,4 @@ namespace big
 	auto_tp_to_waypoint g_auto_tp_to_waypoint("autotptowp", "Auto-Teleport To Waypoint", "Automatically teleports you to a waypoint as soon as you set one.",
 	    g.self.auto_tp);
 }
+#endif

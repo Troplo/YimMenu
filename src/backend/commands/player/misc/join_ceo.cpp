@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/player_command.hpp"
 #include "core/scr_globals.hpp"
 #include "natives.hpp"
@@ -18,3 +19,4 @@ namespace big
 
 	join_ceo g_join_ceo("joinceo", "Join CEO/MC", "Joins the player's CEO/MC", 0, false);
 }
+#endif

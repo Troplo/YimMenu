@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/player_command.hpp"
 #include "core/scr_globals.hpp"
 #include "natives.hpp"
@@ -25,3 +26,4 @@ namespace big
 
 	force_into_mission g_force_into_mission("mission", "Force Into Mission", "Forces the player into a gunrunning mission", 0);
 }
+#endif

@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/bool_command.hpp"
 #include "backend/command.hpp"
 #include "natives.hpp"
@@ -61,3 +62,4 @@ namespace big
 	bool_command g_spawn_inside("spawnin", "Spawn Inside", "Controls whether the player should be set inside the vehicle after it spawns",
 	    g.spawn_vehicle.spawn_inside);
 }
+#endif

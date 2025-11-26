@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped_command.hpp"
 #include "natives.hpp"
 #include "pointers.hpp"
@@ -30,3 +31,4 @@ namespace big
 	ped_rain g_ped_rain("pedrain", "Rain Peds", "Will pour down and rain nearby peds.", g.world.nearby.ped_rain);
 
 }
+#endif

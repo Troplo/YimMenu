@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/bool_command.hpp"
 #include "backend/looped/looped.hpp"
 #include "backend/looped_command.hpp"
@@ -68,3 +69,4 @@ namespace big
 	bool_command g_speedo_meter_left_side("speedometerleftside", "Align to left", "Aligns the speedo meter text to the left instead of to the right.",
 	    g.vehicle.speedo_meter.left_side);
 }
+#endif

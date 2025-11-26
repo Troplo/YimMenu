@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped_command.hpp"
 #include "core/scr_globals.hpp"
 #include "natives.hpp"
@@ -21,3 +22,4 @@ namespace big
 
 	disable_phone g_disable_phone("nophone", "Disable Phone", "Blocks phone and stops all phone calls", g.tunables.disable_phone);
 }
+#endif

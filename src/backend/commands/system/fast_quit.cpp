@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/command.hpp"
 
 namespace big
@@ -14,3 +15,4 @@ namespace big
 
 	fast_quit g_fast_quit("fastquit", "Rage Quit", "We all have bad times sometimes. Close your GTA instant.", 0);
 }
+#endif

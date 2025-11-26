@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped/looped.hpp"
 #include "core/scr_globals.hpp"
 #include "gta/joaat.hpp"
@@ -45,3 +46,4 @@ namespace big
 		last_state = state;
 	}
 }
+#endif

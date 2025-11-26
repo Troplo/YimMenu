@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/player_command.hpp"
 #include "natives.hpp"
 #include "pointers.hpp"
@@ -23,3 +24,4 @@ namespace big
 
 	give_ammo g_give_ammo("giveammo", "Give Ammo", "Gives the player some ammo", 0);
 }
+#endif

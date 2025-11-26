@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/player_command.hpp"
 #include "natives.hpp"
 #include "pointers.hpp"
@@ -17,3 +18,4 @@ namespace big
 
 	bring g_bring("bring", "Bring", "Teleports the player to you", 0, false);
 }
+#endif

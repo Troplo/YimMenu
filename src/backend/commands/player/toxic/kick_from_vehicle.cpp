@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/player_command.hpp"
 #include "gta/net_object_mgr.hpp"
 #include "natives.hpp"
@@ -36,3 +37,4 @@ namespace big
 
 	kick_from_vehicle g_kick_from_vehicle("vehkick", "Vehicle Kick", "Kicks the player from their current vehicle", 0);
 }
+#endif

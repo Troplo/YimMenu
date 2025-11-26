@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/player_command.hpp"
 #include "core/scr_globals.hpp"
 #include "natives.hpp"
@@ -150,3 +151,4 @@ namespace big
 	turn_into_beast g_turn_into_beast("beast", "Turn Into Beast", "Turns the player into the beast", 0, false);
 	turn_into_beast_all g_turn_into_beast_all("beastall", "Turn Everyone Into Beast", "Turns everyone into the beast, including you", 0);
 }
+#endif

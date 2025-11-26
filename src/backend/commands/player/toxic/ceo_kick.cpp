@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/player_command.hpp"
 #include "core/scr_globals.hpp"
 #include "natives.hpp"
@@ -42,3 +43,4 @@ namespace big
 
 	ceo_kick g_ceo_kick("ceokick", "CEO Kick", "Kicks an associate from the CEO/MC. You cannot kick leaders of CEOs/MCs anymore", 0);
 }
+#endif

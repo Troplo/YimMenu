@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/player_command.hpp"
 #include "natives.hpp"
 #include "pointers.hpp"
@@ -45,3 +46,4 @@ namespace big
 
 	send_to_interior g_send_to_interior("interiortp", "TP To Interior", "Teleports the player to the specified interior index", 1);
 }
+#endif

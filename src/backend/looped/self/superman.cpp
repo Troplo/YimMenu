@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped_command.hpp"
 #include "gta/enums.hpp"
 #include "natives.hpp"
@@ -39,3 +40,4 @@ namespace big
 
 	superman g_superman("superman", "Superman", "Fly like a superman", g.self.superman);
 }
+#endif

@@ -1,3 +1,4 @@
+#if ENABLE_TOXIC_CHEATS
 #include "backend/looped_command.hpp"
 #include "natives.hpp"
 
@@ -47,3 +48,4 @@ namespace big
 
 	hudcolor_looped g_hudcolor_looped("hudcolor", "Override HUD Color", "Override HUD colors", g.self.hud.color_override);
 }
+#endif
