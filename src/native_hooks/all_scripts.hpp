@@ -11,6 +11,26 @@ namespace big
 {
 	namespace all_scripts
 	{
+		void STAT_GET_INT(rage::scrNativeCallContext* src) {
+			const auto hash = src->get_arg<Hash>(0);
+			int* out        = src->get_arg<int*>(1);
+			src->set_return_value<BOOL>(STATS::STAT_GET_INT(hash, out, src->get_arg<int>(2)));
+			switch (hash) {
+			case RAGE_JOAAT("MP0_CHAR_IS_NGPC_VERSION"):
+			case RAGE_JOAAT("MP1_CHAR_IS_NGPC_VERSION"):
+			case RAGE_JOAAT("MP1_CHAR_IS_NG_VERSION"):
+			case RAGE_JOAAT("MP0_CHAR_IS_NG_VERSION"):
+			case RAGE_JOAAT("MP0_CHAR_IS_NG_VERSION_SA"):
+			case RAGE_JOAAT("MP1_CHAR_IS_NG_VERSION_SA"):
+				*out             = 1;
+				src->set_return_value<INT>(1);
+				return;
+			default:
+				src->set_return_value<INT>(STATS::STAT_GET_INT(hash, src->get_arg<int*>(1), src->get_arg<int>(2)));
+				return;
+			}
+		}
+
 		void IS_DLC_PRESENT(rage::scrNativeCallContext* src)
 		{
 			const auto hash = src->get_arg<rage::joaat_t>(0);

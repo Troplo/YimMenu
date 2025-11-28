@@ -36,7 +36,8 @@ add_library(YimMenu MODULE "${SRC_MAIN}"
         src/features.h
         src/rgsc/rlpc.hpp
         src/rgsc/paragon/RgscRegistration.cpp
-        src/rgsc/paragon/RgscRegistration.hpp)
+        src/rgsc/paragon/RgscRegistration.hpp
+        src/util/current_module.hpp)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(TARGET YimMenu PROPERTY CXX_STANDARD 23) # 23 Because std::format is not avalible in std:c++20 for some reason. Maybe it's because i use v142 toolset.

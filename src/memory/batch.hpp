@@ -2,6 +2,7 @@
 #include "pattern.hpp"
 #include "signature.hpp"
 #include "range.hpp"
+#include "util/current_module.hpp"
 
 #include <future>
 
@@ -103,7 +104,7 @@ namespace memory
 					std::lock_guard<std::mutex> lock(s_entry_mutex); // Acquire a lock on the mutex to synchronize access.
 
 					std::invoke(std::move(entry.m_on_signature_found), result);
-					LOG(INFO) << "Found '" << entry.m_name << "' Paragon_Legacy.exe+"
+					LOG(INFO) << "Found '" << entry.m_name << "' " << GetCurrentModule() << "+"
 					          << HEX_TO_UPPER(result.as<DWORD64>() - region.begin().as<DWORD64>());
 
 					return true;

@@ -1473,7 +1473,7 @@ namespace big
 	{
 		g_pointers = this;
 
-		const auto mem_region = memory::module("Paragon_Legacy.exe");
+		const auto mem_region = memory::module(GetCurrentModule());
 
 		constexpr auto gta_batch_and_hash = pointers::get_gta_batch();
 		constexpr cstxpr_str gta_batch_name{"GTA5"};
