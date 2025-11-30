@@ -9,22 +9,22 @@
 
 namespace big
 {
-	constexpr auto pointers::get_gta_common_batch()
-	{
-		constexpr auto batch_and_hash = memory::make_batch<
-		// Game Version + Online Version
-		{
-			"GVOV_COMMON",
-			"8B C3 33 D2 C6 44 24 20",
-			[](memory::handle ptr)
-			{
-				g_pointers->m_gta.m_game_version   = ptr.add(0x24).rip().as<const char*>();
-				g_pointers->m_gta.m_online_version = ptr.add(0x24).rip().add(0x20).as<const char*>();
-			}
-		}>();
-
-		return batch_and_hash;
-	}
+	// constexpr auto pointers::get_gta_common_batch()
+	// {
+	// 	constexpr auto batch_and_hash = memory::make_batch<
+	// 	// Game Version + Online Version
+	// 	{
+	// 		"GVOV_COMMON",
+	// 		"8B C3 33 D2 C6 44 24 20",
+	// 		[](memory::handle ptr)
+	// 		{
+	// 			g_pointers->m_gta.m_game_version   = ptr.add(0x24).rip().as<const char*>();
+	// 			g_pointers->m_gta.m_online_version = ptr.add(0x24).rip().add(0x20).as<const char*>();
+	// 		}
+	// 	}>();
+	//
+	// 	return batch_and_hash;
+	// }
 
 	constexpr auto pointers::get_gta_169_batch()
 	{
@@ -2003,6 +2003,15 @@ namespace big
 				g_pointers->m_gta.m_send_clone_create = ptr.sub(0x1C).as<PVOID>();
 			}
 		},
+		{
+			"GVOV",
+			"8B C3 33 D2 C6 44 24 20",
+			[](memory::handle ptr)
+			{
+				g_pointers->m_gta.m_game_version   = ptr.add(0x24).rip().as<const char*>();
+				g_pointers->m_gta.m_online_version = ptr.add(0x24).rip().add(0x20).as<const char*>();
+			}
+		},
 		// PARAGON
 
 		// Rlpc
@@ -2030,7 +2039,7 @@ namespace big
 		// clang-format on
 		return batch_and_hash;
 	}
-
+#if 0
 	constexpr auto pointers::get_gta_161_batch()
 	{
 		constexpr auto batch_and_hash = memory::make_batch<
@@ -3448,6 +3457,7 @@ namespace big
 
 		return batch_and_hash;
 	}
+#endif
 	//
 	// constexpr auto pointers::get_gta_batch()
 	// {
@@ -3551,7 +3561,7 @@ namespace big
 
 	pointers::pointers() :
 	    m_gta_pointers_cache(g_file_manager.get_project_file("./cache/gta_pointers.bin")),
-		m_gta_common_pointers_cache(g_file_manager.get_project_file("./cache/gta_common_pointers.bin")),
+		// m_gta_common_pointers_cache(g_file_manager.get_project_file("./cache/gta_common_pointers.bin")),
 	    m_sc_pointers_cache(g_file_manager.get_project_file("./cache/sc_pointers.bin")),
 	    m_gta_version_target(GTA_VERSION_TARGET)
 	{
@@ -3561,21 +3571,6 @@ namespace big
 		// auto sc_module = memory::module("Paragon.Sdk.dll");
 		// if (sc_module.wait_for_module())
 		{
-			constexpr auto gta_common_batch_and_hash = pointers::get_gta_common_batch();
-			constexpr cstxpr_str gta_common_batch_name{"GTA5_COMMON"};
-			write_to_cache_or_read_from_cache<gta_common_batch_name,
-				gta_common_batch_and_hash.m_hash,
-				gta_pointers_layout_info::offset_of_cache_begin_field,
-				gta_pointers_layout_info::offset_of_cache_end_field,
-				gta_common_batch_and_hash.m_batch>(m_gta_common_pointers_cache, mem_region);
-
-			if (!g_pointers)
-			{
-				LOG(FATAL) << "g_pointers is null";
-				return;
-			}
-
-			if (strcmp(g_pointers->m_gta.m_online_version, "1.61") != 0)
 			{
 				LOG(INFO) << "Detected GTA 1.69";
 				constexpr auto gta_batch_and_hash = pointers::get_gta_169_batch();
@@ -3585,41 +3580,43 @@ namespace big
 					gta_pointers_layout_info::offset_of_cache_begin_field,
 					gta_pointers_layout_info::offset_of_cache_end_field,
 					gta_batch_and_hash.m_batch>(m_gta_pointers_cache, mem_region);
-			} else
-			{
-				LOG(INFO) << "Detected GTA 1.61";
-				constexpr auto gta_batch_and_hash = pointers::get_gta_161_batch();
-				constexpr cstxpr_str gta_batch_name{"GTA5"};
-				write_to_cache_or_read_from_cache<gta_batch_name,
-					gta_batch_and_hash.m_hash,
-					gta_pointers_layout_info::offset_of_cache_begin_field,
-					gta_pointers_layout_info::offset_of_cache_end_field,
-					gta_batch_and_hash.m_batch>(m_gta_pointers_cache, mem_region);
 			}
-		}
+			// else
+			// {
+			// LOG(INFO) << "Detected GTA 1.61";
+			// constexpr auto gta_batch_and_hash = pointers::get_gta_161_batch();
+			// constexpr cstxpr_str gta_batch_name{"GTA5"};
+			// write_to_cache_or_read_from_cache<gta_batch_name,
+			// gta_batch_and_hash.m_hash,
+			// gta_pointers_layout_info::offset_of_cache_begin_field,
+			// gta_pointers_layout_info::offset_of_cache_end_field,
+			// gta_batch_and_hash.m_batch>(m_gta_pointers_cache, mem_region);
+			// }
+			// }
 
-		while (!FindWindow("grcWindow", nullptr))
-			std::this_thread::sleep_for(100ms);
+			while (!FindWindow("grcWindow", nullptr))
+				std::this_thread::sleep_for(100ms);
 
-		// auto sc_module = memory::module("socialclub.dll");
-		// if (sc_module.wait_for_module())
-		// {
+			// auto sc_module = memory::module("socialclub.dll");
+			// if (sc_module.wait_for_module())
+			// {
 			// constexpr auto sc_batch_and_hash = pointers::get_sc_batch();
 			// constexpr cstxpr_str sc_batch_name{"Social Club"};
 			// write_to_cache_or_read_from_cache<sc_batch_name,
-			    // sc_batch_and_hash.m_hash,
-			    // sc_pointers_layout_info::offset_of_cache_begin_field,
-			    // sc_pointers_layout_info::offset_of_cache_end_field,
-			    // sc_batch_and_hash.m_batch>(m_sc_pointers_cache, sc_module);
-		// }
-		// else
+			// sc_batch_and_hash.m_hash,
+			// sc_pointers_layout_info::offset_of_cache_begin_field,
+			// sc_pointers_layout_info::offset_of_cache_end_field,
+			// sc_batch_and_hash.m_batch>(m_sc_pointers_cache, sc_module);
+			// }
+			// else
 			// LOG(WARNING) << "socialclub.dll module was not loaded within the time limit.";
 
-		m_hwnd = FindWindowW(L"grcWindow", nullptr);
+			m_hwnd = FindWindowW(L"grcWindow", nullptr);
 
-		if (!m_hwnd)
-			throw std::runtime_error("Failed to find the game's window.");
-		g_rlPc = m_gta.m_rlpc;
+			if (!m_hwnd)
+				throw std::runtime_error("Failed to find the game's window.");
+			g_rlPc = m_gta.m_rlpc;
+		}
 	}
 
 	pointers::~pointers()

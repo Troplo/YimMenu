@@ -99,9 +99,9 @@ namespace big
 			return false;
 		}
 
-		static constexpr auto get_gta_common_batch();
+		// static constexpr auto get_gta_common_batch();
 		// static constexpr auto get_gta_batch();
-		static constexpr auto get_gta_161_batch();
+		// static constexpr auto get_gta_161_batch();
 		static constexpr auto get_gta_169_batch();
 		static constexpr auto get_sc_batch();
 
@@ -140,7 +140,7 @@ namespace big
 	private:
 		cache_file m_gta_pointers_cache;
 		cache_file m_sc_pointers_cache;
-		cache_file m_gta_common_pointers_cache;
+		// cache_file m_gta_common_pointers_cache;
 
 		const char* m_gta_version_target;
 

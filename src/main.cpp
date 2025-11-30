@@ -183,14 +183,14 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 				auto pointers_instance = std::make_unique<pointers>();
 				LOG(INFO) << "Pointers initialized.";
 
-				if (strcmp(g_pointers->m_gta.m_online_version, "1.61") != 0) {
+				// if (strcmp(g_pointers->m_gta.m_online_version, "1.61") != 0) {
 					while (!disable_anticheat_skeleton())
 					{
 						LOG(WARNING) << "Failed patching anticheat gameskeleton (injected too early?). Waiting 100ms and trying again";
 						std::this_thread::sleep_for(100ms);
 					}
 					LOG(INFO) << "Disabled anticheat gameskeleton.";
-			    }
+			    // }
 				auto byte_patch_manager_instance = std::make_unique<byte_patch_manager>();
 				LOG(INFO) << "Byte Patch Manager initialized.";
 

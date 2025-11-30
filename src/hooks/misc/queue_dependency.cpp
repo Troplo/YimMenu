@@ -57,22 +57,16 @@ namespace big
 
 	int hooks::queue_dependency(void* a1, int a2, int64_t dependency)
 	{
-		if (strcmp(g_pointers->m_gta.m_online_version, "1.61") != 0)
+		if (is_unwanted_dependency(dependency)) [[unlikely]]
 		{
-			if (is_unwanted_dependency(dependency)) [[unlikely]]
-			{
-				LOG(INFO) << "Blocking AC Verifier " << HEX_TO_UPPER(*reinterpret_cast<int64_t*>(dependency + 0x60) - reinterpret_cast<int64_t>(GetModuleHandle(NULL)));
-				ac_verifier* verifier = reinterpret_cast<ac_verifier*>(dependency - 0x30);
-				verifier->m_delay = INT_MAX; // makes it so these won't queue in the future
-				*reinterpret_cast<void**>(dependency + 0x60) = nullsub;
-				*reinterpret_cast<void**>(dependency + 0x100) = nullsub;
-				*reinterpret_cast<void**>(dependency + 0x1A0) = nullsub;
-			}
-
-			return g_hooking->get_original<hooks::queue_dependency>()(a1, a2, dependency);
-		} else
-		{
-			return g_hooking->get_original<hooks::queue_dependency>()(a1, a2, dependency);
+			LOG(INFO) << "Blocking AC Verifier " << HEX_TO_UPPER(*reinterpret_cast<int64_t*>(dependency + 0x60) - reinterpret_cast<int64_t>(GetModuleHandle(NULL)));
+			ac_verifier* verifier = reinterpret_cast<ac_verifier*>(dependency - 0x30);
+			verifier->m_delay = INT_MAX; // makes it so these won't queue in the future
+			*reinterpret_cast<void**>(dependency + 0x60) = nullsub;
+			*reinterpret_cast<void**>(dependency + 0x100) = nullsub;
+			*reinterpret_cast<void**>(dependency + 0x1A0) = nullsub;
 		}
+
+		return g_hooking->get_original<hooks::queue_dependency>()(a1, a2, dependency);
 	}
 }
