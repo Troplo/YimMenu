@@ -85,6 +85,8 @@ namespace big
 
 		struct debug
 		{
+			bool external_console = false;
+
 			struct logs
 			{
 				bool metric_logs{};
@@ -107,7 +109,7 @@ namespace big
 				NLOHMANN_DEFINE_TYPE_INTRUSIVE(logs, metric_logs, packet_logs, script_hook_logs, script_event)
 			} logs{};
 
-			NLOHMANN_DEFINE_TYPE_INTRUSIVE(debug, logs)
+			NLOHMANN_DEFINE_TYPE_INTRUSIVE(debug, external_console, logs)
 		} debug{};
 
 		struct tunables

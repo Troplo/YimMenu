@@ -55,7 +55,7 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 		    	    base_dir /= "YimShim-2699";
 			    auto file_manager_instance = std::make_unique<file_manager>(base_dir);
 
-			    auto logger_instance = std::make_unique<logger>("YimMenu", file_manager_instance->get_project_file("./cout.log"));
+			    auto logger_instance = std::make_unique<logger>("YimMenu", file_manager_instance->get_project_file("./cout.log"), g.debug.external_console);
 
 			    EnableMenuItem(GetSystemMenu(GetConsoleWindow(), 0), SC_CLOSE, MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
 

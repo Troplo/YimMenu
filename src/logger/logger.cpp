@@ -1,18 +1,9 @@
-#pragma once
 #include "logger.hpp"
 
 #include "memory/module.hpp"
 
 namespace big
 {
-	template<typename TP>
-	std::time_t to_time_t(TP tp)
-	{
-		using namespace std::chrono;
-		auto sctp = time_point_cast<system_clock::duration>(tp - TP::clock::now() + system_clock::now());
-		return system_clock::to_time_t(sctp);
-	}
-
 	logger::logger(std::string_view console_title, file file, bool attach_console) :
 	    m_attach_console(attach_console),
 	    m_did_console_exist(false),
@@ -22,14 +13,7 @@ namespace big
 	    m_console_handle(nullptr),
 	    m_file(file)
 	{
-		auto module = memory::module("ntdll.dll");
-		if (const auto env_no_color = std::getenv("NO_COLOR"); module.get_export("wine_get_version") || (env_no_color && strlen(env_no_color)))
-		{
-			LOG(VERBOSE) << "Using simple logger.";
-			m_console_logger = &logger::format_console_simple;
-		}
-
-		initialize();
+		initialize(console_title, file, attach_console);
 
 		g_log = this;
 	}
@@ -39,9 +23,62 @@ namespace big
 		g_log = nullptr;
 	}
 
-	void logger::initialize()
+	template<typename TP>
+	std::time_t to_time_t(TP tp)
 	{
-		if (m_attach_console)
+		using namespace std::chrono;
+		auto sctp = time_point_cast<system_clock::duration>(tp - TP::clock::now() + system_clock::now());
+		return system_clock::to_time_t(sctp);
+	}
+
+	void logger::initialize(const std::string_view console_title, file file, bool attach_console)
+	{
+		m_console_title = console_title;
+		m_file          = file;
+		auto module = memory::module("ntdll.dll");
+		if (const auto env_no_color = std::getenv("NO_COLOR"); module.get_export("wine_get_version") || (env_no_color && strlen(env_no_color)))
+		{
+			LOG(VERBOSE) << "Using simple logger.";
+			m_console_logger = &logger::format_console_simple;
+		}
+
+		create_backup();
+		m_file_out.open(m_file.get_path(), std::ios_base::out | std::ios_base::trunc);
+
+		Logger::Init();
+		Logger::AddSink([this](LogMessagePtr msg) {
+			(this->*m_console_logger)(std::move(msg));
+		});
+		Logger::AddSink([this](LogMessagePtr msg) {
+			format_file(std::move(msg));
+		});
+
+		toggle_external_console(attach_console);
+	}
+
+	void logger::destroy()
+	{
+		Logger::Destroy();
+		m_file_out.close();
+		toggle_external_console(false);
+	}
+
+	void logger::toggle_external_console(bool toggle)
+	{
+		if (m_is_console_open == toggle)
+		{
+			return;
+		}
+		m_is_console_open = toggle;
+
+		m_console_out.close();
+		if (m_did_console_exist)
+			SetConsoleMode(m_console_handle, m_original_console_mode);
+
+		if (!m_did_console_exist)
+			FreeConsole();
+
+		if (toggle)
 		{
 			if (m_did_console_exist = ::AttachConsole(GetCurrentProcessId()); !m_did_console_exist)
 				AllocConsole();
@@ -57,34 +94,12 @@ namespace big
 
 				// terminal like behaviour enable full color support
 				console_mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING | DISABLE_NEWLINE_AUTO_RETURN;
-				// prevent clicking in terminal from suspending our main thread
-				console_mode &= ~(ENABLE_QUICK_EDIT_MODE);
 
 				SetConsoleMode(m_console_handle, console_mode);
 			}
+
+			m_console_out.open("CONOUT$", std::ios_base::out | std::ios_base::app);
 		}
-		create_backup();
-		open_outstreams();
-
-		Logger::Init();
-		Logger::AddSink([this](LogMessagePtr msg) {
-			(this->*m_console_logger)(std::move(msg));
-		});
-		Logger::AddSink([this](LogMessagePtr msg) {
-			format_file(std::move(msg));
-		});
-	}
-
-	void logger::destroy()
-	{
-		Logger::Destroy();
-		close_outstreams();
-
-		if (m_did_console_exist)
-			SetConsoleMode(m_console_handle, m_original_console_mode);
-
-		if (!m_did_console_exist && m_attach_console)
-			FreeConsole();
 	}
 
 	void logger::create_backup()
@@ -106,22 +121,6 @@ namespace big
 		}
 	}
 
-	void logger::open_outstreams()
-	{
-		if (m_attach_console)
-			m_console_out.open("CONOUT$", std::ios_base::out | std::ios_base::app);
-
-		m_file_out.open(m_file.get_path(), std::ios_base::out | std::ios_base::trunc);
-	}
-
-	void logger::close_outstreams()
-	{
-		if (m_attach_console)
-			m_console_out.close();
-
-		m_file_out.close();
-	}
-
 	const LogColor get_color(const eLogLevel level)
 	{
 		switch (level)
@@ -136,12 +135,13 @@ namespace big
 
 	const char* get_level_string(const eLogLevel level)
 	{
-		constexpr std::array<const char*, 4> levelStrings = {{{"DEBUG"}, {"INFO"}, {"WARN"}, {"ERROR"}}};
+		constexpr std::array<const char*, 4> levelStrings = {{{"DEBUG"}, {"INFO"}, {"WARN"}, {"FATAL"}}};
 
 		return levelStrings[level];
 	}
 
-	void logger::format_console(const LogMessagePtr msg)
+
+void logger::format_console(const LogMessagePtr msg)
 	{
 		const auto color = get_color(msg->Level());
 
@@ -152,10 +152,10 @@ namespace big
 		const auto file = std::filesystem::path(location.file_name()).filename().string();
 
 		m_console_out << "[" << timestamp << "]" << ADD_COLOR_TO_STREAM(color) << "[" << get_level_string(level) << "/" << file << ":"
-		              << location.line() << "] " << RESET_STREAM_COLOR << msg->Message() << std::flush;
+			      << location.line() << "] " << RESET_STREAM_COLOR << msg->Message() << std::flush;
 	}
 
-	void logger::format_console_simple(const LogMessagePtr msg)
+void logger::format_console_simple(const LogMessagePtr msg)
 	{
 		const auto color = get_color(msg->Level());
 
@@ -166,7 +166,7 @@ namespace big
 		const auto file = std::filesystem::path(location.file_name()).filename().string();
 
 		m_console_out << "[" << timestamp << "]"
-		              << "[" << get_level_string(level) << "/" << file << ":" << location.line() << "] " << msg->Message() << std::flush;
+			      << "[" << get_level_string(level) << "/" << file << ":" << location.line() << "] " << msg->Message() << std::flush;
 	}
 
 	void logger::format_file(const LogMessagePtr msg)
@@ -181,6 +181,6 @@ namespace big
 		const auto file = std::filesystem::path(location.file_name()).filename().string();
 
 		m_file_out << "[" << timestamp << "]"
-		           << "[" << get_level_string(level) << "/" << file << ":" << location.line() << "] " << msg->Message() << std::flush;
+			   << "[" << get_level_string(level) << "/" << file << ":" << location.line() << "] " << msg->Message() << std::flush;
 	}
 }
