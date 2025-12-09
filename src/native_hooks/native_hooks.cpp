@@ -107,7 +107,7 @@ namespace big
 	{
 		// Paragon
 		// Transactions
-		add_native_detour(0xc18cb5d7a27a2e00, all_scripts::RETURN_FALSE);
+		// add_native_detour(0xc18cb5d7a27a2e00, all_scripts::RETURN_FALSE);
 		// STAT_GET_INT
 		add_native_detour(0xDF7F16323520B858, all_scripts::STAT_GET_INT);
 
