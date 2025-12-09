@@ -165,7 +165,6 @@ namespace big
 
 		void STAT_GET_INT(rage::scrNativeCallContext* src) {
 			const auto hash = src->get_arg<Hash>(0);
-			LOG(INFO) << hash;
 			int* out        = src->get_arg<int*>(1);
 			switch (hash) {
 				case "MP0_CHAR_IS_NGPC_VERSION"_J:

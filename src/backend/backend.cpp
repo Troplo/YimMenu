@@ -2,6 +2,7 @@
 
 #include "looped/looped.hpp"
 #include "looped_command.hpp"
+#include "natives/native_registration.hpp"
 #include "script.hpp"
 #include "script_patches.hpp"
 #include "services/context_menu/context_menu_service.hpp"
@@ -39,6 +40,9 @@ namespace big
 			command->refresh();
 
 		register_script_patches();
+		auto custom_native_registration_instance = std::make_unique<native_registration>();
+		custom_native_registration_instance->init();
+		LOG(INFO) << "Custom native registration complete.";
 
 //		g_squad_spawner_service.fetch_squads();
 //		g_xml_vehicles_service->fetch_xml_files();

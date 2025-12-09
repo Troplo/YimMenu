@@ -1,7 +1,7 @@
-#include "features.h"
 #include "backend/backend.hpp"
 #include "byte_patch_manager.hpp"
 #include "common.hpp"
+#include "features.h"
 #include "fiber_pool.hpp"
 #include "gui.hpp"
 #include "hooking/hooking.hpp"
@@ -9,6 +9,7 @@
 #include "logger/exception_handler.hpp"
 #include "lua/lua_manager.hpp"
 #include "native_hooks/native_hooks.hpp"
+#include "natives/native_registration.hpp"
 #include "pointers.hpp"
 #include "rage/gameSkeleton.hpp"
 #include "renderer/renderer.hpp"
@@ -140,10 +141,6 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 		    nullptr,
 		    0,
 		    [](PVOID) -> DWORD {
-			    auto sc_module = memory::module("Paragon.Sdk.dll");
-				sc_module.wait_for_module();
-				std::this_thread::sleep_for(5000ms);
-				auto handler = exception_handler();
 				std::srand(std::chrono::system_clock::now().time_since_epoch().count());
 
 				while (!FindWindow("grcWindow", nullptr))
@@ -182,6 +179,12 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 
 				auto pointers_instance = std::make_unique<pointers>();
 				LOG(INFO) << "Pointers initialized.";
+
+		    	auto sc_module = memory::module("Paragon.Sdk.dll");
+				sc_module.wait_for_module();
+		    	RgscRegistration();
+				LOG(INFO) << "Rgsc registration complete";
+				auto handler = exception_handler();
 
 				// if (strcmp(g_pointers->m_gta.m_online_version, "1.61") != 0) {
 					while (!disable_anticheat_skeleton())
@@ -272,8 +275,6 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 					std::make_unique<lua_manager>(g_file_manager.get_project_folder("scripts"), g_file_manager.get_project_folder("scripts_config"));
 				LOG(INFO) << "Lua manager initialized.";
 
-		    	RgscRegistration();
-		    	LOG(INFO) << "Rgsc registration complete";
 				g_running = true;
 
 				while (g_running)

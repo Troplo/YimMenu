@@ -1,6 +1,7 @@
 #pragma once
 #include "function_types.hpp"
 #include "gta/enums.hpp"
+#include "rage/scrCommandHash.hpp"
 
 #include <memory/handle.hpp>
 
@@ -425,6 +426,9 @@ namespace big
 		PVOID m_send_clone_create;
 
 		rlPc* m_rlpc;
+
+		scrCommandHash<scrCmd>* m_command_hash;
+		rage_u32* m_sys_obf_rand_next;
 	};
 #pragma pack(pop)
 	static_assert(sizeof(gta_pointers) % 8 == 0, "Pointers are not properly aligned");
