@@ -20,22 +20,8 @@
 
 namespace big
 {
-	void bypass_battleye()
-	{
-		constexpr std::array<std::uint32_t, 16> valid_hashes = {1410389794, 967, 1523678325, 472, 0, 0, 1323039495, 0, 0, 1731098795, 2256610353, 17956, 414639110, 307143837, 3443181821, 0};
-
-		if (auto hashes = *g_pointers->m_gta.m_game_data_hash)
-		{
-			for (int i = 0; i < valid_hashes.size(); i++)
-				hashes->m_data[i] = valid_hashes[i];
-		}
-	}
-
 	void backend::loop()
 	{
-		bool is169 = strcmp(g_pointers->m_gta.m_online_version, "1.61") != 0;
-		if (is169) bypass_battleye();
-
 		for (auto& command : g_bool_commands)
 			command->refresh();
 
@@ -44,16 +30,14 @@ namespace big
 		custom_native_registration_instance->init();
 		LOG(INFO) << "Custom native registration complete.";
 
-//		g_squad_spawner_service.fetch_squads();
-//		g_xml_vehicles_service->fetch_xml_files();
-//		g_xml_map_service->fetch_xml_files();
-//		g_custom_teleport_service.fetch_saved_locations();
-//		g_ped_animation_service.fetch_saved_animations();
+		// g_squad_spawner_service.fetch_squads();
+		// g_xml_vehicles_service->fetch_xml_files();
+		// g_xml_map_service->fetch_xml_files();
+		// g_custom_teleport_service.fetch_saved_locations();
+		// g_ped_animation_service.fetch_saved_animations();
 
 		while (g_running)
 		{
-			if (is169) bypass_battleye();
-
 			looped::system_self_globals();
 			looped::system_update_pointers();
 			looped::system_update_desync_kick();
@@ -61,6 +45,7 @@ namespace big
 			looped::system_spoofing();
 			looped::system_mission_creator();
 			#endif
+
 			for (auto command : g_looped_commands)
 				if (command->is_enabled())
 					command->on_tick();

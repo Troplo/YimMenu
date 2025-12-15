@@ -42,7 +42,6 @@ inline bool is_kick_instruction(rage::datBitBuffer& buffer)
 
 namespace big
 {
-#if ENABLE_TOXIC_CHEATS
 	bool try_read_secondary_header(rage::datBitBuffer& buffer)
 	{
 		auto data = buffer.Read<std::uint32_t>(20);
@@ -408,7 +407,7 @@ namespace big
 					if (player->m_radio_request_rate_limit.exceeded_last_process())
 					{
 						session::add_infraction(player, Infraction::TRIED_KICK_PLAYER);
-						g.reactions.kick.process(player);
+						// g.reactions.kick.process(player);
 						player->block_radio_requests = true;
 					}
 					return true;
@@ -524,8 +523,8 @@ namespace big
 			if (status == 0 && bubble == 10)
 			{
 				LOGF(stream::net_messages, WARNING, "{} sent MsgRoamingJoinBubbleAck with a null bubble id", peer->m_info.name);
-				if (player)
-					g.reactions.break_game.process(player);
+				// if (player)
+					// g.reactions.break_game.process(player);
 				return true;
 			}
 			else if (status == 0)
@@ -663,7 +662,7 @@ namespace big
 					auto p_name = player->get_name();
 
 					session::add_infraction(player, Infraction::TRIED_KICK_PLAYER);
-					g.reactions.kick.process(player);
+					// g.reactions.kick.process(player);
 				}
 				return true;
 			}
@@ -712,8 +711,11 @@ namespace big
 			{
 				if (g.session.log_chat_messages)
 					chat::log_chat(message, player, spam_reason, is_team);
+				g_notification_service.push("PROTECTIONS"_T.data(),
+
+				    std::format("{} {}", player->get_name(), "IS_A_SPAMMER"_T.data()));
 				player->is_spammer = true;
-				g.reactions.chat_spam.process(player);
+				// g.reactions.chat_spam.process(player);
 				return true;
 			}
 			else
@@ -746,6 +748,11 @@ namespace big
 			bool client = buffer.Read<bool>(1);
 			buffer.SeekForward(4); // normalize before we read
 
+			if (size > 1028 || player && player->is_host() == client)
+			{
+				return true;
+			}
+
 			buffer.ReadArray(&data, size * 8);
 
 			if (client && player)
@@ -754,15 +761,12 @@ namespace big
 			}
 			else if (player)
 			{
-				g_battleye_service.send_message_to_server(player->get_net_game_player()->get_host_token(), &data, size);
+				g_battleye_service.on_receive_message_from_server(player->get_net_game_player()->get_host_token(), &data, size);
 			}
 
 			if (player && !player->bad_host && player->is_host())
 			{
 				player->bad_host = true;
-				g_fiber_pool->queue_job([player] {
-					entity::force_remove_network_entity(g_local_player, player, false);
-				});
 			}
 
 			break;
@@ -786,6 +790,7 @@ namespace big
 			}
 		}
 		}
+
+		return g_hooking->get_original<hooks::receive_net_message>()(a1, net_cxn_mgr, event);
 	}
-#endif
 }

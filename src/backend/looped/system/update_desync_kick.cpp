@@ -27,7 +27,7 @@ namespace big
 		    && gta_util::get_network()->m_game_complaint_mgr.m_num_tokens_complained && g_player_service->get_self()->is_valid()
 		    && !g_player_service->get_self()->is_host())
 		{
-			g_pointers->m_gta.m_reset_network_complaints(&gta_util::get_network()->m_game_complaint_mgr);
+			g_pointers->m_gta.m_reset_network_complaints(&gta_util::get_network()->m_game_complaint_mgr, false);
 		}
 	}
 }

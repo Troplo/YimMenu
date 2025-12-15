@@ -268,7 +268,7 @@ namespace big
 		return false;
 	}
 
-	void scan_explosion_event(CNetGamePlayer* player, rage::datBitBuffer* buffer)
+	bool scan_explosion_event(CNetGamePlayer* player, rage::datBitBuffer* buffer)
 	{
 		uint16_t f186;
 		uint16_t targetEntity;
@@ -302,6 +302,8 @@ namespace big
 		bool f191;
 
 		uint32_t f164;
+
+		uint32_t interiorIndex;
 
 		float posX224;
 		float posY224;
@@ -346,6 +348,8 @@ namespace big
 		f191        = buffer->Read<uint8_t>(1);
 		f164        = buffer->Read<uint32_t>(32);
 
+		interiorIndex = buffer->Read<uint32_t>(32);
+
 		if (f242)
 		{
 			posX224 = buffer->ReadSignedFloat(31, 27648.0f);
@@ -359,10 +363,14 @@ namespace big
 			posZ224 = 0;
 		}
 
-		auto f168 = buffer->Read<uint32_t>(32);// >= 1868: f_168
-
-
 		f240 = buffer->Read<uint8_t>(1);
+
+		if (addOwnedExplosion)
+		{
+			buffer->Read<uint32_t>(32);
+			buffer->Read<uint32_t>(32);
+		}
+
 		if (f240)
 		{
 			f218 = buffer->Read<uint16_t>(16);
@@ -374,6 +382,12 @@ namespace big
 		}
 
 		buffer->Seek(0);
+
+		if (*(int16_t*)&interiorIndex < -1)
+		{
+			notify::crash_blocked(player, "invalid interior");
+			return true;
+		}
 
 		auto object = g_pointers->m_gta.m_get_net_object(*g_pointers->m_gta.m_network_object_mgr, ownerNetId, true);
 		auto entity = object ? object->GetGameObject() : nullptr;
@@ -392,7 +406,7 @@ namespace big
 						reinterpret_cast<CPed*>(entity)->m_player_info->m_net_player_data.m_name)));
 			session::add_infraction(g_player_service->get_by_id(player->m_player_id), Infraction::BLAME_EXPLOSION_DETECTED);
 			LOGF(stream::net_events, WARNING, "{} sent an EXPLOSION_EVENT with addOwnedExplosion enabled and with the wrong owner", player->get_name());
-			return;
+			return true;
 		}
 
 		if (g.session.explosion_karma && g_local_player
@@ -404,6 +418,7 @@ namespace big
 			});
 		}
 
+		return false;
 		// clang-format on
 	}
 
@@ -674,9 +689,15 @@ namespace big
 		{
 			auto p1 = buffer->Read<int>(32);
 			auto p2 = buffer->Read<int>(32);
+
 			LOGF(stream::net_events, VERBOSE, "Received REPORT_MYSELF_EVENT from {} with parameters ({}, {})", plyr->get_name(), p1, p2);
-			session::add_infraction(plyr, Infraction::TRIGGERED_ANTICHEAT);
-			g.reactions.game_anti_cheat_modder_detection.process(plyr);
+
+			if (p1 != 6) // false positives when telemetry endpoint is unreachable
+			{
+				session::add_infraction(plyr, Infraction::TRIGGERED_ANTICHEAT);
+				g.reactions.game_anti_cheat_modder_detection.process(plyr);
+			}
+
 			buffer->Seek(0);
 			break;
 		}

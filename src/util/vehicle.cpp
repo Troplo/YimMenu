@@ -182,69 +182,6 @@ namespace big::vehicle
 		return 0;
 	}
 
-	Vehicle clone_from_vehicle_data(std::map<int, int32_t>& data, Vector3 location, float heading)
-	{
-		Vector3 tmpLocation = {location.x, location.y, 1200.0f};
-		if (location.z > 1000.0f && location.z < 1400.0)
-		{
-			tmpLocation.z = 800.0f;
-		}
-
-		// vehicle data
-		for (const auto& [idx, val] : data)
-		{
-			if (idx >= 0 && idx < 142)
-			{
-				*scr_globals::spawn_global.at(27).at(idx).as<int32_t*>() = val;
-			}
-		}
-
-		// permission fix
-		*scr_globals::spawn_global.at(27).at(1).as<int32_t*>() = 0;
-
-		// personal car flag
-		*scr_globals::spawn_global.at(27).at(94).as<int32_t*>() = 14;
-		*scr_globals::spawn_global.at(27).at(95).as<int32_t*>() = 2;
-
-		// mmi
-		*scr_globals::spawn_global.at(27).at(103).as<int32_t*>() = 0;
-
-		// spawn location
-		*scr_globals::spawn_global.at(7).at(0).as<float*>() = tmpLocation.x;
-		*scr_globals::spawn_global.at(7).at(1).as<float*>() = tmpLocation.y;
-		*scr_globals::spawn_global.at(7).at(2).as<float*>() = tmpLocation.z;
-
-		// spawn non pegasus
-		*scr_globals::spawn_global.at(3).as<int*>() = 0;
-
-		// spawn signal
-		int* spawn_signal                               = scr_globals::spawn_global.at(2).as<int32_t*>();
-		*scr_globals::spawn_global.at(5).as<int32_t*>() = 1;
-		*spawn_signal                                   = 1;
-
-		// wait until the vehicle is spawned
-		for (size_t retry = 0; *spawn_signal != 0 && retry < 200; retry++)
-		{
-			script::get_current()->yield(10ms);
-		}
-
-		if (*spawn_signal == 1)
-		{
-			return 0;
-		}
-
-		auto veh = get_closest_to_location(tmpLocation, 200);
-		if (veh == 0)
-		{
-			return 0;
-		}
-
-		ENTITY::SET_ENTITY_COORDS(veh, location.x, location.y, location.z + 1.f, 0, 0, 0, 0);
-		ENTITY::SET_ENTITY_HEADING(veh, heading);
-
-		return veh;
-	}
-
 	std::map<int, int32_t> get_owned_mods_from_vehicle_idx(script_global vehicle_idx)
 	{
 		std::map<int, int32_t> owned_mods;
@@ -257,7 +194,7 @@ namespace big::vehicle
 		int32_t val_32  = *vehicle_idx.at(32).as<int32_t*>();
 		int32_t val_77  = *vehicle_idx.at(77).as<int32_t*>();
 		int32_t val_102 = *vehicle_idx.at(102).as<int32_t*>();
-		int32_t val_103 = *vehicle_idx.at(103).as<int32_t*>();
+		int32_t val_103 = *vehicle_idx.at(104).as<int32_t*>();
 
 		owned_mods[MOD_MODEL_HASH] = *vehicle_idx.at(66).as<int32_t*>();
 

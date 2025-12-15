@@ -1,10 +1,9 @@
 #pragma once
 #include "MinHook.h"
-#include "call_hook.hpp"
 #include "detour_hook.hpp"
-#include "gta/fidevice.hpp"
 #include "vmt_hook.hpp"
 #include "vtable_hook.hpp"
+#include "call_hook.hpp"
 
 #include <gta/enums.hpp>
 #include <network/netConnection.hpp> // cannot stub this
@@ -176,7 +175,7 @@ namespace big
 
 		static bool read_bits_single(void* data, int* out_value, int size, int offset);
 
-		//static void received_clone_remove(CNetworkObjectMgr* mgr, CNetGamePlayer* src, CNetGamePlayer* dst, int16_t object_id, uint32_t ownership_token);
+		static void received_clone_remove(CNetworkObjectMgr* mgr, CNetGamePlayer* src, CNetGamePlayer* dst, int16_t object_id, uint32_t ownership_token);
 
 		static bool sync_reader_serialize_dword(void* _this, uint32_t* dword, int size);
 		static bool sync_reader_serialize_word(void* _this, uint16_t* word, int size);
@@ -209,18 +208,15 @@ namespace big
 		static void send_session_detail_msg(rage::netConnectionManager* mgr, rage::netConnection::InFrame* request_frame, rage::rlSessionDetailMsg* msg);
 
 		static std::uint32_t get_dlc_hash(void* mgr, std::uint32_t seed);
-		static bool add_gamer_to_session(rage::netConnectionManager* mgr, std::uint32_t msg_id, int* req_id, RemoteGamerInfoMsg* info, int flags, void* a6);
-
-		static void error_packet_memmove(void* dst, void* src, int size);
 
 		static void* create_pool_item(GenericPool* pool);
 
-		static bool network_can_access_multiplayer(void* a1, int* error);
+		static uint32_t network_can_access_multiplayer(uint32_t a1, uint64_t* a2);
 
-		static void send_clone_create(CNetworkObjectMgr* _this, rage::netObject* object, CNetGamePlayer* player, rage::datBitBuffer* buffer);
+		static void* add_skeleton_extension(rage::fwEntity* entity);
 
-		// Paragon
-		static bool fipackfile_open_archive(rage::fiPackfile* this_, const char* archive, bool b_true, int type, intptr_t very_false);
+		static std::uint32_t get_anticheat_initialized_hash();
+		static std::uint32_t get_anticheat_initialized_hash_2(void* ac_var, std::uint32_t seed);
 	};
 
 	class minhook_keepalive
@@ -310,8 +306,6 @@ namespace big
 
 		vmt_hook m_swapchain_hook;
 		vtable_hook m_sync_data_reader_hook;
-
-		call_hook m_error_packet_memmove_hook;
 
 		WNDPROC m_og_wndproc = nullptr;
 

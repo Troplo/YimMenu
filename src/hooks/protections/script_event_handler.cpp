@@ -375,7 +375,7 @@ namespace big
 		case eRemoteEvent::InteriorControl:
 		{
 			int interior = (int)args[3];
-			if (interior < 0 || interior > 171) // the upper bound will change after an update
+			if (interior < 0 || interior > 176) // the upper bound will change after an update
 			{
 				if (auto plyr = g_player_service->get_by_id(player->m_player_id))
 					session::add_infraction(plyr, Infraction::TRIED_KICK_PLAYER);
@@ -440,7 +440,7 @@ namespace big
 		}
 		case eRemoteEvent::StartScriptBegin:
 		{
-			auto script_id = args[3];
+			int script_id = args[3];
 
 			if (!protection::should_allow_script_launch(script_id))
 			{

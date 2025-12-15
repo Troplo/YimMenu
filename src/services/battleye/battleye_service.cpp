@@ -69,7 +69,9 @@ namespace big
 		}
 	};
 
+	#if 0
 	battleye_server g_battleye_server("battleyeserver", "BATTLEYE_SERVER", "BATTLEYE_SERVER_DESC", g.debug.battleye_server);
+	#endif
 
 	bool battleye_service::is_running()
 	{
@@ -278,5 +280,55 @@ namespace big
 		}
 
 		m_battleye_api.m_receive_message(token, const_cast<const void*>(message), size);
+	}
+
+	void battleye_service::on_receive_message_from_server(std::uint64_t token, void* message, int size)
+	{
+		if (size == 0)
+		{
+			return;
+		}
+
+		auto msg = reinterpret_cast<unsigned char*>(message);
+		auto op  = msg[0];
+
+		switch (op)
+		{
+		case INIT:
+		{
+			std::uint8_t payload[] = {0x0, 0x5};
+			send_message_to_server(token, payload, sizeof(payload));
+			break;
+		}
+		case START:
+		{
+			LOG(INFO) << "BattlEye: Our GUID: " << (char*)&msg[3];
+			send_message_to_server(token, message, 2);
+			break;
+		}
+		case HEARTBEAT:
+		{
+			send_message_to_server(token, message, size);
+
+			if (g.session.kick_host_to_stay_in_session && msg[1] == 5)
+			{
+				if (auto player = g_player_service->get_by_host_token(token))
+				{
+					player_command::get("nfkick"_J)->call(player, {});
+				}
+			}
+
+			break;
+		}
+		case REQUEST:
+		{
+			if (size == 1028)
+			{
+				break;
+			}
+			send_message_to_server(token, message, 2);
+			break;
+		}
+		}
 	}
 }

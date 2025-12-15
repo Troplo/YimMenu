@@ -4,6 +4,7 @@
 #include "rage/scrCommandHash.hpp"
 
 #include <memory/handle.hpp>
+#include <security/ObfVar.hpp>
 
 
 class rlPc;
@@ -26,6 +27,7 @@ class CPedFactory;
 class GtaThread;
 class GameDataHash;
 class InputMethodEditor;
+class CAnticheatContext;
 
 namespace rage
 {
@@ -66,8 +68,6 @@ namespace big
 		memory::handle m_disable_collision;
 
 		memory::handle m_crash_trigger;
-
-		memory::handle m_window_hook;
 
 		memory::handle m_script_vm_patch_1;
 		memory::handle m_script_vm_patch_2;
@@ -196,13 +196,6 @@ namespace big
 
 		PVOID m_init_native_tables;
 		functions::script_vm m_script_vm;
-
-		functions::generate_uuid m_generate_uuid;
-		uint64_t* m_host_token;
-		uint64_t* m_peer_id;
-		rage::rlGamerInfo* m_profile_gamer_info;     // per profile gamer info
-		rage::rlGamerInfo* m_player_info_gamer_info; // the gamer info that is applied to CPlayerInfo
-		CCommunications** m_communications;
 
 		PVOID m_handle_join_request;
 		functions::write_join_response_data m_write_join_response_data;
@@ -393,13 +386,9 @@ namespace big
 		void** m_dlc_manager;
 		PVOID m_get_dlc_hash;
 
-		PVOID m_add_gamer_to_session;
-
 		functions::set_head_blend_data m_set_head_blend_data;
 
 		std::uint32_t* m_object_ids_offset;
-
-		PVOID m_error_packet_memmove;
 
 		PVOID m_create_pool_item;
 
@@ -429,6 +418,15 @@ namespace big
 
 		scrCommandHash<scrCmd>* m_command_hash;
 		rage_u32* m_sys_obf_rand_next;
+		PVOID m_be_network_bail_patch;
+
+		PVOID m_add_skeleton_extension;
+		int* m_skeleton_extension_count;
+
+		rage::Obf32** m_anticheat_initialized_hash;
+		PVOID m_get_anticheat_initialized_hash;
+		PVOID m_get_anticheat_initialized_hash_2;
+		CAnticheatContext** m_anticheat_context;
 	};
 #pragma pack(pop)
 	static_assert(sizeof(gta_pointers) % 8 == 0, "Pointers are not properly aligned");

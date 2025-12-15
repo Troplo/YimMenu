@@ -405,13 +405,14 @@ namespace big
 			LOG_FIELD_B(CTrainGameStateDataNode, m_direction);
 			LOG_FIELD_B(CTrainGameStateDataNode, m_has_passenger_carriages);
 			LOG_FIELD_B(CTrainGameStateDataNode, m_render_derailed);
-			LOG_FIELD_B(CTrainGameStateDataNode, unk_00C6);
 			LOG_FIELD_B(CTrainGameStateDataNode, unk_00C7);
+			LOG_FIELD_B(CTrainGameStateDataNode, new_00C8);
 			LOG_FIELD_NI(CTrainGameStateDataNode, m_engine_id);
 			LOG_FIELD_C(CTrainGameStateDataNode, m_train_config_index);
 			LOG_FIELD_C(CTrainGameStateDataNode, m_carriage_config_index);
 			LOG_FIELD_C(CTrainGameStateDataNode, m_track_id);
 			LOG_FIELD(CTrainGameStateDataNode, m_distance_from_engine);
+			LOG_FIELD(CTrainGameStateDataNode, new_00D4);
 			LOG_FIELD(CTrainGameStateDataNode, m_cruise_speed);
 			LOG_FIELD_NI(CTrainGameStateDataNode, m_linked_to_backward_id);
 			LOG_FIELD_NI(CTrainGameStateDataNode, m_linked_to_forward_id);
@@ -1539,6 +1540,11 @@ namespace big
 			case sync_node_id("CPedGameStateDataNode"):
 			{
 				const auto game_state_node = (CPedGameStateDataNode*)(node);
+				if (game_state_node->m_weapon_hash == "WEAPON_STRICKLER"_J)
+				{
+					notify::crash_blocked(sender, "invalid weapon");
+					return true;
+				}
 				if (game_state_node->m_on_mount)
 				{
 					notify::crash_blocked(sender, "mount flag");
