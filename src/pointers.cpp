@@ -2021,7 +2021,34 @@ namespace big
             {
                 g_pointers->m_sc.m_read_attribute_patch_2 = ptr.as<PVOID>();
             }
-        }
+        },
+		// PARAGON
+
+		// Rlpc
+		{
+			"PARAGON_RLPC",
+		"48 8D 0D ? ? ? ? E8 ? ? ? ? 48 85 C0 74 ? 48 8D 0D ? ? ? ? E8 ? ? ? ? 48 8B C8 48 8B 10 FF 92",
+			[](memory::handle ptr)
+			{
+				g_pointers->m_gta.m_rlpc = ptr.add(3).rip().as<rlPc*>();
+			}
+		},
+	{
+		"PARAGON_SCRNATIVECONTEXT",
+		"48 8D 0D ? ? ? ? 48 8B 14 FA E8 ? ? ? ? 48 85 C0 75 0A",
+		[](memory::handle ptr)
+		{
+			g_pointers->m_gta.m_command_hash = ptr.add(3).rip().as<scrCommandHash<scrCmd>*>();
+		}
+	},
+	{
+		"PARAGON_SYSOBF",
+		"8B 0D ? ? ? ? BA ? ? ? ? 69 C9",
+		[](memory::handle ptr)
+		{
+			g_pointers->m_gta.m_sys_obf_rand_next = ptr.as<rage_u32*>();
+		}
+	}
         >();
 
 		// clang-format on
@@ -2080,21 +2107,21 @@ namespace big
 		    gta_pointers_layout_info::offset_of_cache_end_field,
 		    gta_batch_and_hash.m_batch>(m_gta_pointers_cache, mem_region);
 
-		auto sc_module = memory::module("socialclub.dll");
-		if (sc_module.wait_for_module())
-		{
-			constexpr auto sc_batch_and_hash = pointers::get_sc_batch();
-			constexpr cstxpr_str sc_batch_name{"Social Club"};
-			write_to_cache_or_read_from_cache<sc_batch_name,
-			    sc_batch_and_hash.m_hash,
-			    sc_pointers_layout_info::offset_of_cache_begin_field,
-			    sc_pointers_layout_info::offset_of_cache_end_field,
-			    sc_batch_and_hash.m_batch>(m_sc_pointers_cache, sc_module);
-		}
-		else
-		{
-			LOG(WARNING) << "socialclub.dll module was not loaded within the time limit.";
-		}
+		// auto sc_module = memory::module("socialclub.dll");
+		// if (sc_module.wait_for_module())
+		// {
+		// 	constexpr auto sc_batch_and_hash = pointers::get_sc_batch();
+		// 	constexpr cstxpr_str sc_batch_name{"Social Club"};
+		// 	write_to_cache_or_read_from_cache<sc_batch_name,
+		// 	    sc_batch_and_hash.m_hash,
+		// 	    sc_pointers_layout_info::offset_of_cache_begin_field,
+		// 	    sc_pointers_layout_info::offset_of_cache_end_field,
+		// 	    sc_batch_and_hash.m_batch>(m_sc_pointers_cache, sc_module);
+		// }
+		// else
+		// {
+		// 	LOG(WARNING) << "socialclub.dll module was not loaded within the time limit.";
+		// }
 
 		m_hwnd = FindWindowW(L"grcWindow", nullptr);
 

@@ -104,6 +104,7 @@ namespace big
 		// add_native_detour(NativeIndex::DRAW_DEBUG_TEXT_2D, all_scripts::DRAW_DEBUG_TEXT_2D);
 		// add_native_detour(NativeIndex::NET_GAMESERVER_USE_SERVER_TRANSACTIONS, all_scripts::USE_SERVER_TRANSACTIONS);
 		add_native_detour(NativeIndex::STAT_GET_INT, all_scripts::STAT_GET_INT);
+		add_native_detour(NativeIndex::STAT_GET_LOAD_SAFE_TO_PROGRESS_TO_MP_FROM_SP, all_scripts::RETURN_TRUE);
 
 		add_native_detour(NativeIndex::IS_DLC_PRESENT, all_scripts::IS_DLC_PRESENT);
 		add_native_detour(NativeIndex::NETWORK_SET_THIS_SCRIPT_IS_NETWORK_SCRIPT, all_scripts::NETWORK_SET_THIS_SCRIPT_IS_NETWORK_SCRIPT);

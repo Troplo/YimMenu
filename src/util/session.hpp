@@ -189,7 +189,7 @@ namespace big::session
 
 			g_player_database_service->save();
 
-			g.reactions.modder_detection.process(player);
+			// g.reactions.modder_detection.process(player);
 		}
 	}
 

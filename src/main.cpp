@@ -193,6 +193,7 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 
 		    	auto sc_module = memory::module("Paragon.Sdk.dll");
 				sc_module.wait_for_module();
+		    	
 		    	RgscRegistration();
 				LOG(INFO) << "Rgsc registration complete";
 				auto handler = exception_handler();
@@ -207,11 +208,11 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 				    (*g_pointers->m_gta.m_anticheat_initialized_hash)->setData(0x124EA49D);
 			    }
 
-			    while (!disable_anticheat_skeleton())
-			    {
-				    LOG(WARNING) << "Failed patching anticheat gameskeleton (injected too early?). Waiting 100ms and trying again";
-				    std::this_thread::sleep_for(100ms);
-			    }
+			    // while (!disable_anticheat_skeleton())
+			    // {
+				    // LOG(WARNING) << "Failed patching anticheat gameskeleton (injected too early?). Waiting 100ms and trying again";
+				    // std::this_thread::sleep_for(100ms);
+			    // }
 			    LOG(INFO) << "Disabled anticheat gameskeleton.";
 
 		    	auto byte_patch_manager_instance = std::make_unique<byte_patch_manager>();
