@@ -11,7 +11,6 @@
 #include "native_hooks/native_hooks.hpp"
 #include "natives/native_registration.hpp"
 #include "pointers.hpp"
-#include "rage/gameSkeleton.hpp"
 #include "renderer/renderer.hpp"
 #include "script_mgr.hpp"
 #include "services/api/api_service.hpp"
@@ -34,58 +33,15 @@
 #include "services/vehicle/handling_service.hpp"
 #include "services/vehicle/xml_vehicles_service.hpp"
 #include "services/xml_maps/xml_map_service.hpp"
+#include "services/script_function_hook/script_function_hook_service.hpp"
 #include "thread_pool.hpp"
 #include "util/is_proton.hpp"
 #include "version.hpp"
 
+#include <Psapi.h>
+
 namespace big
 {
-	static void nop_game_skeleton_element(rage::game_skeleton_update_element* element)
-	{
-		// TODO: small memory leak
-		// Hey rockstar if you keep up with this I'll make you integrity check everything until you can't anymore, please grow a brain and realize that this is futile
-		// and kills performance if you're the host
-		auto vtable = *reinterpret_cast<void***>(element);
-		if (vtable[1] == g_pointers->m_gta.m_nullsub)
-		{
-			return; // already nopped
-		}
-
-		auto new_vtable = new void*[3];
-		memcpy(new_vtable, vtable, sizeof(void*) * 3);
-		new_vtable[1]                       = g_pointers->m_gta.m_nullsub;
-		*reinterpret_cast<void***>(element) = new_vtable;
-	}
-
-	bool disable_anticheat_skeleton()
-	{
-		bool patched = false;
-		for (rage::game_skeleton_update_mode* mode = g_pointers->m_gta.m_game_skeleton->m_update_modes; mode; mode = mode->m_next)
-		{
-			for (rage::game_skeleton_update_base* update_node = mode->m_head; update_node; update_node = update_node->m_next)
-			{
-				if (update_node->m_hash != "Common Main"_J)
-					continue;
-
-				rage::game_skeleton_update_group* group = reinterpret_cast<rage::game_skeleton_update_group*>(update_node);
-
-				for (rage::game_skeleton_update_base* group_child_node = group->m_head; group_child_node;
-				     group_child_node                                  = group_child_node->m_next)
-				{
-					// TamperActions is a leftover from the old AC, but still useful to block anyway
-					if (group_child_node->m_hash != 0xA0F39FB6 && group_child_node->m_hash != "TamperActions"_J)
-						continue;
-					patched = true;
-
-					nop_game_skeleton_element(reinterpret_cast<rage::game_skeleton_update_element*>(group_child_node));
-				}
-				break;
-			}
-		}
-
-		return patched;
-	}
-
 	std::string ReadRegistryKeySZ(HKEY hKeyParent, std::string subkey, std::string valueName)
 	{
 		HKEY hKey;
@@ -138,6 +94,29 @@ namespace big
 		// BrandingFormatString requires a GlobalFree.
 		GlobalFree(UTF16);
 		return UTF8;
+	}
+
+	HMODULE CheckForFSL()
+	{
+		HMODULE modules[1024];
+		DWORD needed;
+
+		if (!EnumProcessModules(GetCurrentProcess(), modules, sizeof(modules), &needed))
+		{
+			return nullptr;
+		}
+
+		size_t count = needed / sizeof(HMODULE);
+
+		for (size_t i = 0; i < count; ++i)
+		{
+			if (GetProcAddress(modules[i], "LawnchairGetVersion"))
+			{
+				return modules[i];
+			}
+		}
+
+		return nullptr;
 	}
 }
 
@@ -201,12 +180,8 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 		    	if (!*g_pointers->m_gta.m_anticheat_initialized_hash)
 			    {
 				    *g_pointers->m_gta.m_anticheat_initialized_hash = new rage::Obf32; // this doesn't get freed so we don't have to use the game allocator
-				    (*g_pointers->m_gta.m_anticheat_initialized_hash)->setData(0x124EA49D);
 			    }
-			    else
-			    {
-				    (*g_pointers->m_gta.m_anticheat_initialized_hash)->setData(0x124EA49D);
-			    }
+				(*g_pointers->m_gta.m_anticheat_initialized_hash)->setData(0x124EA49D);
 
 			    // while (!disable_anticheat_skeleton())
 			    // {
@@ -214,6 +189,16 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 				    // std::this_thread::sleep_for(100ms);
 			    // }
 			    LOG(INFO) << "Disabled anticheat gameskeleton.";
+				// if (HMODULE FSL = CheckForFSL())
+				// {
+				//     LOGF(INFO, "FSL Version: {}", reinterpret_cast<int (*)()>(GetProcAddress(FSL, "LawnchairGetVersion"))());
+				//     LOGF(INFO, "FSL Local Saves: {}", reinterpret_cast<bool (*)()>(GetProcAddress(FSL, "LawnchairIsProvidingLocalSaves"))() ? "Enabled" : "Disabled");
+				//     LOGF(INFO, "FSL BE Bypass: {}", reinterpret_cast<bool (*)()>(GetProcAddress(FSL, "LawnchairIsProvidingBattlEyeBypass"))() ? "Enabled" : "Disabled");
+				// }
+				// else
+				// {
+				//     LOGF(FATAL, "YimMenu requires FSL to be loaded. Please get it from UnknownCheats.me");
+				// }
 
 		    	auto byte_patch_manager_instance = std::make_unique<byte_patch_manager>();
 				LOG(INFO) << "Byte Patch Manager initialized.";
@@ -236,24 +221,25 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 
 				g_gta_data_service.init();
 
-				auto context_menu_service_instance      = std::make_unique<context_menu_service>();
-				auto custom_text_service_instance       = std::make_unique<custom_text_service>();
-				auto mobile_service_instance            = std::make_unique<mobile_service>();
-				auto pickup_service_instance            = std::make_unique<pickup_service>();
-				auto player_service_instance            = std::make_unique<player_service>();
-				auto model_preview_service_instance     = std::make_unique<model_preview_service>();
-				auto handling_service_instance          = std::make_unique<handling_service>();
-				auto gui_service_instance               = std::make_unique<gui_service>();
-				auto script_patcher_service_instance    = std::make_unique<script_patcher_service>();
-				auto player_database_service_instance   = std::make_unique<player_database_service>();
-				auto hotkey_service_instance            = std::make_unique<hotkey_service>();
-				auto matchmaking_service_instance       = std::make_unique<matchmaking_service>();
-				auto api_service_instance               = std::make_unique<api_service>();
-				auto tunables_service_instance          = std::make_unique<tunables_service>();
-				auto script_connection_service_instance = std::make_unique<script_connection_service>();
-				auto xml_vehicles_service_instance      = std::make_unique<xml_vehicles_service>();
-				auto xml_maps_service_instance          = std::make_unique<xml_map_service>();
-				LOG(INFO) << "Registered service instances...";
+			    auto context_menu_service_instance      = std::make_unique<context_menu_service>();
+			    auto custom_text_service_instance       = std::make_unique<custom_text_service>();
+			    auto mobile_service_instance            = std::make_unique<mobile_service>();
+			    auto pickup_service_instance            = std::make_unique<pickup_service>();
+			    auto player_service_instance            = std::make_unique<player_service>();
+			    auto model_preview_service_instance     = std::make_unique<model_preview_service>();
+			    auto handling_service_instance          = std::make_unique<handling_service>();
+			    auto gui_service_instance               = std::make_unique<gui_service>();
+			    auto script_patcher_service_instance    = std::make_unique<script_patcher_service>();
+			    auto player_database_service_instance   = std::make_unique<player_database_service>();
+			    auto hotkey_service_instance            = std::make_unique<hotkey_service>();
+			    auto matchmaking_service_instance       = std::make_unique<matchmaking_service>();
+			    auto api_service_instance               = std::make_unique<api_service>();
+			    auto tunables_service_instance          = std::make_unique<tunables_service>();
+			    auto script_connection_service_instance = std::make_unique<script_connection_service>();
+			    auto xml_vehicles_service_instance      = std::make_unique<xml_vehicles_service>();
+			    auto xml_maps_service_instance          = std::make_unique<xml_map_service>();
+			    auto script_function_hook_service_instance = std::make_unique<script_function_hook_service>();
+			    LOG(INFO) << "Registered service instances...";
 
 				g_notification_service.initialise();
 				LOG(INFO) << "Finished initialising services.";
@@ -322,39 +308,41 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 				thread_pool_instance->destroy();
 				LOG(INFO) << "Destroyed thread pool.";
 
-				script_connection_service_instance.reset();
-				LOG(INFO) << "Script Connection Service reset.";
-				tunables_service_instance.reset();
-				LOG(INFO) << "Tunables Service reset.";
-				hotkey_service_instance.reset();
-				LOG(INFO) << "Hotkey Service reset.";
-				matchmaking_service_instance.reset();
-				LOG(INFO) << "Matchmaking Service reset.";
-				player_database_service_instance.reset();
-				LOG(INFO) << "Player Database Service reset.";
-				api_service_instance.reset();
-				LOG(INFO) << "API Service reset.";
-				script_patcher_service_instance.reset();
-				LOG(INFO) << "Script Patcher Service reset.";
-				gui_service_instance.reset();
-				LOG(INFO) << "Gui Service reset.";
-				handling_service_instance.reset();
-				LOG(INFO) << "Vehicle Service reset.";
-				model_preview_service_instance.reset();
-				LOG(INFO) << "Model Preview Service reset.";
-				mobile_service_instance.reset();
-				LOG(INFO) << "Mobile Service reset.";
-				player_service_instance.reset();
-				LOG(INFO) << "Player Service reset.";
-				pickup_service_instance.reset();
-				LOG(INFO) << "Pickup Service reset.";
-				custom_text_service_instance.reset();
-				LOG(INFO) << "Custom Text Service reset.";
-				context_menu_service_instance.reset();
-				LOG(INFO) << "Context Service reset.";
-				xml_vehicles_service_instance.reset();
-				LOG(INFO) << "Xml Vehicles Service reset.";
-				LOG(INFO) << "Services uninitialized.";
+			    script_connection_service_instance.reset();
+			    LOG(INFO) << "Script Connection Service reset.";
+			    tunables_service_instance.reset();
+			    LOG(INFO) << "Tunables Service reset.";
+			    hotkey_service_instance.reset();
+			    LOG(INFO) << "Hotkey Service reset.";
+			    matchmaking_service_instance.reset();
+			    LOG(INFO) << "Matchmaking Service reset.";
+			    player_database_service_instance.reset();
+			    LOG(INFO) << "Player Database Service reset.";
+			    api_service_instance.reset();
+			    LOG(INFO) << "API Service reset.";
+			    script_patcher_service_instance.reset();
+			    LOG(INFO) << "Script Patcher Service reset.";
+			    gui_service_instance.reset();
+			    LOG(INFO) << "Gui Service reset.";
+			    handling_service_instance.reset();
+			    LOG(INFO) << "Vehicle Service reset.";
+			    model_preview_service_instance.reset();
+			    LOG(INFO) << "Model Preview Service reset.";
+			    mobile_service_instance.reset();
+			    LOG(INFO) << "Mobile Service reset.";
+			    player_service_instance.reset();
+			    LOG(INFO) << "Player Service reset.";
+			    pickup_service_instance.reset();
+			    LOG(INFO) << "Pickup Service reset.";
+			    custom_text_service_instance.reset();
+			    LOG(INFO) << "Custom Text Service reset.";
+			    context_menu_service_instance.reset();
+			    LOG(INFO) << "Context Service reset.";
+			    xml_vehicles_service_instance.reset();
+			    LOG(INFO) << "Xml Vehicles Service reset.";
+			    script_function_hook_service_instance.reset();
+			    LOG(INFO) << "Script Function Hook Service reset.";
+			    LOG(INFO) << "Services uninitialized.";
 
 				hooking_instance.reset();
 				LOG(INFO) << "Hooking uninitialized.";

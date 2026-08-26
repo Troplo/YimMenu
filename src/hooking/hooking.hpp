@@ -64,6 +64,7 @@ namespace rage
 	class netSyncDataNode;
 	class rlSessionDetailMsg;
 	class netEvent;
+	struct game_skeleton;
 }
 
 namespace big
@@ -137,7 +138,7 @@ namespace big
 		static int nt_query_virtual_memory(void* _this, HANDLE handle, PVOID base_addr, int info_class, MEMORY_BASIC_INFORMATION* info, int size, size_t* return_len);
 		static int queue_dependency(void* a1, int a2, int64_t dependency);
 
-		static bool prepare_metric_for_sending(rage::json_serializer* bit_buffer, int unk, int time, rage::rlMetric* metric);
+		static bool prepare_metric_for_sending(rage::json_serializer* bit_buffer, bool* failed, char* unk, uint64_t time, rage::rlMetric* metric);
 		static bool http_start_request(void* request, const char* uri);
 
 		static bool received_array_update(rage::netArrayHandlerBase* array, CNetGamePlayer* sender, rage::datBitBuffer* buffer, int size, int16_t cycle);
@@ -217,6 +218,8 @@ namespace big
 
 		static std::uint32_t get_anticheat_initialized_hash();
 		static std::uint32_t get_anticheat_initialized_hash_2(void* ac_var, std::uint32_t seed);
+
+		static void game_skeleton_update(rage::game_skeleton* skeleton, int type);
 	};
 
 	class minhook_keepalive

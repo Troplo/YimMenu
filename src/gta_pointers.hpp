@@ -427,6 +427,10 @@ namespace big
 		PVOID m_get_anticheat_initialized_hash;
 		PVOID m_get_anticheat_initialized_hash_2;
 		CAnticheatContext** m_anticheat_context;
+
+		PVOID m_game_skeleton_update;
+
+		PVOID m_script_vm_on_enter_end;
 	};
 #pragma pack(pop)
 	static_assert(sizeof(gta_pointers) % 8 == 0, "Pointers are not properly aligned");
