@@ -44,7 +44,7 @@ namespace big
 
 		detour_hook_helper::add<hooks::gta_thread_start>("GTS", g_pointers->m_gta.m_gta_thread_start);
 		detour_hook_helper::add<hooks::gta_thread_kill>("GTK", g_pointers->m_gta.m_gta_thread_kill);
-		detour_hook_helper::add<hooks::init_native_tables>("INT", g_pointers->m_gta.m_init_native_tables);
+		// detour_hook_helper::add<hooks::init_native_tables>("INT", g_pointers->m_gta.m_init_native_tables);
 		detour_hook_helper::add<hooks::script_vm>("SVM", g_pointers->m_gta.m_script_vm);
 
 		detour_hook_helper::add<hooks::network_player_mgr_init>("NPMI", g_pointers->m_gta.m_network_player_mgr_init);
@@ -163,7 +163,7 @@ namespace big
 		detour_hook_helper::add<hooks::get_anticheat_initialized_hash_2>("GAIH2", g_pointers->m_gta.m_get_anticheat_initialized_hash_2);
 
 		detour_hook_helper::add<hooks::game_skeleton_update>("GSU", g_pointers->m_gta.m_game_skeleton_update);
-
+		detour_hook_helper::add<hooks::create_native>("Create Native", (void*)g_pointers->m_gta.m_create_native);
 		g_hooking = this;
 	}
 

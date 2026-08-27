@@ -1,9 +1,10 @@
 #pragma once
 #include "MinHook.h"
+#include "call_hook.hpp"
 #include "detour_hook.hpp"
+#include "script/scrNativeHandler.hpp"
 #include "vmt_hook.hpp"
 #include "vtable_hook.hpp"
-#include "call_hook.hpp"
 
 #include <gta/enums.hpp>
 #include <network/netConnection.hpp> // cannot stub this
@@ -72,6 +73,7 @@ namespace big
 	struct hooks
 	{
 		static bool run_script_threads(uint32_t ops_to_execute);
+		static void create_native(void* a1, rage::scrNativeHash native_hash, rage::scrNativeHandler native_handler);
 
 		static constexpr auto swapchain_num_funcs           = 19;
 		static constexpr auto swapchain_present_index       = 8;

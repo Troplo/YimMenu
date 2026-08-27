@@ -133,6 +133,11 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 		    [](PVOID) -> DWORD {
 				std::srand(std::chrono::system_clock::now().time_since_epoch().count());
 
+		    	while (!GetModuleHandleA("Paragon.Sdk.dll"))
+		    	{
+		    		std::this_thread::sleep_for(100ms);
+		    	}
+
 				while (!FindWindow("grcWindow", nullptr))
 					std::this_thread::sleep_for(100ms);
 

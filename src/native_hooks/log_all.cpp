@@ -1,3 +1,4 @@
+#if 0
 #include "log_all.hpp"
 #include "logger/logger.hpp"
 #include "natives.hpp"
@@ -33173,3 +33174,4 @@ void init_native_hooks_logs(native_hooks* nhooks) {
     nhooks->add_native_detour(NativeIndex::GET_HASH_OF_MAP_AREA_AT_COORDS, lua::native::LUA_NATIVE_ZONE_GET_HASH_OF_MAP_AREA_AT_COORDS_LOG);
 }
 }
+#endif

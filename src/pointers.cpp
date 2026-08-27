@@ -2,6 +2,7 @@
 
 #include "gta_pointers_layout_info.hpp"
 #include "sc_pointers_layout_info.hpp"
+#include "util/current_module.hpp"
 
 #define GTA_VERSION_TARGET "1.73-3889.0"
 
@@ -1979,7 +1980,15 @@ namespace big
             {
                 g_pointers->m_gta.m_script_vm_on_enter_end = ptr.as<PVOID>();
             }
-        }
+        },
+{
+	"PN2",
+	"BD C3 9E 26 00 48 8D",
+	[](memory::handle ptr)
+	{
+		g_pointers->m_gta.m_create_native = ptr.sub(0x1e).as<void*>();
+	}
+}
         >(); // don't leave a trailing comma at the end
 
 		// clang-format on
@@ -1994,7 +2003,8 @@ namespace big
         constexpr auto batch_and_hash = memory::make_batch<
         // Presence Data
         // Update instructions: Scan 48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 18 57 41 56 41 57 48 83 EC 40 41 8B E9 and xref it to get to the vtable. Xref the vtable and generate a new signature
-        {
+#if 0
+        	{
             "PD",
             "48 8D 05 ? ? ? ? 48 8B F9 48 89 01 48 83 C1 08 E8",
             [](memory::handle ptr)
@@ -2040,6 +2050,7 @@ namespace big
                 g_pointers->m_sc.m_read_attribute_patch_2 = ptr.as<PVOID>();
             }
         },
+#endif
 		// PARAGON
 
 		// Rlpc
@@ -2115,7 +2126,7 @@ namespace big
 	{
 		g_pointers = this;
 
-		const auto mem_region = memory::module("GTA5.exe");
+		const auto mem_region = memory::module(GetCurrentModule());
 
 		constexpr auto gta_batch_and_hash = pointers::get_gta_batch();
 		constexpr cstxpr_str gta_batch_name{"GTA5"};
@@ -2125,9 +2136,9 @@ namespace big
 		    gta_pointers_layout_info::offset_of_cache_end_field,
 		    gta_batch_and_hash.m_batch>(m_gta_pointers_cache, mem_region);
 
-		// auto sc_module = memory::module("socialclub.dll");
-		// if (sc_module.wait_for_module())
-		// {
+		auto sc_module = memory::module("Paragon.Sdk.dll");
+		if (sc_module.wait_for_module())
+		{
 		// 	constexpr auto sc_batch_and_hash = pointers::get_sc_batch();
 		// 	constexpr cstxpr_str sc_batch_name{"Social Club"};
 		// 	write_to_cache_or_read_from_cache<sc_batch_name,
@@ -2139,7 +2150,7 @@ namespace big
 		// else
 		// {
 		// 	LOG(WARNING) << "socialclub.dll module was not loaded within the time limit.";
-		// }
+		}
 
 		m_hwnd = FindWindowW(L"grcWindow", nullptr);
 

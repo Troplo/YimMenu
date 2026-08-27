@@ -125,30 +125,30 @@ namespace big
 
 		void generic_detour(rage::scrNativeCallContext* src)
 		{
-			LOG(VERBOSE) << "Native called";
-
-			NativeIndex index = static_cast<NativeIndex>(reinterpret_cast<std::uintptr_t>(src->m_orig[0]));
-			LOG(VERBOSE) << "Native called: " << static_cast<int>(index)
-				<< " | args=" << src->m_arg_count << "\n";
-
-			for (std::size_t i = 0; i < src->m_arg_count; ++i)
-				LOG(VERBOSE) << "  arg[" << i << "]=" << src->get_arg<std::uint64_t>(i) << "\n";
-
-			if (!g_native_hooks)
-				return;
-
-			auto& registrations = g_native_hooks->m_native_registrations;
-			for (auto& [hash, detours] : registrations)
-			{
-				for (auto& d : detours)
-				{
-					if (d.first == index && d.second != generic_detour)
-					{
-						d.second(src);
-						return;
-					}
-				}
-			}
+			// LOG(VERBOSE) << "Native called";
+			//
+			// NativeIndex index = static_cast<NativeIndex>(reinterpret_cast<std::uintptr_t>(src->m_orig[0]));
+			// LOG(VERBOSE) << "Native called: " << static_cast<int>(index)
+			// 	<< " | args=" << src->m_arg_count << "\n";
+			//
+			// for (std::size_t i = 0; i < src->m_arg_count; ++i)
+			// 	LOG(VERBOSE) << "  arg[" << i << "]=" << src->get_arg<std::uint64_t>(i) << "\n";
+			//
+			// if (!g_native_hooks)
+			// 	return;
+			//
+			// auto& registrations = g_native_hooks->m_native_registrations;
+			// for (auto& [hash, detours] : registrations)
+			// {
+			// 	for (auto& d : detours)
+			// 	{
+			// 		if (d.first == index && d.second != generic_detour)
+			// 		{
+			// 			d.second(src);
+			// 			return;
+			// 		}
+			// 	}
+			// }
 		}
 
 		void DRAW_DEBUG_TEXT_2D(rage::scrNativeCallContext* info)
@@ -299,6 +299,7 @@ namespace big
 
 		void RETURN_TRUE(rage::scrNativeCallContext* src)
 		{
+			LOG(INFO) << "RETURN_TRUE";
 			src->set_return_value<BOOL>(TRUE);
 		}
 
