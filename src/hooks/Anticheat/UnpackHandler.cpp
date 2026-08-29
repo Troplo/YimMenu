@@ -6,6 +6,7 @@
 #include <cstring>
 #include <fstream>
 #include <limits>
+#include <mutex>
 
 #define MERGE_PACKS 0
 
@@ -29,7 +30,7 @@ namespace big
 
     namespace
     {
-        constexpr char TESTADDRS_MAGIC[8] = {'T', 'E', 'S', 'T', 'A', 'D', 'D', 'R'};
+        constexpr char TESTADDRS_MAGIC[9] = {'T', 'E', 'S', 'T', 'A', 'D', 'D', 'R', '\0'};
         constexpr uint32_t TESTADDRS_VERSION = 1;
 
         constexpr char PARAPAK_MAGIC[8] = {'P', 'A', 'R', 'A', 'P', 'A', 'K', '\0'};
@@ -108,34 +109,35 @@ namespace big
             return false;
         }
     }
-	std::vector<UnpackHandler::ExportLocation> GetMemcpyLocations()
+
+    std::vector<UnpackHandler::ExportLocation> GetMemcpyLocations()
     {
-    	std::vector<UnpackHandler::ExportLocation> locations;
+        std::vector<UnpackHandler::ExportLocation> locations;
 
-    	std::lock_guard<std::mutex> lock(g_unpackLocationsMutex);
+        std::lock_guard<std::mutex> lock(g_unpackLocationsMutex);
 
-    	for (const auto& [dest, size] : g_unpackLocations)
-    	{
-    		const uintptr_t imageBase =
-				reinterpret_cast<uintptr_t>(GetModuleBase());
+        for (const auto& [dest, size] : g_unpackLocations)
+        {
+            const uintptr_t imageBase =
+                reinterpret_cast<uintptr_t>(GetModuleBase());
 
-    		if (dest < imageBase)
-    			continue;
+            if (dest < imageBase)
+                continue;
 
-    		const uint64_t rva =
-				static_cast<uint64_t>(dest - imageBase);
+            const uint64_t rva =
+                static_cast<uint64_t>(dest - imageBase);
 
-    		if (size == 0)
-    			continue;
+            if (size == 0)
+                continue;
 
-    		locations.push_back({
-				rva,
-				size,
-				{}
-			});
-    	}
+            locations.push_back({
+                rva,
+                size,
+                {}
+            });
+        }
 
-    	return locations;
+        return locations;
     }
 
     bool UnpackHandler::DecodeLocation(const uint8_t** stream, uint64_t* offset, uint64_t* size)
@@ -349,12 +351,19 @@ namespace big
 
                 if (wasCopiedByMemcpy || currentSection.rva == 0x19ce600 || 1)
                 {
-                    ExportLocation location{};
-                    location.rva = rva;
-                    location.size = 1;
-                    location.data.push_back(newByte);
-                    m_locations.push_back(std::move(location));
-
+                    if (!m_locations.empty() && m_locations.back().rva + m_locations.back().size == rva)
+                    {
+                        m_locations.back().data.push_back(newByte);
+                        m_locations.back().size++;
+                    }
+                    else
+                    {
+                        ExportLocation location{};
+                        location.rva = rva;
+                        location.size = 1;
+                        location.data.push_back(newByte);
+                        m_locations.push_back(std::move(location));
+                    }
                     ++filteredDifferenceCount;
                 }
             }
@@ -362,35 +371,35 @@ namespace big
         LOG(VERBOSE) << ".text comparison complete: " << std::dec << totalDifferenceCount << " total byte(s) changed.";
         LOG(VERBOSE) << "Filtered to " << filteredDifferenceCount << " byte(s) touched by memcpy.";
 
-    	auto memcpySnaps = GetMemcpyLocations();
+        auto memcpySnaps = GetMemcpyLocations();
 
-    	for (const auto& snap : memcpySnaps)
-    	{
-    		bool found = false;
+        for (const auto& snap : memcpySnaps)
+        {
+            bool found = false;
 
-    		for (const auto& location : m_locations)
-    		{
-    			const uint64_t memcpyStart = snap.rva;
-    			const uint64_t memcpyEnd = snap.rva + snap.size;
+            for (const auto& location : m_locations)
+            {
+                const uint64_t memcpyStart = snap.rva;
+                const uint64_t memcpyEnd = snap.rva + snap.size;
 
-    			const uint64_t locationStart = location.rva;
-    			const uint64_t locationEnd = location.rva + location.size;
+                const uint64_t locationStart = location.rva;
+                const uint64_t locationEnd = location.rva + location.size;
 
-    			if (memcpyStart < locationEnd && locationStart < memcpyEnd)
-    			{
-    				found = true;
-    				break;
-    			}
-    		}
+                if (memcpyStart < locationEnd && locationStart < memcpyEnd)
+                {
+                    found = true;
+                    break;
+                }
+            }
 
-    		if (!found)
-    		{
-    			LOG(WARNING)
-					<< "Memcpy destination was not detected in changed locations: "
-					<< "RVA 0x" << std::hex << snap.rva
-					<< " size 0x" << snap.size;
-    		}
-    	}
+            if (!found)
+            {
+                LOG(VERBOSE)
+                    << "Memcpy destination unchanged somehow?: "
+                    << "RVA 0x" << std::hex << snap.rva
+                    << " size 0x" << snap.size;
+            }
+        }
         return true;
     }
 
@@ -400,7 +409,6 @@ namespace big
         if (!imageBase) return false;
 
         std::vector<ExportLocation> locations;
-        // Pre-reserve for at least the dynamically caught locations
         locations.reserve(m_locations.size() + 100);
 
         for (const auto& location : m_locations)
@@ -417,7 +425,6 @@ namespace big
             locations.push_back(std::move(exported));
         }
 
-        // Add PackerList1 blocks unconditionally
         const uint8_t* packerStream = g_pointers->m_gta.PackerList1;
         if (packerStream)
         {
@@ -474,14 +481,17 @@ namespace big
         LOG(VERBOSE) << "Imported " << locations.size() << " locations from " << path;
         return true;
     }
+
     void UnpackHandler::DoExport()
     {
-        Export("parapak.bin");
+    	auto file = g_file_manager.get_baked_project_file(std::filesystem::path("ParaPaks") / "legacy_3889.parapak");
+        Export(file.get_path().string());
     }
 
     void UnpackHandler::DoImport()
     {
-        Import("parapak.bin");
+    	auto file = g_file_manager.get_baked_project_file(std::filesystem::path("ParaPaks") / "legacy_3889.parapak");
+        Import(file.get_path().string());
     }
 
     bool UnpackHandler::WriteTestAddresses(const std::string& path, const std::vector<ExportLocation>& locations)
@@ -582,7 +592,6 @@ namespace big
         uint8_t relocBuffer[8] = {0};
 
         LOG(VERBOSE) << "Starting unpack, module base: " << reinterpret_cast<void*>(imageBase);
-        Logger::FlushQueue();
 
         while (true)
         {
@@ -592,14 +601,13 @@ namespace big
 
             if (blockOffset == 0xFFFFFFFF)
             {
-                LOG(INFO) << "End reached, blockOffset: -1";
+                LOG(VERBOSE) << "End reached, blockOffset: -1";
                 break;
             }
 
             uint8_t* outputPtr = imageBase + blockOffset;
             uint8_t* blockEnd = outputPtr + blockSize;
             LOG(VERBOSE) << "Processing block at " << reinterpret_cast<void*>(outputPtr) << " size " << blockSize;
-            Logger::FlushQueue();
 
             while (outputPtr != blockEnd)
             {

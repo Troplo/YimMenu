@@ -26,9 +26,13 @@ namespace big
 		static std::filesystem::path ensure_file_can_be_created(const std::filesystem::path file_path);
 		static std::filesystem::path ensure_folder_exists(const std::filesystem::path folder_path);
 
+		file get_baked_project_file(std::filesystem::path file_path);
+		folder get_baked_project_folder(std::filesystem::path folder_path);
+		const std::filesystem::path& GetGameDirectory();
+
 	private:
 		std::filesystem::path m_base_dir;
-
+		std::filesystem::path m_baked_base_dir;
 	};
 	inline auto g_file_manager = file_manager();
 }

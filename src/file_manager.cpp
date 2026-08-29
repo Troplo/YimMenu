@@ -52,8 +52,37 @@ namespace big
 			create_path = true;
 		}
 		if (create_path)
+		{
 			create_directories(folder_path);
+		}
 
 		return folder_path;
+	}
+
+	file file_manager::get_baked_project_file(std::filesystem::path file_path)
+	{
+		auto fullPath = GetGameDirectory() / "paragon_utils" / "YimShim" / file_path;
+		ensure_file_can_be_created(fullPath);
+		return file(fullPath);
+	}
+
+	folder file_manager::get_baked_project_folder(std::filesystem::path folder_path)
+	{
+		auto fullPath = GetGameDirectory() / "paragon_utils" / "YimShim" / folder_path;
+		return file_manager::ensure_folder_exists(fullPath);
+	}
+
+	const std::filesystem::path& file_manager::GetGameDirectory()
+	{
+		if (!m_baked_base_dir.empty())
+		{
+			return m_baked_base_dir;
+		}
+		wchar_t buffer[MAX_PATH];
+		GetModuleFileNameW(NULL, buffer, MAX_PATH);
+
+		std::filesystem::path exePath(buffer);
+		m_baked_base_dir = exePath.parent_path().parent_path();
+		return m_baked_base_dir;
 	}
 }
