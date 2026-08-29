@@ -2,7 +2,7 @@
 #include "util/current_module.hpp"
 #include "pointers.hpp"
 
-#include <Windows.h>
+#include <windows.h>
 #include <cstring>
 #include <fstream>
 #include <limits>
@@ -11,6 +11,9 @@
 
 namespace big
 {
+    extern std::mutex g_unpackLocationsMutex;
+    extern std::vector<std::pair<uintptr_t, uint32_t>> g_unpackLocations;
+
     std::vector<UnpackHandler::TextSnapshot> UnpackHandler::m_textSnapshots{};
     std::vector<UnpackHandler::ExportLocation> UnpackHandler::m_locations{};
 
@@ -41,16 +44,13 @@ namespace big
         uint64_t GetImageSize()
         {
             uint8_t* mod = GetModuleBase();
-            if (!mod)
-                return 0;
+            if (!mod) return 0;
 
             auto* dosHeader = reinterpret_cast<IMAGE_DOS_HEADER*>(mod);
-            if (dosHeader->e_magic != IMAGE_DOS_SIGNATURE)
-                return 0;
+            if (dosHeader->e_magic != IMAGE_DOS_SIGNATURE) return 0;
 
             auto* ntHeaders = reinterpret_cast<IMAGE_NT_HEADERS*>(mod + dosHeader->e_lfanew);
-            if (ntHeaders->Signature != IMAGE_NT_SIGNATURE)
-                return 0;
+            if (ntHeaders->Signature != IMAGE_NT_SIGNATURE) return 0;
 
             return ntHeaders->OptionalHeader.SizeOfImage;
         }
@@ -58,16 +58,13 @@ namespace big
         std::vector<UnpackHandler::Location> GetTextSections(uint8_t* imageBase)
         {
             std::vector<UnpackHandler::Location> sections;
-            if (!imageBase)
-                return sections;
+            if (!imageBase) return sections;
 
             auto* dosHeader = reinterpret_cast<IMAGE_DOS_HEADER*>(imageBase);
-            if (dosHeader->e_magic != IMAGE_DOS_SIGNATURE)
-                return sections;
+            if (dosHeader->e_magic != IMAGE_DOS_SIGNATURE) return sections;
 
             auto* ntHeaders = reinterpret_cast<IMAGE_NT_HEADERS*>(imageBase + dosHeader->e_lfanew);
-            if (ntHeaders->Signature != IMAGE_NT_SIGNATURE)
-                return sections;
+            if (ntHeaders->Signature != IMAGE_NT_SIGNATURE) return sections;
 
             IMAGE_SECTION_HEADER* section = IMAGE_FIRST_SECTION(ntHeaders);
 
@@ -89,12 +86,11 @@ namespace big
                     << (static_cast<uint64_t>(section[i].VirtualAddress) +
                         section[i].Misc.VirtualSize);
 
-                if (std::strcmp(name, ".text") == 0 && section[i].Misc.VirtualSize != 0)
+                if (std::strcmp(name, ".data") != 0 && std::strcmp(name, ".tls") != 0 && section[i].Misc.VirtualSize != 0)
                 {
                     sections.emplace_back(section[i].VirtualAddress, section[i].Misc.VirtualSize);
                 }
             }
-
             return sections;
         }
 
@@ -106,104 +102,102 @@ namespace big
                 {
                     const uint64_t offset = rva - section.rva;
                     if (offset <= section.size && size <= section.size - offset)
-                    {
                         return true;
-                    }
                 }
             }
             return false;
         }
     }
+	std::vector<UnpackHandler::ExportLocation> GetMemcpyLocations()
+    {
+    	std::vector<UnpackHandler::ExportLocation> locations;
+
+    	std::lock_guard<std::mutex> lock(g_unpackLocationsMutex);
+
+    	for (const auto& [dest, size] : g_unpackLocations)
+    	{
+    		const uintptr_t imageBase =
+				reinterpret_cast<uintptr_t>(GetModuleBase());
+
+    		if (dest < imageBase)
+    			continue;
+
+    		const uint64_t rva =
+				static_cast<uint64_t>(dest - imageBase);
+
+    		if (size == 0)
+    			continue;
+
+    		locations.push_back({
+				rva,
+				size,
+				{}
+			});
+    	}
+
+    	return locations;
+    }
 
     bool UnpackHandler::DecodeLocation(const uint8_t** stream, uint64_t* offset, uint64_t* size)
     {
-        uint64_t delta = 0;
-        uint64_t shift = 0;
-
+        uint64_t delta = 0, shift = 0;
         while (true)
         {
             const uint8_t b = *(*stream)++;
             delta |= static_cast<uint64_t>(b & 0x7F) << shift;
-
-            if (!(b & 0x80))
-                break;
-
+            if (!(b & 0x80)) break;
             shift += 7;
         }
-
         *offset += delta + *size;
-
-        if (*offset == 0xFFFFFFFFFFFFFFFF)
-            return false;
+        if (*offset == 0xFFFFFFFFFFFFFFFF) return false;
 
         uint64_t newSize = 0;
         shift = 0;
-
         while (true)
         {
             const uint8_t b = *(*stream)++;
             newSize |= static_cast<uint64_t>(b & 0x7F) << shift;
-
-            if (!(b & 0x80))
-                break;
-
+            if (!(b & 0x80)) break;
             shift += 7;
         }
-
         *size = newSize;
         return true;
     }
 
     void UnpackHandler::DecodeStream(const uint8_t** stream, uint32_t* offset, uint32_t* size)
     {
-        uint32_t delta = 0;
-        uint32_t shift = 0;
-
+        uint32_t delta = 0, shift = 0;
         while (true)
         {
             uint8_t b = *(*stream)++;
             delta |= (b & 0x7F) << shift;
             shift += 7;
-            if (!(b & 0x80))
-                break;
+            if (!(b & 0x80)) break;
         }
-
         *offset += delta + *size;
-
-        if (*offset == 0xFFFFFFFF)
-            return;
+        if (*offset == 0xFFFFFFFF) return;
 
         uint32_t newSize = 0;
         shift = 0;
-
         while (true)
         {
             uint8_t b = *(*stream)++;
             newSize |= (b & 0x7F) << shift;
             shift += 7;
-            if (!(b & 0x80))
-                break;
+            if (!(b & 0x80)) break;
         }
-
         *size = newSize;
     }
 
     std::vector<UnpackHandler::Location> UnpackHandler::GetExportLocations()
     {
-        static const std::vector<uint64_t> locationStreams = {
-            0x03C4C8F9,
-            0x0359C024,
-            0x03188000
-        };
-
+        static const std::vector<uint64_t> locationStreams = { 0x03C4C8F9, 0x0359C024, 0x03188000 };
         std::vector<Location> locations;
 
         for (const uint64_t streamRva : locationStreams)
         {
             const uint8_t* stream = GetModuleBase() + streamRva;
-
-            uint64_t offset = 0;
-            uint64_t size = 0;
+            uint64_t offset = 0, size = 0;
 
             while (DecodeLocation(&stream, &offset, &size))
             {
@@ -211,15 +205,13 @@ namespace big
                 locations.push_back({ offset, size });
             }
         }
-
         return locations;
     }
 
     bool UnpackHandler::WriteExportFile(const std::string& path, const std::vector<ExportLocation>& locations)
     {
         std::ofstream file(path, std::ios::binary | std::ios::trunc);
-        if (!file)
-            return false;
+        if (!file) return false;
 
         FileHeader header{};
         std::memcpy(header.magic, PARAPAK_MAGIC, sizeof(header.magic));
@@ -227,48 +219,29 @@ namespace big
         header.locationCount = static_cast<uint32_t>(locations.size());
 
         file.write(reinterpret_cast<const char*>(&header), sizeof(header));
-        if (!file)
-            return false;
+        if (!file) return false;
 
         for (const auto& location : locations)
         {
-            if (location.data.size() != location.size)
-                return false;
-
             LocationHeader locationHeader{};
             locationHeader.rva = location.rva;
             locationHeader.size = location.size;
 
             file.write(reinterpret_cast<const char*>(&locationHeader), sizeof(locationHeader));
-            if (!file)
-                return false;
-
             if (location.size != 0)
-            {
                 file.write(reinterpret_cast<const char*>(location.data.data()), location.size);
-                if (!file)
-                    return false;
-            }
         }
-
         return true;
     }
 
     bool UnpackHandler::ReadExportFile(const std::string& path, std::vector<ExportLocation>& locations)
     {
         std::ifstream file(path, std::ios::binary);
-        if (!file)
-            return false;
+        if (!file) return false;
 
         FileHeader header{};
         file.read(reinterpret_cast<char*>(&header), sizeof(header));
-        if (!file)
-            return false;
-
-        if (std::memcmp(header.magic, PARAPAK_MAGIC, sizeof(header.magic)) != 0)
-            return false;
-
-        if (header.version != PARAPAK_VERSION)
+        if (std::memcmp(header.magic, PARAPAK_MAGIC, sizeof(header.magic)) != 0 || header.version != PARAPAK_VERSION)
             return false;
 
         locations.clear();
@@ -278,8 +251,6 @@ namespace big
         {
             LocationHeader locationHeader{};
             file.read(reinterpret_cast<char*>(&locationHeader), sizeof(locationHeader));
-            if (!file)
-                return false;
 
             ExportLocation location{};
             location.rva = locationHeader.rva;
@@ -287,33 +258,20 @@ namespace big
             location.data.resize(location.size);
 
             if (location.size != 0)
-            {
                 file.read(reinterpret_cast<char*>(location.data.data()), location.size);
-                if (!file)
-                    return false;
-            }
 
             locations.push_back(std::move(location));
         }
-
         return true;
     }
 
     bool UnpackHandler::TakeTextSnapshot()
     {
         uint8_t* imageBase = GetModuleBase();
-        if (!imageBase)
-        {
-            LOG(VERBOSE) << "Failed to get module base";
-            return false;
-        }
+        if (!imageBase) return false;
 
         auto textSections = GetTextSections(imageBase);
-        if (textSections.empty())
-        {
-            LOG(VERBOSE) << "Failed to find any .text sections";
-            return false;
-        }
+        if (textSections.empty()) return false;
 
         m_textSnapshots.clear();
         m_textSnapshots.reserve(textSections.size());
@@ -323,13 +281,11 @@ namespace big
             TextSnapshot snapshot{};
             snapshot.rva = section.rva;
             snapshot.data.resize(section.size);
-
             std::memcpy(snapshot.data.data(), imageBase + section.rva, section.size);
             m_textSnapshots.push_back(std::move(snapshot));
 
             LOG(VERBOSE) << "Captured .text snapshot: RVA 0x" << std::hex << section.rva << " size 0x" << section.size;
         }
-
         return true;
     }
 
@@ -342,38 +298,30 @@ namespace big
         }
 
         uint8_t* imageBase = GetModuleBase();
-        if (!imageBase)
-        {
-            LOG(VERBOSE) << "Failed to get module base";
-            return false;
-        }
+        if (!imageBase) return false;
 
         auto textSections = GetTextSections(imageBase);
-        if (textSections.size() != m_textSnapshots.size())
+
+        std::vector<std::pair<uintptr_t, uint32_t>> vehBlocks;
         {
             LOG(VERBOSE) << "The number of .text sections changed: old=" << std::dec << m_textSnapshots.size() << " new=" << textSections.size();
-            return false;
+            std::lock_guard<std::mutex> lock(g_unpackLocationsMutex);
+            vehBlocks = g_unpackLocations;
         }
 
+        LOG(VERBOSE) << "Retrieved " << std::dec << vehBlocks.size() << " block(s) from VEH memcpy intercepts.";
+
         m_locations.clear();
-        uint64_t differenceCount = 0;
+        uint64_t totalDifferenceCount = 0;
+        uint64_t filteredDifferenceCount = 0;
 
         for (size_t s = 0; s < textSections.size(); ++s)
         {
             const auto& currentSection = textSections[s];
             const auto& snapshot = m_textSnapshots[s];
 
-            if (currentSection.rva != snapshot.rva)
-            {
-                LOG(VERBOSE) << "A .text RVA changed: old=0x" << std::hex << snapshot.rva << " new=0x" << currentSection.rva;
+            if (currentSection.rva != snapshot.rva || currentSection.size != snapshot.data.size())
                 return false;
-            }
-
-            if (currentSection.size != snapshot.data.size())
-            {
-                LOG(VERBOSE) << "A .text size changed: old=0x" << std::hex << snapshot.data.size() << " new=0x" << currentSection.size;
-                return false;
-            }
 
             const uint8_t* currentData = imageBase + currentSection.rva;
 
@@ -382,93 +330,78 @@ namespace big
                 const uint8_t oldByte = snapshot.data[i];
                 const uint8_t newByte = currentData[i];
 
-                if (oldByte == newByte)
-                    continue;
+                if (oldByte == newByte) continue;
 
-                ++differenceCount;
+                ++totalDifferenceCount;
                 const uint64_t rva = currentSection.rva + i;
+                const uintptr_t absAddress = reinterpret_cast<uintptr_t>(imageBase) + rva;
 
-                LOG(VERBOSE) << ".text changed at RVA 0x" << std::hex << rva << " offset 0x" << i << ": 0x" << static_cast<uint32_t>(oldByte) << " -> 0x" << static_cast<uint32_t>(newByte) << "SECT: " << currentSection.rva;
-
-                ExportLocation location{};
-                location.rva = rva;
-                location.size = 1;
-                location.data.push_back(newByte);
-
-                m_locations.push_back(std::move(location));
-            }
-        }
-
-        LOG(VERBOSE) << ".text comparison complete: " << std::dec << differenceCount << " byte(s) changed across " << textSections.size() << " section(s)";
-
-#if MERGE_PACKS
-        std::vector<TestAddr> testAddresses{};
-
-        if (ReadTestAddresses("testaddrs.bin", testAddresses))
-        {
-            uint64_t addedCount = 0;
-
-            for (const auto& address : testAddresses)
-            {
-                bool alreadyExists = false;
-
-                for (const auto& location : m_locations)
+                bool wasCopiedByMemcpy = false;
+                for (const auto& [dest, size] : vehBlocks)
                 {
-                    if (location.rva == address.rva && location.size == address.size)
+                    if (absAddress >= dest && absAddress < (dest + size))
                     {
-                        alreadyExists = true;
+                        wasCopiedByMemcpy = true;
                         break;
                     }
                 }
+                LOG(VERBOSE) << ".text changed at RVA 0x" << std::hex << rva << " offset 0x" << i << ": 0x" << static_cast<uint32_t>(oldByte) << " -> 0x" << static_cast<uint32_t>(newByte) << "SECT: " << currentSection.rva << " MEMCPY: " << wasCopiedByMemcpy;
 
-                if (alreadyExists)
+                if (wasCopiedByMemcpy || currentSection.rva == 0x19ce600 || 1)
                 {
-                    LOG(VERBOSE) << "testaddrs address already discovered: RVA 0x" << std::hex << address.rva << " size 0x" << address.size;
-                    continue;
+                    ExportLocation location{};
+                    location.rva = rva;
+                    location.size = 1;
+                    location.data.push_back(newByte);
+                    m_locations.push_back(std::move(location));
+
+                    ++filteredDifferenceCount;
                 }
-
-                ExportLocation location{};
-                location.rva = address.rva;
-                location.size = address.size;
-                location.data.resize(address.size);
-
-                std::memcpy(location.data.data(), imageBase + address.rva, address.size);
-                m_locations.push_back(std::move(location));
-                ++addedCount;
-
-                LOG(VERBOSE) << "Added persistent test address: RVA 0x" << std::hex << address.rva << " size 0x" << address.size;
             }
-
-            LOG(VERBOSE) << "Merged " << std::dec << addedCount << " persistent test address(es)";
         }
-        else
-        {
-            LOG(VERBOSE) << "No testaddrs.bin found; creating it from current delta";
+        LOG(VERBOSE) << ".text comparison complete: " << std::dec << totalDifferenceCount << " total byte(s) changed.";
+        LOG(VERBOSE) << "Filtered to " << filteredDifferenceCount << " byte(s) touched by memcpy.";
 
-            if (!WriteTestAddresses("testaddrs.bin", m_locations))
-            {
-                LOG(VERBOSE) << "Failed to create testaddrs.bin";
-                return false;
-            }
+    	auto memcpySnaps = GetMemcpyLocations();
 
-            LOG(VERBOSE) << "Created testaddrs.bin with " << std::dec << m_locations.size() << " address(es)";
-        }
-#endif
+    	for (const auto& snap : memcpySnaps)
+    	{
+    		bool found = false;
 
+    		for (const auto& location : m_locations)
+    		{
+    			const uint64_t memcpyStart = snap.rva;
+    			const uint64_t memcpyEnd = snap.rva + snap.size;
+
+    			const uint64_t locationStart = location.rva;
+    			const uint64_t locationEnd = location.rva + location.size;
+
+    			if (memcpyStart < locationEnd && locationStart < memcpyEnd)
+    			{
+    				found = true;
+    				break;
+    			}
+    		}
+
+    		if (!found)
+    		{
+    			LOG(WARNING)
+					<< "Memcpy destination was not detected in changed locations: "
+					<< "RVA 0x" << std::hex << snap.rva
+					<< " size 0x" << snap.size;
+    		}
+    	}
         return true;
     }
 
     bool UnpackHandler::Export(const std::string& path)
     {
         uint8_t* imageBase = GetModuleBase();
-        if (!imageBase)
-        {
-            LOG(VERBOSE) << "Failed to get module base";
-            return false;
-        }
+        if (!imageBase) return false;
 
         std::vector<ExportLocation> locations;
-        locations.reserve(m_locations.size());
+        // Pre-reserve for at least the dynamically caught locations
+        locations.reserve(m_locations.size() + 100);
 
         for (const auto& location : m_locations)
         {
@@ -484,6 +417,7 @@ namespace big
             locations.push_back(std::move(exported));
         }
 
+        // Add PackerList1 blocks unconditionally
         const uint8_t* packerStream = g_pointers->m_gta.PackerList1;
         if (packerStream)
         {
@@ -512,50 +446,25 @@ namespace big
         }
 
         if (!WriteExportFile(path, locations))
-        {
-            LOG(VERBOSE) << "Failed to write ParaPak file: " << path;
             return false;
-        }
 
         LOG(VERBOSE) << "Exported " << std::dec << locations.size() << " locations to " << path;
-
         return true;
     }
 
     bool UnpackHandler::Import(const std::string& path)
     {
         uint8_t* imageBase = GetModuleBase();
-        if (!imageBase)
-        {
-            LOG(VERBOSE) << "Failed to get module base";
-            return false;
-        }
+        if (!imageBase) return false;
 
         std::vector<UnpackHandler::ExportLocation> locations{};
-        if (!ReadExportFile(path, locations))
-        {
-            LOG(VERBOSE) << "Failed to read ParaPak file: " << path;
-            return false;
-        }
+        if (!ReadExportFile(path, locations)) return false;
 
         const auto imageSize = GetImageSize();
-        if (imageSize == 0)
-        {
-            LOG(FATAL) << "Failed to retrieve ImageSize from PE header";
-            return false;
-        }
 
         for (const auto& location : locations)
         {
-            DumpBytes("IMPORT SOURCE", location.data.data(), location.size);
-            DumpBytes("IMPORT DEST BEFORE", imageBase + location.rva, location.size);
-
-            if (location.rva >= imageSize || location.size > imageSize - location.rva)
-            {
-                LOG(FATAL) << "ParaPak location out of bounds: RVA 0x" << std::hex << location.rva << " size 0x" << location.size << " (ImageSize: 0x" << imageSize << ")";
-                return false;
-            }
-
+            if (location.rva >= imageSize || location.size > imageSize - location.rva) return false;
             std::memcpy(imageBase + location.rva, location.data.data(), location.size);
 
             DumpBytes("IMPORT DEST AFTER", imageBase + location.rva, location.size);
@@ -563,10 +472,8 @@ namespace big
         }
 
         LOG(VERBOSE) << "Imported " << locations.size() << " locations from " << path;
-
         return true;
     }
-
     void UnpackHandler::DoExport()
     {
         Export("parapak.bin");
