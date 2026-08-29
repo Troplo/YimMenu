@@ -5,6 +5,8 @@
 #include "fiber_pool.hpp"
 #include "gui.hpp"
 #include "hooking/hooking.hpp"
+#include "hooks/Anticheat/UnpackHandler.hpp"
+#include "hooks/Anticheat/VehPackHandler.hpp"
 #include "http_client/http_client.hpp"
 #include "logger/exception_handler.hpp"
 #include "lua/lua_manager.hpp"
@@ -28,17 +30,18 @@
 #include "services/player_database/player_database_service.hpp"
 #include "services/players/player_service.hpp"
 #include "services/script_connection/script_connection_service.hpp"
+#include "services/script_function_hook/script_function_hook_service.hpp"
 #include "services/script_patcher/script_patcher_service.hpp"
 #include "services/tunables/tunables_service.hpp"
 #include "services/vehicle/handling_service.hpp"
 #include "services/vehicle/xml_vehicles_service.hpp"
 #include "services/xml_maps/xml_map_service.hpp"
-#include "services/script_function_hook/script_function_hook_service.hpp"
 #include "thread_pool.hpp"
 #include "util/is_proton.hpp"
 #include "version.hpp"
 
 #include <Psapi.h>
+#include <tlhelp32.h>
 
 namespace big
 {
@@ -120,6 +123,523 @@ namespace big
 	}
 }
 
+namespace
+{
+    std::vector<uintptr_t> g_watchedAddresses = {
+        0x00000141150540
+ ,   	0x000001412D37D1
+    	,
+    	0x00000001412D37CC,
+    	0x1411A1480,
+    	0x1411A1488,
+    	0x143B1661C,
+    	0x142636B50
+    };
+
+    struct PageProtectionInfo
+    {
+        DWORD originalProtect;
+        DWORD restrictedProtect;
+    };
+
+    std::unordered_map<uintptr_t, PageProtectionInfo> g_pageMap;
+    PVOID g_vehHandle = nullptr;
+    thread_local uintptr_t t_rearmPage = 0;
+
+
+    void LogRegister(const char* name, DWORD64 value)
+    {
+        LOG(VERBOSE)
+            << "    "
+            << std::left
+            << std::setw(8)
+            << name
+            << " = 0x"
+            << std::right
+            << std::hex
+            << std::setw(16)
+            << std::setfill('0')
+            << value
+            << std::dec
+            << std::setfill(' ');
+    }
+
+    void LogMemoryBytes(
+        uintptr_t address,
+        size_t count)
+    {
+        LOG(VERBOSE)
+            << "    0x"
+            << std::hex
+            << std::setw(16)
+            << std::setfill('0')
+            << address
+            << ": ";
+
+        for (size_t i = 0; i < count; ++i)
+        {
+            MEMORY_BASIC_INFORMATION mbi{};
+
+            if (VirtualQuery(
+                    reinterpret_cast<LPCVOID>(address + i),
+                    &mbi,
+                    sizeof(mbi)) == 0)
+            {
+                LOG(VERBOSE) << "?? ";
+                continue;
+            }
+
+            const DWORD protect = mbi.Protect;
+
+            const bool readable =
+                protect == PAGE_READONLY ||
+                protect == PAGE_READWRITE ||
+                protect == PAGE_WRITECOPY ||
+                protect == PAGE_EXECUTE_READ ||
+                protect == PAGE_EXECUTE_READWRITE ||
+                protect == PAGE_EXECUTE_WRITECOPY;
+
+            if (!readable)
+            {
+                LOG(VERBOSE) << "?? ";
+                continue;
+            }
+
+            const auto* ptr =
+                reinterpret_cast<const uint8_t*>(address + i);
+
+            LOG(VERBOSE)
+                << std::setw(2)
+                << static_cast<unsigned>(*ptr)
+                << ' ';
+        }
+
+        LOG(VERBOSE) << std::dec << "\n";
+    }
+
+    bool IsReadable(uintptr_t address, size_t size)
+    {
+        MEMORY_BASIC_INFORMATION mbi{};
+
+        if (VirtualQuery(
+                reinterpret_cast<LPCVOID>(address),
+                &mbi,
+                sizeof(mbi)) == 0)
+        {
+            return false;
+        }
+
+        if (mbi.State != MEM_COMMIT)
+            return false;
+
+        if (mbi.Protect & PAGE_GUARD)
+            return false;
+
+        if (mbi.Protect & PAGE_NOACCESS)
+            return false;
+
+        const uintptr_t regionEnd =
+            reinterpret_cast<uintptr_t>(mbi.BaseAddress) +
+            mbi.RegionSize;
+
+        if (address > regionEnd)
+            return false;
+
+        return size <= regionEnd - address;
+    }
+
+    void LogStackMemory(
+        const CONTEXT& context,
+        size_t entries)
+    {
+        const uintptr_t rsp =
+            static_cast<uintptr_t>(context.Rsp);
+
+        LOG(VERBOSE)
+            << "  Stack memory:\n";
+
+        for (size_t i = 0; i < entries; ++i)
+        {
+            const uintptr_t address =
+                rsp + i * sizeof(uint64_t);
+
+            if (!IsReadable(address, sizeof(uint64_t)))
+            {
+                LOG(VERBOSE)
+                    << "    [RSP + 0x"
+                    << std::hex
+                    << i * sizeof(uint64_t)
+                    << "] <unreadable>\n";
+
+                break;
+            }
+
+            const auto value =
+                *reinterpret_cast<const uint64_t*>(address);
+
+            LOG(VERBOSE)
+                << "    [RSP + 0x"
+                << std::hex
+                << std::setw(3)
+                << std::setfill('0')
+                << i * sizeof(uint64_t)
+                << "] = 0x"
+                << std::setw(16)
+                << value
+                << std::dec
+                << std::setfill(' ')
+                << "\n";
+        }
+    }
+
+    void LogExceptionCode(DWORD code)
+    {
+        LOG(VERBOSE)
+            << "  Exception code: 0x"
+            << std::hex
+            << std::setw(8)
+            << std::setfill('0')
+            << code
+            << std::dec
+            << std::setfill(' ')
+            << "\n";
+    }
+}
+
+void LogExceptionContext(
+    PEXCEPTION_POINTERS exceptionInfo)
+{
+    if (exceptionInfo == nullptr ||
+        exceptionInfo->ExceptionRecord == nullptr ||
+        exceptionInfo->ContextRecord == nullptr)
+    {
+        return;
+    }
+
+    const auto* record =
+        exceptionInfo->ExceptionRecord;
+
+    const auto& ctx =
+        *exceptionInfo->ContextRecord;
+
+    LOG(VERBOSE) << "\n";
+    LOG(VERBOSE) << "========== Exception Context ==========\n";
+
+    LogExceptionCode(record->ExceptionCode);
+
+    LOG(VERBOSE)
+        << "  Exception flags: 0x"
+        << std::hex
+        << record->ExceptionFlags
+        << std::dec
+        << "\n";
+
+    LOG(VERBOSE)
+        << "  Exception address: 0x"
+        << std::hex
+        << std::setw(16)
+        << std::setfill('0')
+        << reinterpret_cast<uintptr_t>(
+               record->ExceptionAddress)
+        << std::dec
+        << std::setfill(' ')
+        << "\n";
+
+    LOG(VERBOSE)
+        << "  Parameters: "
+        << std::dec
+        << record->NumberParameters
+        << "\n";
+
+    for (DWORD i = 0;
+         i < record->NumberParameters;
+         ++i)
+    {
+        LOG(VERBOSE)
+            << "    ExceptionInformation["
+            << i
+            << "] = 0x"
+            << std::hex
+            << std::setw(16)
+            << std::setfill('0')
+            << record->ExceptionInformation[i]
+            << std::dec
+            << std::setfill(' ')
+            << "\n";
+    }
+
+    if (record->ExceptionCode == EXCEPTION_ACCESS_VIOLATION &&
+        record->NumberParameters >= 2)
+    {
+        const auto accessType =
+            record->ExceptionInformation[0];
+
+        const auto faultAddress =
+            record->ExceptionInformation[1];
+
+        LOG(VERBOSE) << "  Access violation:\n";
+
+        LOG(VERBOSE)
+            << "    Operation : "
+            << (accessType == 0 ? "READ" :
+                accessType == 1 ? "WRITE" :
+                accessType == 8 ? "EXECUTE" :
+                "UNKNOWN");
+
+        LOG(VERBOSE)
+            << "    Address   : 0x"
+            << std::hex
+            << std::setw(16)
+            << std::setfill('0')
+            << faultAddress
+            << std::dec
+            << std::setfill(' ');
+    }
+
+    LOG(VERBOSE) << "  Registers: ";
+
+    LogRegister("RAX", ctx.Rax);
+    LogRegister("RBX", ctx.Rbx);
+    LogRegister("RCX", ctx.Rcx);
+    LogRegister("RDX", ctx.Rdx);
+    LogRegister("RSI", ctx.Rsi);
+    LogRegister("RDI", ctx.Rdi);
+    LogRegister("RBP", ctx.Rbp);
+    LogRegister("RSP", ctx.Rsp);
+    LogRegister("R8",  ctx.R8);
+    LogRegister("R9",  ctx.R9);
+    LogRegister("R10", ctx.R10);
+    LogRegister("R11", ctx.R11);
+    LogRegister("R12", ctx.R12);
+    LogRegister("R13", ctx.R13);
+    LogRegister("R14", ctx.R14);
+    LogRegister("R15", ctx.R15);
+
+    LogRegister("RIP", ctx.Rip);
+    LogRegister("EFLAGS", ctx.EFlags);
+
+    // LOG(VERBOSE) << "\n";
+    // LOG(VERBOSE) << "  Segments:\n";
+    //
+    // LOG(VERBOSE)
+    //     << "    CS = 0x"
+    //     << std::hex
+    //     << ctx.SegCs
+    //     << "\n";
+    //
+    // LOG(VERBOSE)
+    //     << "    SS = 0x"
+    //     << std::hex
+    //     << ctx.SegSs
+    //     << "\n";
+    //
+    // LOG(VERBOSE)
+    //     << "    DS = 0x"
+    //     << std::hex
+    //     << ctx.SegDs
+    //     << "\n";
+    //
+    // LOG(VERBOSE)
+    //     << "    ES = 0x"
+    //     << std::hex
+    //     << ctx.SegEs
+    //     << "\n";
+    //
+    // LOG(VERBOSE)
+    //     << "    FS = 0x"
+    //     << std::hex
+    //     << ctx.SegFs
+    //     << "\n";
+    //
+    // LOG(VERBOSE)
+    //     << "    GS = 0x"
+    //     << std::hex
+    //     << ctx.SegGs
+    //     << "\n";
+
+    LOG(VERBOSE) << std::dec;
+    //
+    // LOG(VERBOSE) << "\n";
+    // LOG(VERBOSE) << "  Instruction bytes around RIP:\n";
+    //
+    // const uintptr_t rip =
+    //     static_cast<uintptr_t>(ctx.Rip);
+    //
+    // constexpr size_t before = 16;
+    // constexpr size_t after = 32;
+    //
+    // if (rip >= before)
+    // {
+    //     const uintptr_t start = rip - before;
+    //
+    //     if (IsReadable(start, before + after))
+    //     {
+    //         for (size_t i = 0; i < before + after; ++i)
+    //         {
+    //             if (i == before)
+    //                 LOG(VERBOSE) << " | ";
+    //
+    //             const auto* ptr =
+    //                 reinterpret_cast<const uint8_t*>(
+    //                     start + i);
+    //
+    //             LOG(VERBOSE)
+    //                 << std::hex
+    //                 << std::setw(2)
+    //                 << std::setfill('0')
+    //                 << static_cast<unsigned>(*ptr)
+    //                 << ' ';
+    //         }
+    //
+    //         LOG(VERBOSE) << std::dec << "\n";
+    //     }
+    //     else
+    //     {
+    //         LOG(VERBOSE)
+    //             << "    <unable to read instruction memory>\n";
+    //     }
+    // }
+
+    // LOG(VERBOSE) << "\n";
+
+    // LogStackMemory(ctx, 32);
+
+    // LOG(VERBOSE) << "\n";
+    LOG(VERBOSE) << "========================================\n";
+}
+
+    DWORD GetRestrictedProtection(DWORD protect)
+    {
+        if (protect & PAGE_EXECUTE_READWRITE) return PAGE_EXECUTE_READ;
+        if (protect & PAGE_EXECUTE_WRITECOPY) return PAGE_EXECUTE_READ;
+        if (protect & PAGE_READWRITE)         return PAGE_READONLY;
+        if (protect & PAGE_WRITECOPY)         return PAGE_READONLY;
+        return protect;
+    }
+
+    uintptr_t AlignToPage(uintptr_t address, size_t pageSize)
+    {
+        return address & ~(pageSize - 1);
+    }
+
+    LONG NTAPI VectoredExceptionHandler(PEXCEPTION_POINTERS exceptionInfo)
+    {
+        const DWORD exceptionCode = exceptionInfo->ExceptionRecord->ExceptionCode;
+    	// LOG(INFO) << "VectoredExceptionHandler code: " << std::hex << exceptionCode;
+        if (exceptionCode == EXCEPTION_ACCESS_VIOLATION)
+        {
+            const auto accessType = exceptionInfo->ExceptionRecord->ExceptionInformation[0];
+            const auto faultAddress = static_cast<uintptr_t>(exceptionInfo->ExceptionRecord->ExceptionInformation[1]);
+            const uintptr_t hitIp = exceptionInfo->ContextRecord->Rip;
+
+            SYSTEM_INFO si;
+            GetSystemInfo(&si);
+            const uintptr_t pageBase = AlignToPage(faultAddress, si.dwPageSize);
+
+            auto it = g_pageMap.find(pageBase);
+            if (it != g_pageMap.end())
+            {
+                if (accessType == 1)
+                {
+                    if (std::ranges::find(g_watchedAddresses, faultAddress) != g_watchedAddresses.end())
+                    {
+                    	const auto* record = exceptionInfo->ExceptionRecord;
+                    	const auto* context = exceptionInfo->ContextRecord;
+
+                    	const auto oldValue = *reinterpret_cast<const std::uint8_t*>(faultAddress);
+
+                    	LOG(VERBOSE) << "Memory write detected at 0x"
+									 << std::hex << faultAddress
+									 << ", old byte: 0x"
+									 << static_cast<unsigned>(oldValue);
+
+                    	LogExceptionContext(exceptionInfo);
+                    }
+                }
+
+                DWORD oldProtect = 0;
+                VirtualProtect(reinterpret_cast<LPVOID>(pageBase), si.dwPageSize, it->second.originalProtect, &oldProtect);
+
+                t_rearmPage = pageBase;
+                exceptionInfo->ContextRecord->EFlags |= (1 << 8);
+
+                return EXCEPTION_CONTINUE_EXECUTION;
+            }
+        }
+        else if (exceptionCode == EXCEPTION_SINGLE_STEP)
+        {
+            if (t_rearmPage != 0)
+            {
+                auto it = g_pageMap.find(t_rearmPage);
+                if (it != g_pageMap.end())
+                {
+                    SYSTEM_INFO si;
+                    GetSystemInfo(&si);
+
+                    DWORD oldProtect = 0;
+                    VirtualProtect(reinterpret_cast<LPVOID>(t_rearmPage), si.dwPageSize, it->second.restrictedProtect, &oldProtect);
+                }
+
+                t_rearmPage = 0;
+                return EXCEPTION_CONTINUE_EXECUTION;
+            }
+        }
+
+        return EXCEPTION_CONTINUE_SEARCH;
+    }
+
+void InitializeMemoryWatchpoints()
+{
+    SYSTEM_INFO si;
+    GetSystemInfo(&si);
+
+    for (uintptr_t address : g_watchedAddresses)
+    {
+        uintptr_t pageBase = AlignToPage(address, si.dwPageSize);
+        if (g_pageMap.contains(pageBase))
+            continue;
+
+        MEMORY_BASIC_INFORMATION mbi{};
+        if (VirtualQuery(reinterpret_cast<LPCVOID>(pageBase), &mbi, sizeof(mbi)))
+        {
+            DWORD restricted = GetRestrictedProtection(mbi.Protect);
+            if (restricted != mbi.Protect)
+            {
+                DWORD oldProtect = 0;
+                if (VirtualProtect(reinterpret_cast<LPVOID>(pageBase), si.dwPageSize, restricted, &oldProtect))
+                {
+                    g_pageMap[pageBase] = PageProtectionInfo{
+                        .originalProtect = oldProtect,
+                        .restrictedProtect = restricted
+                    };
+                }
+            }
+        }
+    }
+
+    g_vehHandle = AddVectoredExceptionHandler(1, VectoredExceptionHandler);
+}
+
+void CleanupMemoryWatchpoints()
+{
+    if (g_vehHandle)
+    {
+        RemoveVectoredExceptionHandler(g_vehHandle);
+        g_vehHandle = nullptr;
+    }
+
+    SYSTEM_INFO si;
+    GetSystemInfo(&si);
+
+    for (const auto& [pageBase, pageInfo] : g_pageMap)
+    {
+        DWORD oldProtect = 0;
+        VirtualProtect(reinterpret_cast<LPVOID>(pageBase), si.dwPageSize, pageInfo.originalProtect, &oldProtect);
+    }
+
+    g_pageMap.clear();
+}
+
 BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 {
 	using namespace big;
@@ -132,22 +652,69 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 		    0,
 		    [](PVOID) -> DWORD {
 				std::srand(std::chrono::system_clock::now().time_since_epoch().count());
+		    	std::filesystem::path base_dir = std::getenv("appdata");
+				std::string shim_dir = "YimShim";
+				constexpr std::string_view tacid_arg = "-tacidUserId=";
+				const std::string command_line = GetCommandLineA();
+				if (const auto arg_start = command_line.find(tacid_arg); arg_start != std::string::npos)
+				{
+					const auto value_start = arg_start + tacid_arg.size();
+					const auto value_end   = command_line.find_first_of(" \t", value_start);
+					const auto user_id     = command_line.substr(value_start, value_end - value_start);
+					if (!user_id.empty()
+						&& std::all_of(user_id.begin(), user_id.end(), [](const char c) { return c >= '0' && c <= '9'; }))
+						shim_dir += "-" + user_id;
+				}
 
-		    	while (!GetModuleHandleA("Paragon.Sdk.dll"))
-		    	{
-		    		std::this_thread::sleep_for(100ms);
-		    	}
 
-				while (!FindWindow("grcWindow", nullptr))
-					std::this_thread::sleep_for(100ms);
+		  //   	constexpr std::string_view addrString = "-packerAddress=";
+		  //   	uint64_t packerAddr = 0;
+				// if (const auto arg_start = command_line.find(addrString); arg_start != std::string::npos)
+				// {
+				// 	const auto value_start = arg_start + addrString.size();
+				// 	const auto value_end   = command_line.find_first_of(" \t", value_start);
+				// 	const auto user_id_str  = command_line.substr(value_start, value_end - value_start);
+			 //
+				// 	uint64_t user_id{};
+				// 	const auto [ptr, ec] = std::from_chars(
+				// 		user_id_str.data(),
+				// 		user_id_str.data() + user_id_str.size(),
+				// 		user_id
+				// 	);
+			 //
+				// 	if (!user_id_str.empty() && ec == std::errc{} && ptr == user_id_str.data() + user_id_str.size())
+				// 	{
+				// 		packerAddr = user_id;
+				// 	}
+				// }
 
-				std::filesystem::path base_dir = std::getenv("appdata");
-				base_dir /= "Paragon\\YimShim";
+		    	constexpr std::string_view exportPacker = "-packerExport";
+		    	bool import = true;
+				if (const auto arg_start = command_line.find(exportPacker); arg_start != std::string::npos)
+				{
+					import = false;
+				}
+
+				base_dir /= std::filesystem::path("Paragon") / shim_dir;
 				g_file_manager.init(base_dir);
 
 				g.init(g_file_manager.get_project_file("./settings.json"));
 				g_log.initialize("YimMenu for Paragon Legacy", g_file_manager.get_project_file("./cout.log"), g.debug.external_console);
-				LOG(INFO) << "Settings Loaded and logger initialized.";
+					// while (!GetModuleHandleA("bink2w64.dll"))
+					{
+						std::this_thread::sleep_for(300ms);
+					}
+		    	InitializeMemoryWatchpoints();
+
+		    	while (!GetModuleHandleA("Paragon.Sdk.dll"))
+		    	{
+					std::this_thread::sleep_for(100ms);
+				}
+		    	UnpackHandler::TakeTextSnapshot();
+
+
+
+		    	LOG(INFO) << "Settings Loaded and logger initialized.";
 
 				LOG(INFO) << "Yim's Menu Initializing";
 				LOGF(INFO, "Git Info\n\tBranch:\t{}\n\tHash:\t{}\n\tDate:\t{}", version::GIT_BRANCH, version::GIT_SHA1, version::GIT_DATE);
@@ -171,16 +738,31 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 
 				auto thread_pool_instance = std::make_unique<thread_pool>();
 				LOG(INFO) << "Thread pool initialized.";
+		    	while (!FindWindow("grcWindow", nullptr))
+		    		std::this_thread::sleep_for(100ms);
 
-				auto pointers_instance = std::make_unique<pointers>();
-				LOG(INFO) << "Pointers initialized.";
 
 		    	auto sc_module = memory::module("Paragon.Sdk.dll");
 				sc_module.wait_for_module();
-		    	
+				auto handler = exception_handler();
+		    	auto pointers_instance = std::make_unique<pointers>();
+				LOG(INFO) << "Pointers initialized.";
+		    	std::this_thread::sleep_for(import ? 10000ms : 30000ms);
+		    	if (import) UnpackHandler::DoImport();
+		    	else
+		    	{
+		    		UnpackHandler::CompareTextSnapshot();
+		    		UnpackHandler::DoExport();
+		    	}
+
+						// VehPackHandler::InitializeVehHooks(
+						  // reinterpret_cast<void*>(
+							  // g_pointers->m_gta.PackerList1
+							  // packerAddr
+							  // ),
+						  // nullptr);
 		    	RgscRegistration();
 				LOG(INFO) << "Rgsc registration complete";
-				auto handler = exception_handler();
 
 		    	if (!*g_pointers->m_gta.m_anticheat_initialized_hash)
 			    {
@@ -221,9 +803,12 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 				g_translation_service.init();
 				LOG(INFO) << "Translation Service initialized.";
 
-				auto hooking_instance = std::make_unique<hooking>();
-				LOG(INFO) << "Hooking initialized.";
-
+		    	std::unique_ptr<hooking> hooking_instance{};
+		    	if (import)
+		    	{
+		    		hooking_instance = std::make_unique<hooking>();
+					LOG(INFO) << "Hooking initialized.";
+		    	}
 				g_gta_data_service.init();
 
 			    auto context_menu_service_instance      = std::make_unique<context_menu_service>();
@@ -277,12 +862,15 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 
 				LOG(INFO) << "Scripts registered.";
 
-				g_hooking->enable();
+				if (import) g_hooking->enable();
 				LOG(INFO) << "Hooking enabled.";
 
-				auto native_hooks_instance = std::make_unique<native_hooks>();
-				LOG(INFO) << "Dynamic native hooker initialized.";
-
+		    	std::unique_ptr<native_hooks> native_hooks_instance;
+		    	if (import)
+		    	{
+		    		native_hooks_instance = std::make_unique<native_hooks>();
+					LOG(INFO) << "Dynamic native hooker initialized.";
+		    	}
 				auto lua_manager_instance =
 					std::make_unique<lua_manager>(g_file_manager.get_project_folder("scripts"), g_file_manager.get_project_folder("scripts_config"));
 				LOG(INFO) << "Lua manager initialized.";
@@ -302,10 +890,10 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 				lua_manager_instance.reset();
 				LOG(INFO) << "Lua manager uninitialized.";
 
-				g_hooking->disable();
+				if (import) g_hooking->disable();
 				LOG(INFO) << "Hooking disabled.";
 
-				native_hooks_instance.reset();
+				if (native_hooks_instance) native_hooks_instance.reset();
 				LOG(INFO) << "Dynamic native hooker uninitialized.";
 
 				// Make sure that all threads created don't have any blocking loops
@@ -349,7 +937,7 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 			    LOG(INFO) << "Script Function Hook Service reset.";
 			    LOG(INFO) << "Services uninitialized.";
 
-				hooking_instance.reset();
+		    	if (!import && hooking_instance) hooking_instance.reset();
 				LOG(INFO) << "Hooking uninitialized.";
 
 				fiber_pool_instance.reset();

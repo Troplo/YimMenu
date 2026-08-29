@@ -54,6 +54,7 @@ namespace big
 	}
 
 	// Returns true if bad event
+#if ENABLE_TOXIC_CHEATS || 1
 #if ENABLE_TOXIC_CHEATS
 	bool scan_weapon_damage_event(rage::netEventMgr* event_manager, CNetGamePlayer* player, CNetGamePlayer* target_player, int event_index, int event_handled_bitset, rage::datBitBuffer* buffer)
 	{
@@ -523,6 +524,7 @@ namespace big
 		buffer.Seek(0);
 		return should_block;
 	}
+#endif
 
 
 	void hooks::received_event(rage::netEventMgr* event_manager, CNetGamePlayer* source_player, CNetGamePlayer* target_player, uint16_t event_id, int event_index, int event_handled_bitset, int buffer_size, rage::datBitBuffer* buffer)
@@ -550,419 +552,422 @@ namespace big
 
 		switch (static_cast<eNetworkEvents>(event_id))
 		{
-		case eNetworkEvents::KICK_VOTES_EVENT:
-		{
-			uint32_t player_bitfield = buffer->Read<uint32_t>(32);
-			if (player_bitfield & (1 << target_player->m_player_id))
-			{
-				g.reactions.kick_vote.process(plyr);
-			}
-			buffer->Seek(0);
-			break;
-		}
-		case eNetworkEvents::SCRIPT_ENTITY_STATE_CHANGE_EVENT:
-		{
-			uint16_t entity = buffer->Read<uint16_t>(13);
-			auto type       = buffer->Read<ScriptEntityChangeType>(4);
-			uint32_t unk    = buffer->Read<uint32_t>(32);
-			if (type == ScriptEntityChangeType::SettingOfTaskVehicleTempAction)
-			{
-				uint16_t ped_id = buffer->Read<uint16_t>(13);
-				uint32_t action = buffer->Read<uint32_t>(8);
-
-				if ((action >= 15 && action <= 18) || action == 33)
-				{
-					g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
-					notify::crash_blocked(source_player, "vehicle temp action");
-					LOGF(stream::net_events, WARNING, "Blocked SCRIPT_ENTITY_STATE_CHANGE_EVENT of type SettingOfTaskVehicleTempAction with action {} that would crash the game", plyr->get_name(), action);
-					return;
-				}
-			}
-			else if (type == ScriptEntityChangeType::SetVehicleLockState)
-			{
-				if (g_local_player && g_local_player->m_vehicle && g_local_player->m_vehicle->m_net_object
-				    && g_local_player->m_vehicle->m_net_object->m_object_id == entity)
-				{
-					g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
-					LOGF(stream::net_events, WARNING, "Blocked SCRIPT_ENTITY_STATE_CHANGE_EVENT of type SetVehicleLockState from {} on our local vehicle", plyr->get_name());
-					return;
-				}
-			}
-			else if (type == ScriptEntityChangeType::SetVehicleExclusiveDriver)
-			{
-				if (g_local_player && g_local_player->m_vehicle && g_local_player->m_vehicle->m_net_object
-				    && g_local_player->m_vehicle->m_net_object->m_object_id == entity)
-				{
-					g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
-					LOGF(stream::net_events, WARNING, "Blocked SCRIPT_ENTITY_STATE_CHANGE_EVENT of type SetVehicleExclusiveDriver from {} on our local vehicle", plyr->get_name());
-					g.reactions.vehicle_kick.process(plyr);
-					return;
-				}
-			}
-			else if (type == ScriptEntityChangeType::SetPedFacialIdleAnimOverride)
-			{
-				if (g_local_player && g_local_player->m_net_object && g_local_player->m_net_object->m_object_id)
-				{
-					g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
-					LOGF(stream::net_events, WARNING, "Blocked SCRIPT_ENTITY_STATE_CHANGE_EVENT of type SetPedFacialIdleAnimOverride from {} on our local player", plyr->get_name());
-					return;
-				}
-			}
-			else if (type > ScriptEntityChangeType::SetVehicleExclusiveDriver || type < ScriptEntityChangeType::BlockingOfNonTemporaryEvents)
-			{
-				notify::crash_blocked(source_player, "invalid script entity change type");
-				g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
-				return;
-			}
-			buffer->Seek(0);
-			break;
-		}
-		case eNetworkEvents::SCRIPTED_GAME_EVENT:
-		{
-			const auto scripted_game_event = std::make_unique<CScriptedGameEvent>();
-
-			buffer->ReadDword(&scripted_game_event->m_args_size, 32);
-			if (scripted_game_event->m_args_size > sizeof(scripted_game_event->m_args))
-			{
-				g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
-				return;
-			}
-
-			buffer->ReadArray(&scripted_game_event->m_args, 8 * scripted_game_event->m_args_size);
-
-			if (hooks::scripted_game_event(scripted_game_event.get(), source_player))
-			{
-				g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
-				return;
-			}
-
-			buffer->Seek(0);
-			break;
-		}
-		case eNetworkEvents::NETWORK_CLEAR_PED_TASKS_EVENT:
-		{
-			int net_id = buffer->Read<int>(13);
-
-			if (g_local_player && g_local_player->m_net_object && g_local_player->m_net_object->m_object_id == net_id)
-			{
-				g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
-				g.reactions.clear_ped_tasks.process(plyr);
-				return;
-			}
-
-			buffer->Seek(0);
-			break;
-		}
-		case eNetworkEvents::RAGDOLL_REQUEST_EVENT:
-		{
-			int net_id = buffer->Read<int>(13);
-
-			if (g_local_player && g_local_player->m_net_object && g_local_player->m_net_object->m_object_id == net_id)
-			{
-				g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
-				g.reactions.remote_ragdoll.process(plyr);
-				return;
-			}
-
-			buffer->Seek(0);
-			break;
-		}
-		// Don't block this event, we still want to report this player
-		// because if we still report others, our account seems less fishy
-		case eNetworkEvents::REPORT_CASH_SPAWN_EVENT:
-		{
-			uint32_t money;
-
-			buffer->Seek(64);
-			buffer->ReadDword(&money, 32);
-			buffer->Seek(0);
-
-			if (money >= 2000)
-			{
-				g.reactions.report_cash_spawn.process(plyr);
-			}
-
-			break;
-		}
-		// player sending this event is a modder
-		case eNetworkEvents::REPORT_MYSELF_EVENT:
-		{
-			auto p1 = buffer->Read<int>(32);
-			auto p2 = buffer->Read<int>(32);
-
-			LOGF(stream::net_events, VERBOSE, "Received REPORT_MYSELF_EVENT from {} with parameters ({}, {})", plyr->get_name(), p1, p2);
-
-			if (p1 != 6) // false positives when telemetry endpoint is unreachable
-			{
-				session::add_infraction(plyr, Infraction::TRIGGERED_ANTICHEAT);
-				g.reactions.game_anti_cheat_modder_detection.process(plyr);
-			}
-
-			buffer->Seek(0);
-			break;
-		}
-		case eNetworkEvents::REQUEST_CONTROL_EVENT:
-		{
-			auto net_id = buffer->Read<int>(13);
-			if (g_local_player && g_local_player->m_vehicle && g_local_player->m_vehicle->m_net_object
-			    && g_local_player->m_vehicle->m_net_object->m_object_id == net_id) //The request is for a vehicle we are currently in.
-			{
-				Vehicle personal_vehicle = mobile::mechanic::get_personal_vehicle();
-				Vehicle veh              = g_pointers->m_gta.m_ptr_to_handle(g_local_player->m_vehicle);
-				if (!NETWORK::NETWORK_IS_ACTIVITY_SESSION()     //If we're in Freemode.
-				    || personal_vehicle == veh                  //Or we're in our personal vehicle.
-				    || self::spawned_vehicles.contains(net_id)) // Or it's a vehicle we spawned.
-				{
-					// Let trusted friends and players request control (e.g., they want to hook us to their tow-truck or something)
-					if (plyr && (plyr->is_trusted || (g.session.trust_friends && plyr->is_friend())))
-					{
-						buffer->Seek(0);
-						break;
-					}
-
-					if (g_local_player->m_vehicle->m_driver != source_player->m_player_info->m_ped) //This will block hackers who are not in the car but still want control.
-					{
-						g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset); // Tell them to get bent.
-						g.reactions.request_control_event.process(plyr);
-						return;
-					}
-				}
-			}
-			buffer->Seek(0);
-			break;
-		}
-		case eNetworkEvents::SCRIPT_WORLD_STATE_EVENT:
-		{
-			auto type = buffer->Read<WorldStateDataType>(4);
-			buffer->Read<bool>(1);
-			CGameScriptId id;
-			script_id_deserialize(id, *buffer);
-
-			if (type == WorldStateDataType::Rope)
-			{
-				buffer->Read<int>(9);        // network rope id
-				buffer->ReadSigned<int>(19); // pos x
-				buffer->ReadSigned<int>(19); // pos y
-				buffer->Read<int>(19);       // pos z
-				buffer->ReadSigned<int>(19); // rot x
-				buffer->ReadSigned<int>(19); // rot y
-				buffer->Read<int>(19);       // rot z
-				float max_length     = buffer->ReadSignedFloat(16, 100.0f);
-				int type             = buffer->Read<int>(4);
-				float initial_length = buffer->ReadSignedFloat(16, 100.0f);
-				float min_length     = buffer->ReadSignedFloat(16, 100.0f);
-
-				if (type == 0 || initial_length < min_length || max_length < min_length || max_length < 0.0f)
-				{
-					LOGF(stream::net_events, WARNING, "{} sent a SCRIPT_WORLD_STATE_EVENT of type Rope that would crash the game. Script Hash: {:X}, Type: {}, Initial Length: {}, Min Length: {}, Max Length: {}", plyr->get_name(), id.m_hash, type, initial_length, min_length, max_length);
-					notify::crash_blocked(source_player, "rope");
-					g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
-					return;
-				}
-			}
-			else if (type == WorldStateDataType::PopGroupOverride)
-			{
-				int pop_schedule = buffer->ReadSigned<int>(8); // Pop Schedule
-				int pop_group    = buffer->Read<int>(32);      // Pop Group
-				int percentage   = buffer->Read<int>(7);       // Percentage
-
-				if (pop_group == 0 && (percentage == 0 || percentage == 103))
-				{
-					notify::crash_blocked(source_player, "pop group override");
-					LOGF(stream::net_events, WARNING, "{} sent a SCRIPT_WORLD_STATE_EVENT of type PopGroupOverride that would crash the game. Pop schedule: {}, Pop group: {}, Percentage: {}, Script Hash: {:X}", plyr->get_name(), pop_schedule, pop_group, percentage, id.m_hash);
-					g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
-					return;
-				}
-			}
-			else if (type > WorldStateDataType::VehiclePlayerLocking || type < WorldStateDataType::CarGen)
-			{
-				notify::crash_blocked(source_player, "invalid world state type");
-				g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
-				return;
-			}
-			else if (type == WorldStateDataType::PopMultiplierArea && g.protections.stop_traffic && !NETWORK::NETWORK_IS_ACTIVITY_SESSION())
-			{
-				LOGF(stream::net_events, WARNING, "Blocked a SCRIPT_WORLD_STATE_EVENT of type PopMultiplierArea from {}", plyr->get_name());
-				g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
-				return;
-			}
-
-			buffer->Seek(0);
-			break;
-		}
-		case eNetworkEvents::REMOVE_WEAPON_EVENT:
-		{
-			std::int16_t net_id = buffer->Read<std::int16_t>(13);
-			Hash hash           = buffer->Read<Hash>(32);
-
-			if (hash == "WEAPON_UNARMED"_J)
-			{
-				LOGF(stream::net_events, WARNING, "{} sent a REMOVED_WEAPON_EVENT with weapon hash == WEAPON_UNARMED", plyr->get_name());
-				notify::crash_blocked(source_player, "remove unarmed");
-				g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
-				return;
-			}
-
-			if (g_local_player && g_local_player->m_net_object && g_local_player->m_net_object->m_object_id == net_id)
-			{
-				weapon_item weapon = g_gta_data_service.weapon_by_hash(hash);
-				g_notification_service.push_warning("PROTECTIONS"_T.data(),
-				    std::format("{} {} {}.", source_player->get_name(), "REMOVE_WEAPON_ATTEMPT_MESSAGE"_T, weapon.m_display_name));
-				g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
-				return;
-			}
-
-			buffer->Seek(0);
-			break;
-		}
-		case eNetworkEvents::GIVE_WEAPON_EVENT:
-		{
-			std::int16_t net_id = buffer->Read<std::int16_t>(13);
-			Hash hash           = buffer->Read<Hash>(32);
-
-			if (g_local_player && g_local_player->m_net_object && g_local_player->m_net_object->m_object_id == net_id)
-			{
-				weapon_item weapon = g_gta_data_service.weapon_by_hash(hash);
-				g_notification_service.push_warning("PROTECTIONS"_T.data(),
-				    std::format("{} {} {}.", source_player->get_name(), "GIVE_WEAPON_ATTEMPT_MESSAGE"_T, weapon.m_display_name));
-				g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
-				return;
-			}
-
-			buffer->Seek(0);
-			break;
-		}
-		case eNetworkEvents::GIVE_CONTROL_EVENT:
-		{
-			uint32_t timestamp                = buffer->Read<uint32_t>(32);
-			int count                         = buffer->Read<int>(2);
-			bool all_objects_migrate_together = buffer->Read<bool>(1);
-			eNetObjType sync_type;
-
-			if (count > 3)
-			{
-				count = 3;
-			}
-
-			for (int i = 0; i < count; i++)
-			{
-				int net_id              = buffer->Read<int>(13);
-				eNetObjType object_type = buffer->Read<eNetObjType>(4);
-				int migration_type      = buffer->Read<int>(3);
-
-				if (object_type < eNetObjType::NET_OBJ_TYPE_AUTOMOBILE || object_type > eNetObjType::NET_OBJ_TYPE_TRAIN)
-				{
-					notify::crash_blocked(source_player, "out of bounds give control type");
-					g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
-					return;
-				}
-
-				sync_type = object_type;
-			}
-
-			buffer->Seek(0);
-
-			if (count)
-			{
-				g.m_syncing_player      = source_player;
-				g.m_syncing_object_type = sync_type;
-			}
-			break;
-		}
-		case eNetworkEvents::NETWORK_PLAY_SOUND_EVENT:
-		{
-			if (plyr && plyr->m_play_sound_rate_limit.process())
-			{
-				if (plyr->m_play_sound_rate_limit.exceeded_last_process())
-				{
-					//notify::crash_blocked(source_player, "sound spam"); --- false positives
-				}
-				g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
-				return;
-			}
-
-			if (plyr && scan_play_sound_event(plyr, *buffer))
-			{
-				g.reactions.sound_spam.process(plyr);
-				g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
-				return;
-			}
-
-			break;
-		}
-		case eNetworkEvents::EXPLOSION_EVENT:
-		{
-			if (plyr && plyr->block_explosions)
-			{
-				g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
-				return;
-			}
-
-			scan_explosion_event(source_player, buffer);
-			break;
-		}
-		case eNetworkEvents::WEAPON_DAMAGE_EVENT:
-		{
-			if (scan_weapon_damage_event(event_manager, source_player, target_player, event_index, event_handled_bitset, buffer))
-			{
-				g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
-				return;
-			}
-			break;
-		}
-		case eNetworkEvents::ACTIVATE_VEHICLE_SPECIAL_ABILITY_EVENT:
-		{
-			int16_t net_id = buffer->Read<int16_t>(13);
-
-			if (is_local_vehicle(net_id))
-			{
-				g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
-				return;
-			}
-
-			buffer->Seek(0);
-			break;
-		}
-		case eNetworkEvents::DOOR_BREAK_EVENT:
-		{
-			int16_t net_id = buffer->Read<int16_t>(13);
-
-			if (is_local_vehicle(net_id))
-			{
-				g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
-				return;
-			}
-
-			buffer->Seek(0);
-			break;
-		}
-		case eNetworkEvents::CHANGE_RADIO_STATION_EVENT:
-		{
-			int16_t net_id = buffer->Read<int16_t>(13);
-
-			if (is_local_vehicle(net_id))
-			{
-				if (!is_in_vehicle(plyr->get_ped()))
-				{
-					g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
-					return;
-				}
-
-				if (plyr->m_radio_station_change_rate_limit.process())
-				{
-					g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
-					return;
-				}
-			}
-			else
-			{
-				g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
-				return;
-			}
-
-			buffer->Seek(0);
-			break;
-		}
+		// case eNetworkEvents::KICK_VOTES_EVENT:
+		// {
+		// 	uint32_t player_bitfield = buffer->Read<uint32_t>(32);
+		// 	if (player_bitfield & (1 << target_player->m_player_id))
+		// 	{
+		// 		g.reactions.kick_vote.process(plyr);
+		// 	}
+		// 	buffer->Seek(0);
+		// 	break;
+		// }
+		// case eNetworkEvents::SCRIPT_ENTITY_STATE_CHANGE_EVENT:
+		// {
+		// 	uint16_t entity = buffer->Read<uint16_t>(13);
+		// 	auto type       = buffer->Read<ScriptEntityChangeType>(4);
+		// 	uint32_t unk    = buffer->Read<uint32_t>(32);
+		// 	if (type == ScriptEntityChangeType::SettingOfTaskVehicleTempAction)
+		// 	{
+		// 		uint16_t ped_id = buffer->Read<uint16_t>(13);
+		// 		uint32_t action = buffer->Read<uint32_t>(8);
+		//
+		// 		if ((action >= 15 && action <= 18) || action == 33)
+		// 		{
+		// 			g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
+		// 			notify::crash_blocked(source_player, "vehicle temp action");
+		// 			LOGF(stream::net_events, WARNING, "Blocked SCRIPT_ENTITY_STATE_CHANGE_EVENT of type SettingOfTaskVehicleTempAction with action {} that would crash the game", plyr->get_name(), action);
+		// 			return;
+		// 		}
+		// 	}
+		// 	else if (type == ScriptEntityChangeType::SetVehicleLockState)
+		// 	{
+		// 		if (g_local_player && g_local_player->m_vehicle && g_local_player->m_vehicle->m_net_object
+		// 		    && g_local_player->m_vehicle->m_net_object->m_object_id == entity)
+		// 		{
+		// 			g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
+		// 			LOGF(stream::net_events, WARNING, "Blocked SCRIPT_ENTITY_STATE_CHANGE_EVENT of type SetVehicleLockState from {} on our local vehicle", plyr->get_name());
+		// 			return;
+		// 		}
+		// 	}
+		// 	else if (type == ScriptEntityChangeType::SetVehicleExclusiveDriver)
+		// 	{
+		// 		if (g_local_player && g_local_player->m_vehicle && g_local_player->m_vehicle->m_net_object
+		// 		    && g_local_player->m_vehicle->m_net_object->m_object_id == entity)
+		// 		{
+		// 			g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
+		// 			LOGF(stream::net_events, WARNING, "Blocked SCRIPT_ENTITY_STATE_CHANGE_EVENT of type SetVehicleExclusiveDriver from {} on our local vehicle", plyr->get_name());
+		// 			g.reactions.vehicle_kick.process(plyr);
+		// 			return;
+		// 		}
+		// 	}
+		// 	else if (type == ScriptEntityChangeType::SetPedFacialIdleAnimOverride)
+		// 	{
+		// 		if (g_local_player && g_local_player->m_net_object && g_local_player->m_net_object->m_object_id)
+		// 		{
+		// 			g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
+		// 			LOGF(stream::net_events, WARNING, "Blocked SCRIPT_ENTITY_STATE_CHANGE_EVENT of type SetPedFacialIdleAnimOverride from {} on our local player", plyr->get_name());
+		// 			return;
+		// 		}
+		// 	}
+		// 	else if (type > ScriptEntityChangeType::SetVehicleExclusiveDriver || type < ScriptEntityChangeType::BlockingOfNonTemporaryEvents)
+		// 	{
+		// 		notify::crash_blocked(source_player, "invalid script entity change type");
+		// 		g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
+		// 		return;
+		// 	}
+		// 	buffer->Seek(0);
+		// 	break;
+		// }
+		// case eNetworkEvents::SCRIPTED_GAME_EVENT:
+		// {
+		// 	const auto scripted_game_event = std::make_unique<CScriptedGameEvent>();
+		//
+		// 	buffer->ReadDword(&scripted_game_event->m_args_size, 32);
+		// 	if (scripted_game_event->m_args_size > sizeof(scripted_game_event->m_args))
+		// 	{
+		// 		g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
+		// 		return;
+		// 	}
+		//
+		// 	buffer->ReadArray(&scripted_game_event->m_args, 8 * scripted_game_event->m_args_size);
+		//
+		// 	if (hooks::scripted_game_event(scripted_game_event.get(), source_player))
+		// 	{
+		// 		g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
+		// 		return;
+		// 	}
+		//
+		// 	buffer->Seek(0);
+		// 	break;
+		// }
+		// case eNetworkEvents::NETWORK_CLEAR_PED_TASKS_EVENT:
+		// {
+		// 	int net_id = buffer->Read<int>(13);
+		//
+		// 	if (g_local_player && g_local_player->m_net_object && g_local_player->m_net_object->m_object_id == net_id)
+		// 	{
+		// 		g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
+		// 		g.reactions.clear_ped_tasks.process(plyr);
+		// 		return;
+		// 	}
+		//
+		// 	buffer->Seek(0);
+		// 	break;
+		// }
+		// case eNetworkEvents::RAGDOLL_REQUEST_EVENT:
+		// {
+		// 	int net_id = buffer->Read<int>(13);
+		//
+		// 	if (g_local_player && g_local_player->m_net_object && g_local_player->m_net_object->m_object_id == net_id)
+		// 	{
+		// 		g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
+		// 		g.reactions.remote_ragdoll.process(plyr);
+		// 		return;
+		// 	}
+		//
+		// 	buffer->Seek(0);
+		// 	break;
+		// }
+		// // Don't block this event, we still want to report this player
+		// // because if we still report others, our account seems less fishy
+		// case eNetworkEvents::REPORT_CASH_SPAWN_EVENT:
+		// {
+		// 	uint32_t money;
+		//
+		// 	buffer->Seek(64);
+		// 	buffer->ReadDword(&money, 32);
+		// 	buffer->Seek(0);
+		//
+		// 	if (money >= 2000)
+		// 	{
+		// 		g.reactions.report_cash_spawn.process(plyr);
+		// 	}
+		//
+		// 	break;
+		// }
+		// // player sending this event is a modder
+		// case eNetworkEvents::REPORT_MYSELF_EVENT:
+		// {
+		// 	auto p1 = buffer->Read<int>(32);
+		// 	auto p2 = buffer->Read<int>(32);
+		//
+		// 	LOGF(stream::net_events, VERBOSE, "Received REPORT_MYSELF_EVENT from {} with parameters ({}, {})", plyr->get_name(), p1, p2);
+		//
+		// 	if (p1 != 6) // false positives when telemetry endpoint is unreachable
+		// 	{
+		// 		session::add_infraction(plyr, Infraction::TRIGGERED_ANTICHEAT);
+		// 		g.reactions.game_anti_cheat_modder_detection.process(plyr);
+		// 	}
+		//
+		// 	buffer->Seek(0);
+		// 	break;
+		// }
+		// case eNetworkEvents::REQUEST_CONTROL_EVENT:
+		// {
+		// 	auto net_id = buffer->Read<int>(13);
+		// 	if (g_local_player && g_local_player->m_vehicle && g_local_player->m_vehicle->m_net_object
+		// 	    && g_local_player->m_vehicle->m_net_object->m_object_id == net_id) //The request is for a vehicle we are currently in.
+		// 	{
+		// 		Vehicle personal_vehicle = mobile::mechanic::get_personal_vehicle();
+		// 		Vehicle veh              = g_pointers->m_gta.m_ptr_to_handle(g_local_player->m_vehicle);
+		// 		if (!NETWORK::NETWORK_IS_ACTIVITY_SESSION()     //If we're in Freemode.
+		// 		    || personal_vehicle == veh                  //Or we're in our personal vehicle.
+		// 		    || self::spawned_vehicles.contains(net_id)) // Or it's a vehicle we spawned.
+		// 		{
+		// 			// Let trusted friends and players request control (e.g., they want to hook us to their tow-truck or something)
+		// 			if (plyr && (plyr->is_trusted || (g.session.trust_friends && plyr->is_friend())))
+		// 			{
+		// 				buffer->Seek(0);
+		// 				break;
+		// 			}
+		//
+		// 			if (g_local_player->m_vehicle->m_driver != source_player->m_player_info->m_ped) //This will block hackers who are not in the car but still want control.
+		// 			{
+		// 				g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset); // Tell them to get bent.
+		// 				g.reactions.request_control_event.process(plyr);
+		// 				return;
+		// 			}
+		// 		}
+		// 	}
+		// 	buffer->Seek(0);
+		// 	break;
+		// }
+		// case eNetworkEvents::SCRIPT_WORLD_STATE_EVENT:
+		// {
+		// 	auto type = buffer->Read<WorldStateDataType>(4);
+		// 	buffer->Read<bool>(1);
+		// 	CGameScriptId id;
+		// 	script_id_deserialize(id, *buffer);
+		//
+		// 	if (type == WorldStateDataType::Rope)
+		// 	{
+		// 		buffer->Read<int>(9);        // network rope id
+		// 		buffer->ReadSigned<int>(19); // pos x
+		// 		buffer->ReadSigned<int>(19); // pos y
+		// 		buffer->Read<int>(19);       // pos z
+		// 		buffer->ReadSigned<int>(19); // rot x
+		// 		buffer->ReadSigned<int>(19); // rot y
+		// 		buffer->Read<int>(19);       // rot z
+		// 		float max_length     = buffer->ReadSignedFloat(16, 100.0f);
+		// 		int type             = buffer->Read<int>(4);
+		// 		float initial_length = buffer->ReadSignedFloat(16, 100.0f);
+		// 		float min_length     = buffer->ReadSignedFloat(16, 100.0f);
+		//
+		// 		if (type == 0 || initial_length < min_length || max_length < min_length || max_length < 0.0f)
+		// 		{
+		// 			LOGF(stream::net_events, WARNING, "{} sent a SCRIPT_WORLD_STATE_EVENT of type Rope that would crash the game. Script Hash: {:X}, Type: {}, Initial Length: {}, Min Length: {}, Max Length: {}", plyr->get_name(), id.m_hash, type, initial_length, min_length, max_length);
+		// 			notify::crash_blocked(source_player, "rope");
+		// 			g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
+		// 			return;
+		// 		}
+		// 	}
+		// 	else if (type == WorldStateDataType::PopGroupOverride)
+		// 	{
+		// 		int pop_schedule = buffer->ReadSigned<int>(8); // Pop Schedule
+		// 		int pop_group    = buffer->Read<int>(32);      // Pop Group
+		// 		int percentage   = buffer->Read<int>(7);       // Percentage
+		//
+		// 		if (pop_group == 0 && (percentage == 0 || percentage == 103))
+		// 		{
+		// 			notify::crash_blocked(source_player, "pop group override");
+		// 			LOGF(stream::net_events, WARNING, "{} sent a SCRIPT_WORLD_STATE_EVENT of type PopGroupOverride that would crash the game. Pop schedule: {}, Pop group: {}, Percentage: {}, Script Hash: {:X}", plyr->get_name(), pop_schedule, pop_group, percentage, id.m_hash);
+		// 			g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
+		// 			return;
+		// 		}
+		// 	}
+		// 	else if (type > WorldStateDataType::VehiclePlayerLocking || type < WorldStateDataType::CarGen)
+		// 	{
+		// 		notify::crash_blocked(source_player, "invalid world state type");
+		// 		g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
+		// 		return;
+		// 	}
+		// 	else if (type == WorldStateDataType::PopMultiplierArea && g.protections.stop_traffic && !NETWORK::NETWORK_IS_ACTIVITY_SESSION())
+		// 	{
+		// 		LOGF(stream::net_events, WARNING, "Blocked a SCRIPT_WORLD_STATE_EVENT of type PopMultiplierArea from {}", plyr->get_name());
+		// 		g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
+		// 		return;
+		// 	}
+		//
+		// 	buffer->Seek(0);
+		// 	break;
+		// }
+		// case eNetworkEvents::REMOVE_WEAPON_EVENT:
+		// {
+		// 	std::int16_t net_id = buffer->Read<std::int16_t>(13);
+		// 	Hash hash           = buffer->Read<Hash>(32);
+		//
+		// 	if (hash == "WEAPON_UNARMED"_J)
+		// 	{
+		// 		LOGF(stream::net_events, WARNING, "{} sent a REMOVED_WEAPON_EVENT with weapon hash == WEAPON_UNARMED", plyr->get_name());
+		// 		notify::crash_blocked(source_player, "remove unarmed");
+		// 		g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
+		// 		return;
+		// 	}
+		//
+		// 	if (g_local_player && g_local_player->m_net_object && g_local_player->m_net_object->m_object_id == net_id)
+		// 	{
+		// 		weapon_item weapon = g_gta_data_service.weapon_by_hash(hash);
+		// 		g_notification_service.push_warning("PROTECTIONS"_T.data(),
+		// 		    std::format("{} {} {}.", source_player->get_name(), "REMOVE_WEAPON_ATTEMPT_MESSAGE"_T, weapon.m_display_name));
+		// 		g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
+		// 		return;
+		// 	}
+		//
+		// 	buffer->Seek(0);
+		// 	break;
+		// }
+		// case eNetworkEvents::GIVE_WEAPON_EVENT:
+		// {
+		// 	std::int16_t net_id = buffer->Read<std::int16_t>(13);
+		// 	Hash hash           = buffer->Read<Hash>(32);
+		//
+		// 	if (g_local_player && g_local_player->m_net_object && g_local_player->m_net_object->m_object_id == net_id)
+		// 	{
+		// 		weapon_item weapon = g_gta_data_service.weapon_by_hash(hash);
+		// 		g_notification_service.push_warning("PROTECTIONS"_T.data(),
+		// 		    std::format("{} {} {}.", source_player->get_name(), "GIVE_WEAPON_ATTEMPT_MESSAGE"_T, weapon.m_display_name));
+		// 		g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
+		// 		return;
+		// 	}
+		//
+		// 	buffer->Seek(0);
+		// 	break;
+		// }
+		// case eNetworkEvents::GIVE_CONTROL_EVENT:
+		// {
+		// 	uint32_t timestamp                = buffer->Read<uint32_t>(32);
+		// 	int count                         = buffer->Read<int>(2);
+		// 	bool all_objects_migrate_together = buffer->Read<bool>(1);
+		// 	eNetObjType sync_type;
+		//
+		// 	if (count > 3)
+		// 	{
+		// 		count = 3;
+		// 	}
+		//
+		// 	for (int i = 0; i < count; i++)
+		// 	{
+		// 		int net_id              = buffer->Read<int>(13);
+		// 		eNetObjType object_type = buffer->Read<eNetObjType>(4);
+		// 		int migration_type      = buffer->Read<int>(3);
+		//
+		// 		if (object_type < eNetObjType::NET_OBJ_TYPE_AUTOMOBILE || object_type > eNetObjType::NET_OBJ_TYPE_TRAIN)
+		// 		{
+		// 			notify::crash_blocked(source_player, "out of bounds give control type");
+		// 			g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
+		// 			return;
+		// 		}
+		//
+		// 		sync_type = object_type;
+		// 	}
+		//
+		// 	buffer->Seek(0);
+		//
+		// 	if (count)
+		// 	{
+		// 		g.m_syncing_player      = source_player;
+		// 		g.m_syncing_object_type = sync_type;
+		// 	}
+		// 	break;
+		// }
+		// case eNetworkEvents::NETWORK_PLAY_SOUND_EVENT:
+		// {
+		// 	if (plyr && plyr->m_play_sound_rate_limit.process())
+		// 	{
+		// 		if (plyr->m_play_sound_rate_limit.exceeded_last_process())
+		// 		{
+		// 			//notify::crash_blocked(source_player, "sound spam"); --- false positives
+		// 		}
+		// 		g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
+		// 		return;
+		// 	}
+		//
+		// 	if (plyr && scan_play_sound_event(plyr, *buffer))
+		// 	{
+		// 		// g.reactions.sound_spam.process(plyr);
+		// 		g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
+		// 		return;
+		// 	}
+		//
+		// 	break;
+		// }
+		// case eNetworkEvents::EXPLOSION_EVENT:
+		// {
+		// 	if (plyr && plyr->block_explosions)
+		// 	{
+		// 		g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
+		// 		return;
+		// 	}
+		//
+		// 	scan_explosion_event(source_player, buffer);
+		// 	break;
+		// }
+		// case eNetworkEvents::WEAPON_DAMAGE_EVENT:
+		// {
+		// 	if (scan_weapon_damage_event(event_manager, source_player, target_player, event_index, event_handled_bitset, buffer))
+		// 	{
+		// 		g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
+		// 		return;
+		// 	}
+		// 	break;
+		// }
+		// case eNetworkEvents::ACTIVATE_VEHICLE_SPECIAL_ABILITY_EVENT:
+		// {
+		// 	int16_t net_id = buffer->Read<int16_t>(13);
+		//
+		// 	if (is_local_vehicle(net_id))
+		// 	{
+		// 		g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
+		// 		return;
+		// 	}
+		//
+		// 	buffer->Seek(0);
+		// 	break;
+		// }
+		// case eNetworkEvents::DOOR_BREAK_EVENT:
+		// {
+		// 	int16_t net_id = buffer->Read<int16_t>(13);
+		//
+		// 	if (is_local_vehicle(net_id))
+		// 	{
+		// 		g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
+		// 		return;
+		// 	}
+		//
+		// 	buffer->Seek(0);
+		// 	break;
+		// }
+		// case eNetworkEvents::CHANGE_RADIO_STATION_EVENT:
+		// {
+		// 	int16_t net_id = buffer->Read<int16_t>(13);
+		//
+		// 	if (is_local_vehicle(net_id))
+		// 	{
+		// 		if (!is_in_vehicle(plyr->get_ped()))
+		// 		{
+		// 			g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
+		// 			return;
+		// 		}
+		//
+		// 		if (plyr->m_radio_station_change_rate_limit.process())
+		// 		{
+		// 			g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
+		// 			return;
+		// 		}
+		// 	}
+		// 	else
+		// 	{
+		// 		g_pointers->m_gta.m_send_event_ack(event_manager, source_player, target_player, event_index, event_handled_bitset);
+		// 		return;
+		// 	}
+		//
+		// 	buffer->Seek(0);
+		// 	break;
+		// }
+		// case eNetworkEvents::NETWORK_CHECK_CODE_CRCS_EVENT: {
+				// return;
+			// };
 		}
 
 		return g_hooking->get_original<received_event>()(event_manager, source_player, target_player, event_id, event_index, event_handled_bitset, buffer_size, buffer);

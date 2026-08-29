@@ -16,6 +16,8 @@ namespace big {
 
 	RgscRegistration::RgscRegistration()
 	{
+		return;
+
 		if (m_initialized)
 		{
 			return;

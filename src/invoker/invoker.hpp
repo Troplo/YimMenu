@@ -1,45 +1,72 @@
-/**
-* @file invoker.hpp
- *
- * @copyright GNU General Public License Version 2.
- * This file is part of YimMenu.
- * YimMenu is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 2 of the License, or (at your option) any later version.
- * YimMenu is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with YimMenu. If not, see <https://www.gnu.org/licenses/>.
- */
-
 #pragma once
 #include "crossmap.hpp"
+
 #include <script/scrNativeHandler.hpp>
 
 namespace big
 {
-	class native_call_context : public rage::scrNativeCallContext
+	class custom_call_context : public rage::scrNativeCallContext
 	{
 	public:
-		native_call_context();
+		constexpr custom_call_context()
+		{
+			m_return_value = &m_return_stack[0];
+			m_args         = &m_arg_stack[0];
+		}
 
 	private:
 		uint64_t m_return_stack[10];
-		uint64_t m_arg_stack[100];
+		uint64_t m_arg_stack[40];
 	};
 
 	class native_invoker
 	{
+		static inline rage::scrNativeHandler m_handlers[g_crossmap.size()];
+		static inline bool m_are_handlers_cached{false};
+
 	public:
-		explicit native_invoker() = default;
-		~native_invoker()         = default;
+		constexpr native_invoker(){};
 
-		void add_native_handler(rage::scrNativeHash hash, rage::scrNativeHandler handler);
-		rage::scrNativeHandler get_native_handler(rage::scrNativeHash hash);
+		constexpr void begin_call()
+		{
+			m_call_context.reset();
+		}
 
-		void begin_call();
-		void end_call(rage::scrNativeHash hash);
+		template<int index, bool should_fix_vectors>
+		constexpr void end_call()
+		{
+			// TODO: try to get rid of this
+			if (!m_are_handlers_cached) [[unlikely]]
+				cache_handlers();
+
+			m_handlers[index](&m_call_context);
+			if constexpr (should_fix_vectors)
+				fix_vectors();
+		}
 
 		template<typename T>
-		void push_arg(T&& value)
+		constexpr void push_arg(T&& value)
 		{
 			m_call_context.push_arg(std::forward<T>(value));
+		}
+
+		template<typename T>
+		constexpr T& get_return_value()
+		{
+			return *m_call_context.get_return_value<T>();
+		}
+
+		void fix_vectors();
+
+	public:
+		static void __declspec(noinline) cache_handlers();
+
+		static rage::scrNativeHandler* get_handlers()
+		{
+			if (!m_are_handlers_cached) [[unlikely]]
+				cache_handlers();
+
+			return m_handlers;
 		}
 
 		template<int index, bool fix_vectors, typename Ret, typename... Args>
@@ -49,6 +76,7 @@ namespace big
 
 			invoker.begin_call();
 			(invoker.push_arg(std::forward<Args>(args)), ...);
+			invoker.end_call<index, fix_vectors>();
 
 			if constexpr (!std::is_same_v<Ret, void>)
 			{
@@ -56,21 +84,6 @@ namespace big
 			}
 		}
 
-		template<typename T>
-		T& get_return_value()
-		{
-			return *m_call_context.get_return_value<T>();
-		}
-
-		void* get_return_address()
-		{
-			return m_call_context.m_return_value;
-		}
-
-	public:
-		native_call_context m_call_context;
-		static inline std::unordered_map<rage::scrNativeHash, rage::scrNativeHandler> m_handler_cache;
+		custom_call_context m_call_context{};
 	};
-
-	inline native_invoker g_native_invoker;
 }

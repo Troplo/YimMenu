@@ -41,16 +41,15 @@ namespace big
 		detour_hook_helper::add<hooks::run_script_threads>("SH", g_pointers->m_gta.m_run_script_threads);
 
 		detour_hook_helper::add<hooks::get_label_text>("GLT", g_pointers->m_gta.m_get_label_text);
-
 		detour_hook_helper::add<hooks::gta_thread_start>("GTS", g_pointers->m_gta.m_gta_thread_start);
 		detour_hook_helper::add<hooks::gta_thread_kill>("GTK", g_pointers->m_gta.m_gta_thread_kill);
-		// detour_hook_helper::add<hooks::init_native_tables>("INT", g_pointers->m_gta.m_init_native_tables);
+		detour_hook_helper::add<hooks::init_native_tables>("INT", g_pointers->m_gta.m_init_native_tables);
 		detour_hook_helper::add<hooks::script_vm>("SVM", g_pointers->m_gta.m_script_vm);
 
 		detour_hook_helper::add<hooks::network_player_mgr_init>("NPMI", g_pointers->m_gta.m_network_player_mgr_init);
 		detour_hook_helper::add<hooks::network_player_mgr_shutdown>("NPMS", g_pointers->m_gta.m_network_player_mgr_shutdown);
 
-		// detour_hook_helper::add<hooks::received_event>("RE", g_pointers->m_gta.m_received_event);
+		detour_hook_helper::add<hooks::received_event>("RE", g_pointers->m_gta.m_received_event);
 
 		detour_hook_helper::add<hooks::assign_physical_index>("API", g_pointers->m_gta.m_assign_physical_index);
 
@@ -91,7 +90,7 @@ namespace big
 		detour_hook_helper::add<hooks::serialize_take_off_ped_variation_task>("STOPVT", g_pointers->m_gta.m_serialize_take_off_ped_variation_task);
 		detour_hook_helper::add<hooks::serialize_parachute_task>("SPT", g_pointers->m_gta.m_serialize_parachute_task);
 
-		detour_hook_helper::add<hooks::queue_dependency>("QD", g_pointers->m_gta.m_queue_dependency);
+		// detour_hook_helper::add<hooks::queue_dependency>("QD", g_pointers->m_gta.m_queue_dependency);
 		detour_hook_helper::add<hooks::prepare_metric_for_sending>("PMFS", g_pointers->m_gta.m_prepare_metric_for_sending);
 		detour_hook_helper::add<hooks::http_start_request>("HSR", g_pointers->m_gta.m_http_start_request);
 
@@ -156,14 +155,13 @@ namespace big
 		detour_hook_helper::add<hooks::create_pool_item>("CPI", g_pointers->m_gta.m_create_pool_item);
 
 		detour_hook_helper::add<hooks::network_can_access_multiplayer>("NCAM", g_pointers->m_gta.m_network_can_access_multiplayer);
+		// detour_hook_helper::add<hooks::add_skeleton_extension>("ASE", g_pointers->m_gta.m_add_skeleton_extension);
 
-		detour_hook_helper::add<hooks::add_skeleton_extension>("ASE", g_pointers->m_gta.m_add_skeleton_extension);
+		// detour_hook_helper::add<hooks::get_anticheat_initialized_hash>("GAIH", g_pointers->m_gta.m_get_anticheat_initialized_hash);
+		// detour_hook_helper::add<hooks::get_anticheat_initialized_hash_2>("GAIH2", g_pointers->m_gta.m_get_anticheat_initialized_hash_2);
 
-		detour_hook_helper::add<hooks::get_anticheat_initialized_hash>("GAIH", g_pointers->m_gta.m_get_anticheat_initialized_hash);
-		detour_hook_helper::add<hooks::get_anticheat_initialized_hash_2>("GAIH2", g_pointers->m_gta.m_get_anticheat_initialized_hash_2);
-
-		detour_hook_helper::add<hooks::game_skeleton_update>("GSU", g_pointers->m_gta.m_game_skeleton_update);
-		detour_hook_helper::add<hooks::create_native>("Create Native", (void*)g_pointers->m_gta.m_create_native);
+		// detour_hook_helper::add<hooks::game_skeleton_update>("GSU", g_pointers->m_gta.m_game_skeleton_update);
+		// detour_hook_helper::add<hooks::create_native>("Create Native", (void*)g_pointers->m_gta.m_create_native);
 		g_hooking = this;
 	}
 

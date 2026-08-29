@@ -90,6 +90,7 @@ namespace big
 		const auto context = m_exception_info->ContextRecord;
 
 		m_dump << "Dumping registers:\n"
+		       << "RIP: " << HEX_TO_UPPER(context->Rip) << '\n'
 		       << "RAX: " << HEX_TO_UPPER(context->Rax) << '\n'
 		       << "RCX: " << HEX_TO_UPPER(context->Rcx) << '\n'
 		       << "RDX: " << HEX_TO_UPPER(context->Rdx) << '\n'

@@ -60,7 +60,11 @@ add_library(YimMenu MODULE "${SRC_MAIN}"
         src/rage/scrCommandHash.hpp
         src/natives/native_registration.cpp
         src/natives/native_registration.hpp
-        src/rage/scrCommandHash.cpp)
+        src/rage/scrCommandHash.cpp
+        src/hooks/Anticheat/VehPackHandler.cpp
+        src/hooks/Anticheat/VehPackHandler.hpp
+        src/hooks/Anticheat/UnpackHandler.cpp
+        src/hooks/Anticheat/UnpackHandler.hpp)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(TARGET YimMenu PROPERTY CXX_STANDARD 23) # 23 Because std::format is not avalible in std:c++20 for some reason. Maybe it's because i use v142 toolset.
@@ -110,3 +114,20 @@ if(MSVC)
         add_compile_definitions(YIM_DEV)
     endif()
 endif()
+
+set(OUT_DIR "Y:/paragon_utils")
+
+add_custom_command(TARGET YimMenu POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory
+        "${OUT_DIR}"
+
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "$<TARGET_FILE:YimMenu>"
+        "${OUT_DIR}/$<TARGET_FILE_NAME:YimMenu>"
+
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "$<TARGET_PDB_FILE:YimMenu>"
+        "${OUT_DIR}/$<TARGET_PDB_FILE_NAME:YimMenu>"
+
+        COMMENT "Copying YimMenu binary and PDB to ${OUT_DIR}"
+)

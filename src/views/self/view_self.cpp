@@ -1,9 +1,9 @@
 #include "core/data/hud_component_names.hpp"
 #include "core/data/ptfx_effects.hpp"
-#include "fiber_pool.hpp"
-#include "views/view.hpp"
 #include "core/scr_globals.hpp"
+#include "fiber_pool.hpp"
 #include "gta_util.hpp"
+#include "views/view.hpp"
 
 #include <script/globals/GPBD_FM_3.hpp>
 
@@ -27,7 +27,6 @@ namespace big
 		components::command_button<"fillammo">();
 #endif
 		ImGui::SeparatorText("GENERAL"_T.data());
-
 		ImGui::BeginGroup();
 
 #if ENABLE_TOXIC_CHEATS

@@ -84,6 +84,7 @@ namespace big
 
 	void logger::create_backup()
 	{
+		return;
 		if (m_file.exists())
 		{
 			auto file_time  = std::filesystem::last_write_time(m_file.get_path());

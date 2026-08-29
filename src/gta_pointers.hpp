@@ -433,6 +433,10 @@ namespace big
 		PVOID m_script_vm_on_enter_end;
 
 		void* m_create_native;
+		std::uint8_t* PackerList1;
+		std::uint8_t* PackerList1Locations;
+		using Functions_Encryptor1 = void*(void* in, void* out, uint32_t size);
+		Functions_Encryptor1* Encryptor1;
 	};
 #pragma pack(pop)
 	static_assert(sizeof(gta_pointers) % 8 == 0, "Pointers are not properly aligned");

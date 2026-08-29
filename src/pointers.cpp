@@ -1988,6 +1988,24 @@ namespace big
 	{
 		g_pointers->m_gta.m_create_native = ptr.sub(0x1e).as<void*>();
 	}
+},
+		{
+			// TODO: OUT OF SCOPE, WILL CHANGE EVERY UPDATE
+			"PackerList1NEW",
+			"48 8D 05 ? ? ? ? 48 89 45 ? B8 ? ? ? ? 85 C0 0F 85 ? ? ? ? E9 ? ? ? ? 48 8D 05 ? ? ? ? 48 89 05",
+			[](memory::handle ptr)
+			{
+				g_pointers->m_gta.PackerList1 = ptr.add(3).rip().as<std::uint8_t*>();
+			}
+		},
+{
+	// TODO: OUT OF SCOPE, WILL CHANGE EVERY UPDATE
+	"PackerList1Locations",
+	"48 8D 05 ? ? ? ? 48 89 05 ? ? ? ? E9 ? ? ? ? 48 8B C8 E9",
+	[](memory::handle ptr)
+	{
+		g_pointers->m_gta.PackerList1Locations = ptr.add(3).rip().as<std::uint8_t*>();
+	}
 }
         >(); // don't leave a trailing comma at the end
 
@@ -2136,8 +2154,8 @@ namespace big
 		    gta_pointers_layout_info::offset_of_cache_end_field,
 		    gta_batch_and_hash.m_batch>(m_gta_pointers_cache, mem_region);
 
-		auto sc_module = memory::module("Paragon.Sdk.dll");
-		if (sc_module.wait_for_module())
+		// auto sc_module = memory::module("dxgi.dll");
+		// if (sc_module.wait_for_module())
 		{
 		// 	constexpr auto sc_batch_and_hash = pointers::get_sc_batch();
 		// 	constexpr cstxpr_str sc_batch_name{"Social Club"};
