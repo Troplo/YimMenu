@@ -82,7 +82,7 @@ namespace big
 		GetModuleFileNameW(NULL, buffer, MAX_PATH);
 
 		std::filesystem::path exePath(buffer);
-		m_baked_base_dir = exePath.parent_path().parent_path();
+		m_baked_base_dir = exePath.parent_path();
 		return m_baked_base_dir;
 	}
 }

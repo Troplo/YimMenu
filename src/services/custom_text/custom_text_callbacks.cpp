@@ -40,7 +40,12 @@ namespace big
 	const char* paragon_online_build(const char* label)
 	{
 		return std::format("Paragon SDK: {} (Legacy Edition) Online:",
-					   RgscRegistration::GetSdkVersion()).c_str();
+#if RGSC_ENABLED
+		RgscRegistration::GetSdkVersion()
+#else
+		"Unknown"
+#endif
+		).c_str();
 	}
 
 	const char* paragon_game_build()

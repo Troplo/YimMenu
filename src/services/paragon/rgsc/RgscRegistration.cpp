@@ -3,7 +3,7 @@
 //
 
 #include "RgscRegistration.hpp"
-
+#if RGSC_ENABLED
 #include "gta_pointers.hpp"
 #include "pointers.hpp"
 #include "rgsc/rlpc.h"
@@ -77,3 +77,4 @@ namespace big {
 		return m_sdkVersion;
 	}
 } // big
+#endif

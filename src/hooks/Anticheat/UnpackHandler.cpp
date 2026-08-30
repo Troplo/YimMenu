@@ -73,7 +73,7 @@ namespace big
             {
                 char name[9]{};
                 std::memcpy(name, section[i].Name, sizeof(section[i].Name));
-
+#if __DEBUG
                 LOG(VERBOSE)
                     << "Section "
                     << name
@@ -86,6 +86,7 @@ namespace big
                     << " end RVA 0x"
                     << (static_cast<uint64_t>(section[i].VirtualAddress) +
                         section[i].Misc.VirtualSize);
+    #endif
 
                 if (std::strcmp(name, ".data") != 0 && std::strcmp(name, ".tls") != 0 && section[i].Misc.VirtualSize != 0)
                 {
@@ -286,7 +287,7 @@ namespace big
             std::memcpy(snapshot.data.data(), imageBase + section.rva, section.size);
             m_textSnapshots.push_back(std::move(snapshot));
 
-            LOG(VERBOSE) << "Captured .text snapshot: RVA 0x" << std::hex << section.rva << " size 0x" << section.size;
+            LOG(VERBOSE) << "Captured text snapshot: RVA 0x" << std::hex << section.rva << " size 0x" << section.size;
         }
         return true;
     }
@@ -295,7 +296,7 @@ namespace big
     {
         if (m_textSnapshots.empty())
         {
-            LOG(VERBOSE) << "No .text snapshots have been taken";
+            LOG(VERBOSE) << "No text snapshots have been taken";
             return false;
         }
 
@@ -306,12 +307,12 @@ namespace big
 
         std::vector<std::pair<uintptr_t, uint32_t>> vehBlocks;
         {
-            LOG(VERBOSE) << "The number of .text sections changed: old=" << std::dec << m_textSnapshots.size() << " new=" << textSections.size();
+            LOG(VERBOSE) << "The number of text sections changed: old=" << std::dec << m_textSnapshots.size() << " new=" << textSections.size();
             std::lock_guard<std::mutex> lock(g_unpackLocationsMutex);
             vehBlocks = g_unpackLocations;
         }
 
-        LOG(VERBOSE) << "Retrieved " << std::dec << vehBlocks.size() << " block(s) from VEH memcpy intercepts.";
+        LOG(VERBOSE) << "Retrieved " << std::dec << vehBlocks.size() << " blocks from VEH.";
 
         m_locations.clear();
         uint64_t totalDifferenceCount = 0;
@@ -368,9 +369,10 @@ namespace big
                 }
             }
         }
-        LOG(VERBOSE) << ".text comparison complete: " << std::dec << totalDifferenceCount << " total byte(s) changed.";
-        LOG(VERBOSE) << "Filtered to " << filteredDifferenceCount << " byte(s) touched by memcpy.";
+        LOG(VERBOSE) << ".text differences: " << std::dec << totalDifferenceCount << " total changed.";
+        LOG(VERBOSE) << "Filtered to " << filteredDifferenceCount << ".";
 
+#if __DEBUG
         auto memcpySnaps = GetMemcpyLocations();
 
         for (const auto& snap : memcpySnaps)
@@ -400,6 +402,7 @@ namespace big
                     << " size 0x" << snap.size;
             }
         }
+        #endif
         return true;
     }
 
@@ -465,7 +468,11 @@ namespace big
         if (!imageBase) return false;
 
         std::vector<UnpackHandler::ExportLocation> locations{};
-        if (!ReadExportFile(path, locations)) return false;
+        if (!ReadExportFile(path, locations))
+        {
+	        LOG(FATAL) << "Error reading ParaPak file at " << path;
+        	return false;
+        }
 
         const auto imageSize = GetImageSize();
 
@@ -474,8 +481,10 @@ namespace big
             if (location.rva >= imageSize || location.size > imageSize - location.rva) return false;
             std::memcpy(imageBase + location.rva, location.data.data(), location.size);
 
+        	#if __DEBUG
             DumpBytes("IMPORT DEST AFTER", imageBase + location.rva, location.size);
             LOG(VERBOSE) << "Imported RVA 0x" << std::hex << location.rva << " size 0x" << location.size;
+        	#endif
         }
 
         LOG(VERBOSE) << "Imported " << locations.size() << " locations from " << path;
@@ -524,7 +533,7 @@ namespace big
         {
             if (!IsInTextSections(location.rva, location.size, textSections))
             {
-                LOG(VERBOSE) << "Skipping non-.text address: RVA 0x" << std::hex << location.rva << " size 0x" << location.size;
+                LOG(VERBOSE) << "Skipping non-text address: RVA 0x" << std::hex << location.rva << " size 0x" << location.size;
                 continue;
             }
 

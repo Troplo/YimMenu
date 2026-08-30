@@ -375,13 +375,19 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
                 g_log.initialize("YimMenu for Paragon Legacy", g_file_manager.get_project_file("./cout.log"), g.debug.external_console);
                 std::this_thread::sleep_for(300ms);
 
+#if __DEBUG
                 InitializeMemoryWatchpoints(!import);
+#endif
 
                 while (!GetModuleHandleA("Paragon.Sdk.dll"))
                     std::this_thread::sleep_for(100ms);
 
-                UnpackHandler::TakeTextSnapshot();
-
+#if !__DEBUG
+            	if (!import)
+#endif
+            	{
+            		UnpackHandler::TakeTextSnapshot();
+            	}
                 LOG(VERBOSE) << "Settings Loaded and logger initialized.";
 
                 auto thread_pool_instance = std::make_unique<thread_pool>();
@@ -395,16 +401,18 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 
                 std::this_thread::sleep_for(import ? 10000ms : 10000ms);
 
-                CleanupMemoryWatchpoints();
-
                 if (import) UnpackHandler::DoImport();
                 else
                 {
                     UnpackHandler::CompareTextSnapshot();
                     UnpackHandler::DoExport();
                 }
+            	LOG(INFO) << "Imported";
 
+
+            	#if RGSC_ENABLED
                 RgscRegistration();
+            	#endif
                 if (!*g_pointers->m_gta.m_anticheat_initialized_hash)
                     *g_pointers->m_gta.m_anticheat_initialized_hash = new rage::Obf32;
 
