@@ -416,8 +416,6 @@ namespace big
 
 		rlPc* m_rlpc;
 
-		scrCommandHash<scrCmd>* m_command_hash;
-		rage_u32* m_sys_obf_rand_next;
 		PVOID m_be_network_bail_patch;
 
 		PVOID m_add_skeleton_extension;

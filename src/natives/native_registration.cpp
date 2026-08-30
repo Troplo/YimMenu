@@ -1,18 +1,20 @@
 #include "native_registration.hpp"
 
 #include "pointers.hpp"
+#include "services/matchmaking_networking/matchmaking_networking.hpp"
 
 namespace big
 {
-	void native_registration::call_test(rage::scrNativeCallContext* ctx)
-	{
-		LOG(INFO) << "Test native";
-	}
-
 	void native_registration::init()
 	{
-		// LOG(INFO) << "Check for native rego (valid)" << g_pointers->m_gta.m_command_hash->Lookup(0x0D94071E55F4C9CE);
-		// LOG(INFO) << "Check for native rego (invalid)" << g_pointers->m_gta.m_command_hash->Lookup(0x019FA71E55F4C9C6);
-		// g_pointers->m_gta.m_command_hash->Insert(0x391c5280f4245775, call_test);
+		auto* command_hash = reinterpret_cast<scrCommandHash<scrCmd>*>(g_pointers->m_gta.m_native_registration_table);
+		if (!command_hash)
+		{
+			LOG(FATAL) << "Native registration table is unavailable";
+			return;
+		}
+
+		command_hash->Insert(0x7D2E9B14F0A6C385ULL, matchmaking_networking::report_matchmaking_kill);
+		command_hash->Insert(0x2ED4B9D53994053EULL, matchmaking_networking::send_matchmaking_heartbeat);
 	}
 }
