@@ -3,7 +3,11 @@
 #include "backend/commands/weapons/no_sway.hpp"
 #include "gta/net_array.hpp"
 #include "memory/byte_patch.hpp"
+#include "memory/module.hpp"
+#include "memory/pattern.hpp"
 #include "pointers.hpp"
+#include "util/command_line.hpp"
+#include "util/current_module.hpp"
 #include "util/explosion_anti_cheat_bypass.hpp"
 #include "util/vehicle.hpp"
 #include "util/world_model.hpp"
@@ -15,6 +19,55 @@ namespace big
 {
 	static void init()
 	{
+		// Disable alt enter fullsreen
+		if (!command_line::has_argument(L"-enableAltEnter"))
+		{
+			const memory::module module(GetCurrentModule());
+
+			auto* match = module.scan(memory::pattern("48 83 FE 0D 75 22 E8 ? ? ? ? 3B 05 ? ? ? ? 76 2D E8 ? ? ? ? E8 ? ? ? ? 05 D0 07 00 00 89 05 ? ? ? ?"))
+			                  .value()
+			                  .as<std::uint8_t*>();
+
+			memory::byte_patch::make(match + 0x04, std::uint8_t{0xEB})->apply();
+		}
+
+		// Disable BLIP_CHANGE_FLASH, makes it easier to see exactly when you respawn
+	    if (command_line::is_pvp_patch_enabled()) {
+	        auto* blip_change_flash = memory::module(GetCurrentModule())
+                                     .scan(memory::pattern("8B 15 ? ? ? ? B9 11 00 00 00 E8 ? ? ? ? 8B 15 ? ? ? ? B9 16 00 00 00"))
+                                     .value()
+                                     .as<std::uint8_t*>();
+	        memory::byte_patch::make(blip_change_flash + 0x0B, std::array<uint8_t, 5>{0x90, 0x90, 0x90, 0x90, 0x90})->apply();
+
+	        // Patches to prevent sticky bombs from disappearing if two are thrown by two players at the exact same time. Changes projectile.clear(true) calls to projectile.clear(false).
+	        // That makes the projectiles not get deleted from existence...
+			const auto module_name = GetCurrentModule();
+			const memory::module module(module_name);
+
+			auto* move_net_sync_projectile = module.scan(memory::pattern("48 8B D3 E8 ? ? ? ? B2 01 48 8B CB E8 ? ? ? ? B0 01"))
+			                                    .value()
+			                                    .as<std::uint8_t*>();
+			auto* second_clear = module.scan(memory::pattern("84 C0 75 ? 48 8D 8F 10 01 00 00 B2 01 E8 ? ? ? ? 48 8B 6C 24 58"))
+			                       .value()
+			                       .as<std::uint8_t*>();
+
+		    memory::byte_patch::make(move_net_sync_projectile + 0x09, std::uint8_t{0})->apply();
+			memory::byte_patch::make(second_clear + 0x0C, std::uint8_t{0})->apply();
+		}
+
+	    // patches out m_lodLightsEnabled in CLODLights::Init
+		if (command_line::has_argument(L"-nolodlights"))
+		{
+			const memory::module module(GetCurrentModule());
+
+			auto* match = module.scan(memory::pattern("33 D2 88 0D ? ? ? ? 24 FE 48 8D 0D ? ? ? ?"))
+			                  .value()
+			                  .as<std::uint8_t*>();
+			auto* instruction = match + 2;
+
+			memory::byte_patch::make(instruction, std::array<uint8_t, 6>{0x90, 0x90, 0x90, 0x90, 0x90, 0x90})->apply();
+		}
+
 		// Patch World Model Spawn Bypass
 		std::array<uint8_t, 24> world_spawn_patch;
 		std::fill(world_spawn_patch.begin(), world_spawn_patch.end(), 0x90);

@@ -2079,23 +2079,7 @@ namespace big
 			{
 				g_pointers->m_gta.m_rlpc = ptr.add(3).rip().as<rlPc*>();
 			}
-		},
-	{
-		"PARAGON_SCRNATIVECONTEXT",
-		"48 8D 0D ? ? ? ? 48 8B 14 FA E8 ? ? ? ? 48 85 C0 75 0A",
-		[](memory::handle ptr)
-		{
-			g_pointers->m_gta.m_command_hash = ptr.add(3).rip().as<scrCommandHash<scrCmd>*>();
 		}
-	},
-	{
-		"PARAGON_SYSOBF",
-		"8B 0D ? ? ? ? BA ? ? ? ? 69 C9",
-		[](memory::handle ptr)
-		{
-			g_pointers->m_gta.m_sys_obf_rand_next = ptr.as<rage_u32*>();
-		}
-	}
         >();
 
 		// clang-format on

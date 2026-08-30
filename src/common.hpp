@@ -61,6 +61,8 @@
 #include "services/notifications/notification_service.hpp"
 #include "services/translation_service/translation_service.hpp"
 
+#include "util/command_line.hpp"
+
 #include "lua/sol_include.hpp"
 
 #include <script/types.hpp>

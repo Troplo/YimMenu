@@ -7,6 +7,8 @@ namespace big
 	class byte_patch_manager
 	{
 	public:
+		static void patch_intro();
+
 		byte_patch_manager();
 		~byte_patch_manager();
 	};

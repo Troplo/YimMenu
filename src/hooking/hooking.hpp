@@ -68,6 +68,11 @@ namespace rage
 	struct game_skeleton;
 }
 
+namespace memory
+{
+	class byte_patch;
+}
+
 namespace big
 {
 	struct hooks
@@ -222,6 +227,10 @@ namespace big
 		static std::uint32_t get_anticheat_initialized_hash_2(void* ac_var, std::uint32_t seed);
 
 		static void game_skeleton_update(rage::game_skeleton* skeleton, int type);
+
+		static void GetUnmappedInputs(__int64, __int64);
+		static void processStickyShapeTest(void* projectile);
+		static void render_distant_lod_lights();
 	};
 
 	class minhook_keepalive
@@ -240,6 +249,23 @@ namespace big
 	class hooking
 	{
 		friend hooks;
+
+		class c4_collision_fix
+		{
+		public:
+			~c4_collision_fix();
+
+			void install();
+			void restore();
+			void processStickyShapeTest(void* projectile);
+
+		private:
+			using ProcessStickyShapeTestFn = void (*)(void*);
+
+			memory::byte_patch *g_processPostPhysicsPatch{};
+			std::unique_ptr<call_hook> g_stickyShapeTestHook{};
+			ProcessStickyShapeTestFn g_originalProcessStickyShapeTest{};
+		};
 
 	public:
 		explicit hooking();
@@ -311,6 +337,7 @@ namespace big
 
 		vmt_hook m_swapchain_hook;
 		vtable_hook m_sync_data_reader_hook;
+		c4_collision_fix m_c4_collision_fix;
 
 		WNDPROC m_og_wndproc = nullptr;
 
