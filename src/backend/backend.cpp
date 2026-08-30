@@ -20,6 +20,17 @@
 
 namespace big
 {
+	namespace
+	{
+		HHOOK g_keyboard_hook{};
+
+		LRESULT CALLBACK LowLevelKeyboardProc(int n_code, WPARAM w_param, LPARAM l_param)
+		{
+		    // Do absolutely nothing
+			return CallNextHookEx(nullptr, n_code, w_param, l_param);
+		}
+	}
+
 	void backend::loop()
 	{
 		for (auto& command : g_bool_commands)
@@ -30,6 +41,18 @@ namespace big
 		custom_native_registration_instance->init();
 		LOG(INFO) << "Custom native registration complete.";
 
+	    if (command_line::is_pvp_patch_enabled()) {
+	        g_keyboard_hook = SetWindowsHookExA(
+                WH_KEYBOARD_LL,
+                LowLevelKeyboardProc,
+                g_hmodule,
+                0);
+	        if (g_keyboard_hook)
+	            LOG(INFO) << "Installed the keybaord hook.";
+	        else
+	            LOG(WARNING) << "Failed to install low-level keyboard hook. Error: " << GetLastError();
+	    }
+
 		// g_squad_spawner_service.fetch_squads();
 		// g_xml_vehicles_service->fetch_xml_files();
 		// g_xml_map_service->fetch_xml_files();
@@ -38,6 +61,7 @@ namespace big
 
 		while (g_running)
 		{
+
 			looped::system_self_globals();
 			looped::system_update_pointers();
 			looped::system_update_desync_kick();
@@ -51,6 +75,12 @@ namespace big
 					command->on_tick();
 
 			script::get_current()->yield();
+		}
+
+		if (g_keyboard_hook)
+		{
+			UnhookWindowsHookEx(g_keyboard_hook);
+			g_keyboard_hook = nullptr;
 		}
 	}
 

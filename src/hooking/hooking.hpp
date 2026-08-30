@@ -222,6 +222,8 @@ namespace big
 		static std::uint32_t get_anticheat_initialized_hash_2(void* ac_var, std::uint32_t seed);
 
 		static void game_skeleton_update(rage::game_skeleton* skeleton, int type);
+
+		static void GetUnmappedInputs(__int64, __int64);
 	};
 
 	class minhook_keepalive

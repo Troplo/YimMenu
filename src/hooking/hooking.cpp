@@ -1,6 +1,9 @@
 #include "hooking/hooking.hpp"
 
+#include "memory/module.hpp"
+#include "memory/pattern.hpp"
 #include "pointers.hpp"
+#include "util/current_module.hpp"
 
 namespace big
 {
@@ -39,6 +42,14 @@ namespace big
 		}
 
 		detour_hook_helper::add<hooks::run_script_threads>("SH", g_pointers->m_gta.m_run_script_threads);
+
+	    // Allow unbinding of keybinds. It is impossible to unbind the pause menu, so it is impossible to accidentally softlock yourself due to this.
+		detour_hook_helper::add<hooks::GetUnmappedInputs>(
+		    "GUMI",
+		    memory::module(GetCurrentModule())
+		        .scan(memory::pattern("48 8B C4 48 89 58 08 48 89 68 10 48 89 70 18 48 89 78 20 41 56 48 81 EC 30 09 00 00 48 8B EA 4C 8B F1 33 DB 48 8D 3D ? ? ? ? 48 8D 35 ? ? ? ?"))
+		        .value()
+		        .as<void*>());
 
 		detour_hook_helper::add<hooks::get_label_text>("GLT", g_pointers->m_gta.m_get_label_text);
 		detour_hook_helper::add<hooks::gta_thread_start>("GTS", g_pointers->m_gta.m_gta_thread_start);

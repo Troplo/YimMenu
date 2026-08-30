@@ -144,6 +144,7 @@ namespace big
 			});
 			ImGui::PopID();
 		}
+	    ImGui::EndGroup();
 	}
 
 	void render_lights_tab()
