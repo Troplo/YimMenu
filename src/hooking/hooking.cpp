@@ -3,6 +3,7 @@
 #include "memory/module.hpp"
 #include "memory/pattern.hpp"
 #include "pointers.hpp"
+#include "util/command_line.hpp"
 #include "util/current_module.hpp"
 
 namespace big
@@ -50,6 +51,19 @@ namespace big
 		        .scan(memory::pattern("48 8B C4 48 89 58 08 48 89 68 10 48 89 70 18 48 89 78 20 41 56 48 81 EC 30 09 00 00 48 8B EA 4C 8B F1 33 DB 48 8D 3D ? ? ? ? 48 8D 35 ? ? ? ?"))
 		        .value()
 		        .as<void*>());
+
+	    // prevent nighttime lod rendering completely because it fucks fps massively on some gpus, this is CVisualEffects::RenderDistantLights
+		if (command_line::has_argument(L"-nolodlights"))
+		{
+			auto* match = memory::module(GetCurrentModule())
+			                  .scan(memory::pattern("0F BA E7 0A 73 ? 0F 28 CE 8B CB E8 ? ? ? ?"))
+			                  .value()
+			                  .as<std::uint8_t*>();
+			auto* call = match + 0x0B;
+			auto* render_distant_lod_lights = memory::handle(call).add(1).rip().as<void*>();
+
+			detour_hook_helper::add<hooks::render_distant_lod_lights>("RDLL", render_distant_lod_lights);
+		}
 
 		detour_hook_helper::add<hooks::get_label_text>("GLT", g_pointers->m_gta.m_get_label_text);
 		detour_hook_helper::add<hooks::gta_thread_start>("GTS", g_pointers->m_gta.m_gta_thread_start);
@@ -147,7 +161,7 @@ namespace big
 		detour_hook_helper::add<hooks::can_create_vehicle>("CCV", g_pointers->m_gta.m_can_create_vehicle);
 
 		// detour_hook_helper::add<hooks::aimbot_cam_gameplay_director_update>("CGDU", g_pointers->m_gta.m_cam_gameplay_director_update);
-        
+
 		detour_hook_helper::add<hooks::format_int>("FI", g_pointers->m_gta.m_format_int);
 
 		detour_hook_helper::add<hooks::searchlight_crash>("SLC", g_pointers->m_gta.m_searchlight_crash);
@@ -156,7 +170,7 @@ namespace big
 		detour_hook_helper::add<hooks::update_session_advertisement>("USA", g_pointers->m_gta.m_update_session_advertisement);
 		detour_hook_helper::add<hooks::unadvertise_session>("US", g_pointers->m_gta.m_unadvertise_session);
 		detour_hook_helper::add<hooks::send_session_detail_msg>("SSDM", g_pointers->m_gta.m_send_session_detail_msg);
-  
+
 		detour_hook_helper::add<hooks::write_node_data>("WND", g_pointers->m_gta.m_write_node_data);
 		detour_hook_helper::add<hooks::can_send_node_to_player>("CSNTP", g_pointers->m_gta.m_can_send_node_to_player);
 		detour_hook_helper::add<hooks::write_node>("WN", g_pointers->m_gta.m_write_node);
@@ -174,6 +188,7 @@ namespace big
 		detour_hook_helper::add<hooks::game_skeleton_update>("GSU", g_pointers->m_gta.m_game_skeleton_update);
 		// detour_hook_helper::add<hooks::create_native>("Create Native", (void*)g_pointers->m_gta.m_create_native);
 		g_hooking = this;
+		m_c4_collision_fix.install();
 	}
 
 	hooking::~hooking()
@@ -217,10 +232,16 @@ namespace big
 
 		MH_ApplyQueued();
 
+		m_c4_collision_fix.restore();
+
 		m_detour_hook_helpers.clear();
 	}
 
 	hooking::detour_hook_helper::~detour_hook_helper()
+	{
+	}
+
+	void hooks::render_distant_lod_lights()
 	{
 	}
 
