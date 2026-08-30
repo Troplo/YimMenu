@@ -4,8 +4,12 @@
 
 #ifndef RGSCREGISTRATION_HPP
 #define RGSCREGISTRATION_HPP
+#define RGSC_ENABLED 0
+
+#if RGSC_ENABLED
 #include "rgsc/public_interface/paragon_interface.h"
 #include "rgsc/public_interface/presence_interface.h"
+
 
 namespace big {
 
@@ -22,5 +26,6 @@ public:
 };
 
 } // big
+#endif
 
 #endif //RGSCREGISTRATION_HPP

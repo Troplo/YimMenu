@@ -51,7 +51,6 @@ endif ()
 
 add_library(YimMenu MODULE "${SRC_MAIN}"
         src/features.h
-        src/rgsc/rlpc.h
         src/services/paragon/rgsc/RgscRegistration.cpp
         src/services/paragon/rgsc/RgscRegistration.hpp
         src/rage/CExtraContentManager.hpp
