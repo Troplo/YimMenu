@@ -373,12 +373,16 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
                 g_file_manager.init(base_dir);
                 g.init(g_file_manager.get_project_file("./settings.json"));
                 g_log.initialize("YimMenu for Paragon Legacy", g_file_manager.get_project_file("./cout.log"), g.debug.external_console);
-                std::this_thread::sleep_for(300ms);
 
+                if (command_line::has_argument(L"-nobinkvideo")) {
+                    byte_patch_manager::patch_intro();
+                }
+
+                std::this_thread::sleep_for(300ms);
                 InitializeMemoryWatchpoints(!import);
 
-                while (!GetModuleHandleA("Paragon.Sdk.dll"))
-                    std::this_thread::sleep_for(100ms);
+                auto sc_module = memory::module("Paragon.Sdk.dll");
+                sc_module.wait_for_module();
 
                 UnpackHandler::TakeTextSnapshot();
 
@@ -388,12 +392,10 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
                 while (!FindWindow("grcWindow", nullptr))
                     std::this_thread::sleep_for(100ms);
 
-                auto sc_module = memory::module("Paragon.Sdk.dll");
-                sc_module.wait_for_module();
                 auto handler = exception_handler();
                 auto pointers_instance = std::make_unique<pointers>();
 
-                std::this_thread::sleep_for(import ? 10000ms : 10000ms);
+                std::this_thread::sleep_for(10000ms);
 
                 CleanupMemoryWatchpoints();
 

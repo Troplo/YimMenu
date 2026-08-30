@@ -48,7 +48,7 @@ namespace big
                 g_hmodule,
                 0);
 	        if (g_keyboard_hook)
-	            LOG(INFO) << "Installed the keybaord hook.";
+	            LOG(INFO) << "Installed the keyboard hook to make AutoHotkey macros work, and also make it impossible to use your keyboard in loading screens...";
 	        else
 	            LOG(WARNING) << "Failed to install low-level keyboard hook. Error: " << GetLastError();
 	    }
