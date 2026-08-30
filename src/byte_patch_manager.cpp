@@ -31,10 +31,16 @@ namespace big
 			memory::byte_patch::make(match + 0x04, std::uint8_t{0xEB})->apply();
 		}
 
-	    // Patches to prevent sticky bombs from disappearing if two are thrown by two players at the exact same time. Changes projectile.clear(true) calls to projectile.clear(false).
-	    // That makes the projectiles not get deleted from existence...
-		if (command_line::is_pvp_patch_enabled())
-		{
+		// Disable BLIP_CHANGE_FLASH, makes it easier to see exactly when you respawn
+	    if (command_line::is_pvp_patch_enabled()) {
+	        auto* blip_change_flash = memory::module(GetCurrentModule())
+                                     .scan(memory::pattern("8B 15 ? ? ? ? B9 11 00 00 00 E8 ? ? ? ? 8B 15 ? ? ? ? B9 16 00 00 00"))
+                                     .value()
+                                     .as<std::uint8_t*>();
+	        memory::byte_patch::make(blip_change_flash + 0x0B, std::array<uint8_t, 5>{0x90, 0x90, 0x90, 0x90, 0x90})->apply();
+
+	        // Patches to prevent sticky bombs from disappearing if two are thrown by two players at the exact same time. Changes projectile.clear(true) calls to projectile.clear(false).
+	        // That makes the projectiles not get deleted from existence...
 			const auto module_name = GetCurrentModule();
 			const memory::module module(module_name);
 
