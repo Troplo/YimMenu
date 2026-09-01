@@ -3,6 +3,7 @@
 #include "backend/commands/weapons/no_sway.hpp"
 #include "gta/net_array.hpp"
 #include "memory/byte_patch.hpp"
+#include "memory/first_person_camera_patch.hpp"
 #include "memory/module.hpp"
 #include "memory/pattern.hpp"
 #include "pointers.hpp"
@@ -31,8 +32,9 @@ namespace big
 			memory::byte_patch::make(match + 0x04, std::uint8_t{0xEB})->apply();
 		}
 
-		// Disable BLIP_CHANGE_FLASH, makes it easier to see exactly when you respawn
 		if (command_line::get(L"-pvpPatch", false)) {
+		    // Disable BLIP_CHANGE_FLASH, makes it easier to see exactly when you respawn
+			auto* blip_change_flash = memory::module(GetCurrentModule())
                                      .scan(memory::pattern("8B 15 ? ? ? ? B9 11 00 00 00 E8 ? ? ? ? 8B 15 ? ? ? ? B9 16 00 00 00"))
                                      .value()
                                      .as<std::uint8_t*>();
@@ -69,7 +71,10 @@ namespace big
 			                           .value()
 			                           .as<std::uint8_t*>();
 			memory::byte_patch::make(laser_condition + 0x0B, std::array<uint8_t, 2>{0x90, 0x90})->apply();
-	        LOG(INFO) << "Patched lazer cannon explosive property";
+			LOG(INFO) << "Patched lazer cannon explosive property";
+
+		    // First person camera patches to allow rotating while switching weapons
+			first_person_camera_patch::apply();
 		}
 
 	    // patches out m_lodLightsEnabled in CLODLights::Init
@@ -168,6 +173,7 @@ namespace big
 
 	byte_patch_manager::~byte_patch_manager()
 	{
+		first_person_camera_patch::restore();
 		memory::byte_patch::restore_all();
 
 		g_byte_patch_manager = nullptr;
