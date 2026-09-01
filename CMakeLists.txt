@@ -55,6 +55,9 @@ add_library(YimMenu MODULE "${SRC_MAIN}"
         src/services/paragon/rgsc/RgscRegistration.hpp
         src/rage/CExtraContentManager.hpp
         src/hooks/misc/fipackfile_open_archive.cpp
+        src/hooks/misc/process_sticky_shape_test.cpp
+        src/hooks/misc/should_do_null_transaction.cpp
+        src/hooks/misc/update_look_around_control.cpp
         src/util/current_module.hpp
         src/rage/scrCommandHash.hpp
         src/natives/native_registration.cpp
