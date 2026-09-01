@@ -57,7 +57,7 @@ namespace big {
     }
 
     void hooking::c4_collision_fix::install() {
-        if (!command_line::is_pvp_patch_enabled() || g_stickyShapeTestHook)
+        if (!command_line::get(L"-pvpPatch", false) || g_stickyShapeTestHook)
             return;
 
         auto *processPostPhysics = memory::module(GetCurrentModule())

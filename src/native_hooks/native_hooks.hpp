@@ -6,6 +6,8 @@
 
 namespace big
 {
+	void install_null_transaction_patches();
+
 	class native_hook final
 	{
 	public:

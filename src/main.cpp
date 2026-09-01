@@ -374,7 +374,7 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
                 g.init(g_file_manager.get_project_file("./settings.json"));
                 g_log.initialize("YimMenu for Paragon Legacy", g_file_manager.get_project_file("./cout.log"), g.debug.external_console);
 
-                if (command_line::has_argument(L"-nobinkvideo")) {
+                if (command_line::get(L"-nobinkvideo", false)) {
                     byte_patch_manager::patch_intro();
                 }
 

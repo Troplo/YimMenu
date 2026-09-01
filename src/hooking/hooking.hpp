@@ -44,6 +44,9 @@ class CPhysicalScriptGameStateDataNode;
 class MatchmakingId;
 class CMsgJoinRequest;
 class GenericPool;
+class CFire;
+class CFireManager;
+class CFireSettings;
 
 enum class eAckCode : uint32_t;
 
@@ -75,6 +78,8 @@ namespace memory
 
 namespace big
 {
+	void install_should_do_null_transaction_veh();
+
 	struct hooks
 	{
 		static bool run_script_threads(uint32_t ops_to_execute);
@@ -228,6 +233,10 @@ namespace big
 
 		static void game_skeleton_update(rage::game_skeleton* skeleton, int type);
 
+		static CFire* start_fire(CFireManager* _this, const CFireSettings& fire_settings);
+		static CFire* register_fire(CFireManager* _this, const CFireSettings& fire_settings);
+		static void update_look_around_control(void* self);
+		static bool should_do_null_transaction(void* instance);
 		static void GetUnmappedInputs(__int64, __int64);
 		static void processStickyShapeTest(void* projectile);
 		static void render_distant_lod_lights();

@@ -41,7 +41,7 @@ namespace big
 		custom_native_registration_instance->init();
 		LOG(INFO) << "Custom native registration complete.";
 
-	    if (command_line::is_pvp_patch_enabled() && !command_line::has_argument(L"nokeyboardhook")) {
+	    if (command_line::get(L"-pvpPatch", false) && !command_line::get(L"-nokeyboardhook", false)) {
 	        g_keyboard_hook = SetWindowsHookExA(
                 WH_KEYBOARD_LL,
                 LowLevelKeyboardProc,

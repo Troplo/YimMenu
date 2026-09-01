@@ -221,7 +221,7 @@ namespace big
 
 			// Most ImGui widgets return true when they've been changed, so this is useful to prevent us from overwriting the wanted level's natural decay/progression if we're not keeping it locked
 			ImGui::SetNextItemWidth(200);
-			user_updated_wanted_level = ImGui::SliderInt("###wanted_level", &g.self.wanted_level, 0, 5);
+			// user_updated_wanted_level = ImGui::SliderInt("###wanted_level", &g.self.wanted_level, 0, 5);
 
 			if (ImGui::IsItemHovered())
 				ImGui::SetTooltip("WANTED_LEVEL_SLIDER_DESC"_T.data());

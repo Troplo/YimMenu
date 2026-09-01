@@ -20,7 +20,7 @@ namespace big
 	static void init()
 	{
 		// Disable alt enter fullsreen
-		if (!command_line::has_argument(L"-enableAltEnter"))
+		if (!command_line::get(L"-enableAltEnter", false))
 		{
 			const memory::module module(GetCurrentModule());
 
@@ -32,8 +32,7 @@ namespace big
 		}
 
 		// Disable BLIP_CHANGE_FLASH, makes it easier to see exactly when you respawn
-	    if (command_line::is_pvp_patch_enabled()) {
-	        auto* blip_change_flash = memory::module(GetCurrentModule())
+		if (command_line::get(L"-pvpPatch", false)) {
                                      .scan(memory::pattern("8B 15 ? ? ? ? B9 11 00 00 00 E8 ? ? ? ? 8B 15 ? ? ? ? B9 16 00 00 00"))
                                      .value()
                                      .as<std::uint8_t*>();
@@ -53,10 +52,28 @@ namespace big
 
 		    memory::byte_patch::make(move_net_sync_projectile + 0x09, std::uint8_t{0})->apply();
 			memory::byte_patch::make(second_clear + 0x0C, std::uint8_t{0})->apply();
+
+	        // Go back to old lazer cannons
+			const auto lazer_return_1 = module.scan_all(memory::pattern("F3 0F 10 05 ? ? ? ? EB ? 80 3D ? ? ? ? 00 74 ? 8B 43 10 0F 57 C9"));
+			auto* default_return = lazer_return_1.front().as<std::uint8_t*>();
+			memory::byte_patch::make(default_return, std::array<uint8_t, 8>{0xEB, 0x08, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90})->apply();
+			LOG(INFO) << "Patched Lazer cannons";
+
+			auto* laser_return_2 = module.scan(memory::pattern("38 05 ? ? ? ? 75 0A F3 0F 10 05 ? ? ? ? EB 08 F3 0F 10 83 50 01 00 00"))
+			                       .value()
+			                       .as<std::uint8_t*>();
+			memory::byte_patch::make(laser_return_2 + 0x08, std::array<uint8_t, 8>{0xEB, 0x08, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90})->apply();
+	        LOG(INFO) << "Patched lazer cannons part 2 electric boogalo";
+
+			auto* laser_condition = module.scan(memory::pattern("38 05 ? ? ? ? B8 55 00 00 00 74 03 8B 43 24 48 83 C4 20 5B C3"))
+			                           .value()
+			                           .as<std::uint8_t*>();
+			memory::byte_patch::make(laser_condition + 0x0B, std::array<uint8_t, 2>{0x90, 0x90})->apply();
+	        LOG(INFO) << "Patched lazer cannon explosive property";
 		}
 
 	    // patches out m_lodLightsEnabled in CLODLights::Init
-		if (command_line::has_argument(L"-nolodlights"))
+		if (command_line::get(L"-nolodlights", false))
 		{
 			const memory::module module(GetCurrentModule());
 

@@ -7,6 +7,7 @@
 #include "util/current_module.hpp"
 
 #include <tlhelp32.h>
+#include <timeapi.h>
 
 namespace {
     // Shit to suspend every other thread in the process while it is pattern searching
@@ -67,12 +68,15 @@ namespace big {
         bool legal_patched = false;
         const auto deadline = std::chrono::steady_clock::now() + 10s;
 
+        // I don't want to think about whether or not GTA has called this yet
+        timeBeginPeriod(1);
         while ((!intro_patched || !legal_patched) && std::chrono::steady_clock::now() < deadline) {
             const auto intro_match = intro_patched ? std::optional<memory::handle>{} : module.scan(intro_signature);
             const auto legal_match = legal_patched ? std::optional<memory::handle>{} : module.scan(legal_signature);
 
             if (!intro_match && !legal_match) {
-                std::this_thread::sleep_for(10ms);
+                // THis is definitely fucking stupid.
+                std::this_thread::sleep_for(1ms);
                 continue;
             }
 

@@ -1,5 +1,6 @@
 #include "hooking/hooking.hpp"
 
+#include "gta/tunables.hpp"
 #include "memory/module.hpp"
 #include "memory/pattern.hpp"
 #include "pointers.hpp"
@@ -8,6 +9,24 @@
 
 namespace big
 {
+	namespace
+	{
+		using fire_function = CFire* (*)(CFireManager*, const CFireSettings&);
+
+		CFire* disable_fire(CFireManager* _this, const CFireSettings& fire_settings, fire_function original) {
+		    // Don't produce fire if PARAGON_DISABLE_FIRE is true
+			auto* tunables_ptr = CTunables::GetInstance();
+			if (tunables_ptr) {
+				auto& tunables = *tunables_ptr;
+				if (tunables.GetBool(MP_GLOBAL_HASH, "PARAGON_DISABLE_FIRE"_J, false)) {
+				    return nullptr;
+				}
+			}
+
+			return original(_this, fire_settings);
+		}
+	}
+
 	hooking::hooking() :
 	    m_swapchain_hook(*g_pointers->m_gta.m_swapchain, hooks::swapchain_num_funcs),
 	    m_sync_data_reader_hook(g_pointers->m_gta.m_sync_data_reader_vtable, 27)
@@ -43,6 +62,28 @@ namespace big
 		}
 
 		detour_hook_helper::add<hooks::run_script_threads>("SH", g_pointers->m_gta.m_run_script_threads);
+		detour_hook_helper::add<hooks::update_look_around_control>(
+		    "ULAC",
+		    memory::module(GetCurrentModule())
+		        .scan(memory::pattern("48 8B C4 55 53 56 57 48 8D 68 ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 40 ?"))
+		        .value()
+		        .as<void*>());
+
+	    // Hooks for PARAGON_DISABLE_FIRE
+		if (command_line::get(L"-pvpPatch", false)) {
+			detour_hook_helper::add<hooks::start_fire>(
+			    "DF",
+			    memory::module(GetCurrentModule())
+			        .scan(memory::pattern("48 8B C4 48 89 58 08 48 89 70 18 48 89 78 20 55 41 56 41 57 48 8D A8 18 F6 FF FF 48 81 EC D0 0A 00 00 0F 29 70 D8"))
+			        .value()
+			        .as<void*>());
+			detour_hook_helper::add<hooks::register_fire>(
+			    "RF",
+			    memory::module(GetCurrentModule())
+			        .scan(memory::pattern("48 89 5C 24 08 48 89 74 24 18 57 48 83 EC 20 48 83 7A 20 00 48 8B FA 48 8B F1 75 23 48 8D 54 24 38 45 33 C0 48 8B CF E8 10 AB FD FF"))
+			        .value()
+			        .as<void*>());
+		}
 
 	    // Allow unbinding of keybinds. It is impossible to unbind the pause menu, so it is impossible to accidentally softlock yourself due to this.
 		detour_hook_helper::add<hooks::GetUnmappedInputs>(
@@ -53,7 +94,7 @@ namespace big
 		        .as<void*>());
 
 	    // prevent nighttime lod rendering completely because it fucks fps massively on some gpus, this is CVisualEffects::RenderDistantLights
-		if (command_line::has_argument(L"-nolodlights"))
+		if (command_line::get(L"-nolodlights", false))
 		{
 			auto* match = memory::module(GetCurrentModule())
 			                  .scan(memory::pattern("0F BA E7 0A 73 ? 0F 28 CE 8B CB E8 ? ? ? ?"))
@@ -188,6 +229,7 @@ namespace big
 		detour_hook_helper::add<hooks::game_skeleton_update>("GSU", g_pointers->m_gta.m_game_skeleton_update);
 		// detour_hook_helper::add<hooks::create_native>("Create Native", (void*)g_pointers->m_gta.m_create_native);
 		g_hooking = this;
+		// install_should_do_null_transaction_veh();
 		m_c4_collision_fix.install();
 	}
 
@@ -243,6 +285,14 @@ namespace big
 
 	void hooks::render_distant_lod_lights()
 	{
+	}
+
+	CFire* hooks::start_fire(CFireManager* _this, const CFireSettings& fire_settings) {
+		return disable_fire(_this, fire_settings, g_hooking->get_original<hooks::start_fire>());
+	}
+
+	CFire* hooks::register_fire(CFireManager* _this, const CFireSettings& fire_settings) {
+		return disable_fire(_this, fire_settings, g_hooking->get_original<hooks::register_fire>());
 	}
 
 	void hooking::detour_hook_helper::enable_hook_if_hooking_is_already_running()
