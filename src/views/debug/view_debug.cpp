@@ -31,13 +31,19 @@ namespace big
 		{
 			ImGui::BeginTabBar("debug_tabbar");
 			misc();
+#if ENABLE_TOXIC_CHEATS
 			logs();
+#endif
 			tunables();
+#if ENABLE_TOXIC_CHEATS
 			globals();
 			locals();
 			script_events();
+#endif
 			scripts();
+#if ENABLE_TOXIC_CHEATS
 			threads();
+#endif
 			parapak();
 		}
 		ImGui::End();

@@ -13,9 +13,9 @@ namespace big
 
 	void view::self()
 	{
+	#if ENABLE_TOXIC_CHEATS
 		components::command_button<"suicide">();
 		ImGui::SameLine();
-#if ENABLE_TOXIC_CHEATS
 		components::command_button<"heal">();
 		ImGui::SameLine();
 		components::command_button<"fillsnacks">();

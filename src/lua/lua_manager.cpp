@@ -338,6 +338,9 @@ namespace big
 
 	std::weak_ptr<lua_module> lua_manager::load_module(const std::filesystem::path& module_path)
 	{
+#if !ENABLE_TOXIC_CHEATS
+		return {};
+#else
 		if (!std::filesystem::exists(module_path))
 		{
 			LOG(WARNING) << reinterpret_cast<const char*>(module_path.u8string().c_str()) << " does not exist in the filesystem. Not loading it.";
@@ -381,6 +384,7 @@ namespace big
 		std::lock_guard disabled_guard(m_disabled_module_lock);
 		m_disabled_modules.push_back(module);
 		return module;
+#endif
 	}
 
 	void lua_manager::reload_changed_scripts()

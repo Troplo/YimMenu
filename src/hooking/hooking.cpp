@@ -31,6 +31,15 @@ namespace big
 	    m_swapchain_hook(*g_pointers->m_gta.m_swapchain, hooks::swapchain_num_funcs),
 	    m_sync_data_reader_hook(g_pointers->m_gta.m_sync_data_reader_vtable, 27)
 	{
+		const auto scan_pattern = [](const char* name, const char* signature) {
+			auto result = memory::module(GetCurrentModule()).scan(memory::pattern(signature));
+			if (result)
+				LOG(INFO) << "Found '" << name << "' pattern at " << HEX_TO_UPPER(result->as<std::uintptr_t>());
+			else
+				LOG(WARNING) << "Failed to find '" << name << "' pattern.";
+			return result;
+		};
+
 		m_swapchain_hook.hook(hooks::swapchain_present_index, &hooks::swapchain_present);
 		m_swapchain_hook.hook(hooks::swapchain_resizebuffers_index, &hooks::swapchain_resizebuffers);
 
@@ -62,48 +71,44 @@ namespace big
 		}
 
 		detour_hook_helper::add<hooks::run_script_threads>("SH", g_pointers->m_gta.m_run_script_threads);
-		detour_hook_helper::add<hooks::update_look_around_control>(
-		    "ULAC",
-		    memory::module(GetCurrentModule())
-		        .scan(memory::pattern("48 8B C4 55 53 56 57 48 8D 68 ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 40 ?"))
-		        .value()
-		        .as<void*>());
+		if (auto target = scan_pattern("ULAC", "48 8B C4 55 53 56 57 48 8D 68 ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 40 ?"))
+		{
+			detour_hook_helper::add<hooks::update_look_around_control>("ULAC", target->as<void*>());
+			LOG(INFO) << "Hooked 'ULAC'.";
+		}
 
-	    // Hooks for PARAGON_DISABLE_FIRE
+		// Hooks for PARAGON_DISABLE_FIRE
 		if (command_line::get(L"-pvpPatch", false)) {
-			detour_hook_helper::add<hooks::start_fire>(
-			    "DF",
-			    memory::module(GetCurrentModule())
-			        .scan(memory::pattern("48 8B C4 48 89 58 08 48 89 70 18 48 89 78 20 55 41 56 41 57 48 8D A8 18 F6 FF FF 48 81 EC D0 0A 00 00 0F 29 70 D8"))
-			        .value()
-			        .as<void*>());
-			detour_hook_helper::add<hooks::register_fire>(
-			    "RF",
-			    memory::module(GetCurrentModule())
-			        .scan(memory::pattern("48 89 5C 24 08 48 89 74 24 18 57 48 83 EC 20 48 83 7A 20 00 48 8B FA 48 8B F1 75 23 48 8D 54 24 38 45 33 C0 48 8B CF E8 10 AB FD FF"))
-			        .value()
-			        .as<void*>());
+			if (auto target = scan_pattern("DF", "48 8B C4 48 89 58 08 48 89 70 18 48 89 78 20 55 41 56 41 57 48 8D A8 18 F6 FF FF 48 81 EC D0 0A 00 00 0F 29 70 D8"))
+			{
+				detour_hook_helper::add<hooks::start_fire>("DF", target->as<void*>());
+				LOG(INFO) << "Hooked 'DF'.";
+			}
+			if (auto target = scan_pattern("RF", "48 89 5C 24 08 48 89 74 24 18 57 48 83 EC 20 48 83 7A 20 00 48 8B FA 48 8B F1 75 23 48 8D 54 24 38 45 33 C0 48 8B CF E8 10 AB FD FF"))
+			{
+				detour_hook_helper::add<hooks::register_fire>("RF", target->as<void*>());
+				LOG(INFO) << "Hooked 'RF'.";
+			}
 		}
 
 	    // Allow unbinding of keybinds. It is impossible to unbind the pause menu, so it is impossible to accidentally softlock yourself due to this.
-		detour_hook_helper::add<hooks::GetUnmappedInputs>(
-		    "GUMI",
-		    memory::module(GetCurrentModule())
-		        .scan(memory::pattern("48 8B C4 48 89 58 08 48 89 68 10 48 89 70 18 48 89 78 20 41 56 48 81 EC 30 09 00 00 48 8B EA 4C 8B F1 33 DB 48 8D 3D ? ? ? ? 48 8D 35 ? ? ? ?"))
-		        .value()
-		        .as<void*>());
+		if (auto target = scan_pattern("GUMI", "48 8B C4 48 89 58 08 48 89 68 10 48 89 70 18 48 89 78 20 41 56 48 81 EC 30 09 00 00 48 8B EA 4C 8B F1 33 DB 48 8D 3D ? ? ? ? 48 8D 35 ? ? ? ?"))
+		{
+			detour_hook_helper::add<hooks::GetUnmappedInputs>("GUMI", target->as<void*>());
+			LOG(INFO) << "Hooked 'GUMI'.";
+		}
 
-	    // prevent nighttime lod rendering completely because it fucks fps massively on some gpus, this is CVisualEffects::RenderDistantLights
+		// prevent nighttime lod rendering completely because it fucks fps massively on some gpus, this is CVisualEffects::RenderDistantLights
 		if (command_line::get(L"-nolodlights", false))
 		{
-			auto* match = memory::module(GetCurrentModule())
-			                  .scan(memory::pattern("0F BA E7 0A 73 ? 0F 28 CE 8B CB E8 ? ? ? ?"))
-			                  .value()
-			                  .as<std::uint8_t*>();
-			auto* call = match + 0x0B;
-			auto* render_distant_lod_lights = memory::handle(call).add(1).rip().as<void*>();
+			if (auto match = scan_pattern("RDLL", "0F BA E7 0A 73 ? 0F 28 CE 8B CB E8 ? ? ? ?"))
+			{
+				auto* call = match->as<std::uint8_t*>() + 0x0B;
+				auto* render_distant_lod_lights = memory::handle(call).add(1).rip().as<void*>();
 
-			detour_hook_helper::add<hooks::render_distant_lod_lights>("RDLL", render_distant_lod_lights);
+				detour_hook_helper::add<hooks::render_distant_lod_lights>("RDLL", render_distant_lod_lights);
+				LOG(INFO) << "Hooked 'RDLL'.";
+			}
 		}
 
 		detour_hook_helper::add<hooks::get_label_text>("GLT", g_pointers->m_gta.m_get_label_text);

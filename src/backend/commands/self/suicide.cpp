@@ -1,6 +1,7 @@
 #include "backend/command.hpp"
 #include "natives.hpp"
 
+#if ENABLE_TOXIC_CHEATS
 namespace big
 {
 	class suicide : command
@@ -15,3 +16,4 @@ namespace big
 
 	suicide g_suicide("suicide", "SUICIDE", "SUICIDE_DESC", 0);
 }
+#endif

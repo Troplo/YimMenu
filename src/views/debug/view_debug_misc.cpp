@@ -40,9 +40,11 @@ namespace big
 				system::dump_entry_points();
 			}
 
+#if ENABLE_TOXIC_CHEATS
 			components::button("NETWORK_BAIL"_T, [] {
 				NETWORK::NETWORK_BAIL(16, 0, 0);
 			});
+#endif
 
 			components::button("DEBUG_REMOVE_FROM_BAD_SPORT"_T, [] {
 				STATS::STAT_SET_INT("MPPLY_BADSPORT_MESSAGE"_J, 0, 1);
@@ -51,6 +53,7 @@ namespace big
 				STATS::STAT_SET_BOOL("MPPLY_CHAR_IS_BADSPORT"_J, false, true);
 			});
 
+#if ENABLE_TOXIC_CHEATS
 			components::button("LOAD_MP_MAP"_T, [] {
 				DLC::ON_ENTER_MP();
 			});
@@ -60,16 +63,20 @@ namespace big
 			components::button("LOAD_SP_MAP"_T, [] {
 				DLC::ON_ENTER_SP();
 			});
+#endif
 
 			components::button("SKIP_CUTSCENE"_T, [] {
 				CUTSCENE::STOP_CUTSCENE_IMMEDIATELY();
 			});
 
+#if ENABLE_TOXIC_CHEATS
 			components::button("REFRESH_INTERIOR"_T, [] {
 				Interior interior = INTERIOR::GET_INTERIOR_AT_COORDS(self::pos.x, self::pos.y, self::pos.z);
 				INTERIOR::REFRESH_INTERIOR(interior);
 			});
+#endif
 
+#if ENABLE_TOXIC_CHEATS
 			components::button("NET_SHUTDOWN_AND_LOAD_SP"_T, [] {
 				NETWORK::SHUTDOWN_AND_LAUNCH_SINGLE_PLAYER_GAME();
 			});
@@ -77,7 +84,9 @@ namespace big
 			components::button("NET_SHUTDOWN_AND_LOAD_SAVE"_T, [] {
 				NETWORK::SHUTDOWN_AND_LOAD_MOST_RECENT_SAVE();
 			});
+#endif
 
+#if ENABLE_TOXIC_CHEATS
 			components::button("REMOVE_BLACKSCREEN"_T, [] {
 				CAM::DO_SCREEN_FADE_IN(0);
 				PLAYER::SET_PLAYER_CONTROL(self::id, true, 0);
@@ -97,6 +106,7 @@ namespace big
 				else
 					g_notification_service.push_error("DEBUG_TAB_MISC"_T.data(), "VIEW_DEBUG_MISC_TP_TO_SAFE_POS_FAILED"_T.data());
 			});
+#endif
 
 			ImGui::Checkbox("VIEW_DEBUG_MISC_IMGUI_DEMO"_T.data(), &g.window.demo);
 
