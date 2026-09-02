@@ -86,6 +86,7 @@ namespace big
 		// install_null_transaction_patches();
 	    // add_native_detour(NativeIndex::NET_GAMESERVER_USE_SERVER_TRANSACTIONS, all_scripts::USE_SERVER_TRANSACTIONS);
 
+	    add_native_detour(NativeIndex::STAT_GET_INT, all_scripts::STAT_GET_INT);
 		add_native_detour(NativeIndex::IS_DLC_PRESENT, all_scripts::IS_DLC_PRESENT);
 		add_native_detour(NativeIndex::NETWORK_SET_THIS_SCRIPT_IS_NETWORK_SCRIPT, all_scripts::NETWORK_SET_THIS_SCRIPT_IS_NETWORK_SCRIPT);
 		add_native_detour(NativeIndex::NETWORK_TRY_TO_SET_THIS_SCRIPT_IS_NETWORK_SCRIPT, all_scripts::NETWORK_TRY_TO_SET_THIS_SCRIPT_IS_NETWORK_SCRIPT);
