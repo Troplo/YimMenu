@@ -351,7 +351,7 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
             [](PVOID) -> DWORD {
                 std::srand(std::chrono::system_clock::now().time_since_epoch().count());
                 std::filesystem::path base_dir = std::getenv("appdata");
-                std::string shim_dir = "YimShim";
+                std::string shim_dir = "YimShim-173";
                     constexpr std::string_view tacid_arg = "-tacidUserId=";
                     const std::string command_line = GetCommandLineA();
 

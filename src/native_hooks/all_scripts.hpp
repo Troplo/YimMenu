@@ -171,11 +171,14 @@ namespace big
 				case "MP1_CHAR_IS_NGPC_VERSION"_J:
 				case "MP1_CHAR_IS_NG_VERSION"_J:
 				case "MP0_CHAR_IS_NG_VERSION"_J:
-				case "MP0_CHAR_IS_NG_VERSION_SA"_J:
-				case "MP1_CHAR_IS_NG_VERSION_SA"_J:
 					*out = 1;
 					src->set_return_value<INT>(1);
 					return;
+				case "MP1_CHAR_IS_NG_VERSION_SA"_J:
+			    case "MP0_CHAR_IS_NG_VERSION_SA"_J:
+			        *out = 0;
+			        src->set_return_value<INT>(0);
+			        return;
 				default:
 					src->set_return_value<INT>(STATS::STAT_GET_INT(hash, out, src->get_arg<int>(2)));
             }
