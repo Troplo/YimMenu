@@ -31,6 +31,7 @@ namespace big
 			g.spawn_vehicle.plate = plate_buf;
 		});
 
+#if ENABLE_CACHE
 		static int selected_class = -1;
 		const auto& class_arr     = g_gta_data_service.vehicle_classes();
 
@@ -58,12 +59,13 @@ namespace big
 
 			ImGui::EndCombo();
 		}
-
+#endif
 		static char search[64];
 
 		ImGui::SetNextItemWidth(300.f);
 		components::input_text_with_hint("MODEL_NAME"_T, "SEARCH"_T, search, sizeof(search), ImGuiInputTextFlags_None);
 
+#if ENABLE_CACHE
 		vehicle_map calculated_map{};
 
 		if (g_gta_data_service.vehicles().size() > 0)
@@ -213,6 +215,7 @@ namespace big
 			}
 			ImGui::EndListBox();
 		}
+#endif
 	}
 
 	void view::spawn_vehicle()

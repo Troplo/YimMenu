@@ -17,6 +17,7 @@
 
 #include <algorithm>
 
+#if ENABLE_CACHE
 namespace big
 {
 	bool add_if_not_exists(string_vec& vec, std::string str)
@@ -691,3 +692,4 @@ namespace big
 		});
 	}
 }
+#endif

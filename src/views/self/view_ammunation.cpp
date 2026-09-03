@@ -69,6 +69,7 @@ namespace big
 		}
 		if (ImGui::BeginPopup("##weapons_popup", ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove))
 		{
+#if ENABLE_CACHE
 			std::map<std::string, weapon_item> sorted_map;
 			for (const auto& [_, weapon] : g_gta_data_service.weapons())
 			{
@@ -118,6 +119,7 @@ namespace big
 			}
 			if (!found_match)
 				ImGui::Text("NO_WEAPON_IN_REGISTRY"_T.data());
+#endif
 			ImGui::EndPopup();
 		}
 		components::button("VIEW_WEAPON_GIVE_WEAPON"_T, [] {
@@ -130,6 +132,7 @@ namespace big
 
 		if (ImGui::BeginCombo("VIEW_WEAPON_ATTACHMENTS"_T.data(), selected_attachment.c_str()))
 		{
+#if ENABLE_CACHE
 			weapon_item weapon = g_gta_data_service.weapon_by_hash(selected_weapon_hash);
 			if (!weapon.m_attachments.empty())
 			{
@@ -164,6 +167,7 @@ namespace big
 			{
 				ImGui::Text("NO_WEAPON_ATTACHMENT_IN_REGISTRY"_T.data());
 			}
+#endif
 			ImGui::EndCombo();
 		}
 		components::button("VIEW_WEAPON_ADD_TO_WEAPON"_T, [] {
@@ -270,6 +274,7 @@ namespace big
 			int counter = 0;
 			for (auto& weapon_hash : g.weapons.weapon_hotkeys[selected_key])
 			{
+#if ENABLE_CACHE
 				weapon_item weapon = g_gta_data_service.weapon_by_hash(weapon_hash);
 				ImGui::PushID(counter);
 				if (ImGui::BeginCombo("GUI_TAB_WEAPONS"_T.data(), weapon.m_display_name.c_str()))
@@ -312,6 +317,7 @@ namespace big
 				}
 				ImGui::PopID();
 				counter++;
+#endif
 			}
 		}
 		if (ImGui::Button("VIEW_WEAPON_WEAPON_ADD_WEAPON"_T.data()))

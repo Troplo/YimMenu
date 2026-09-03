@@ -57,6 +57,9 @@ namespace big
 
 		m_dump << "Dumping modules:\n";
 
+		// somehow missing
+		LOG(INFO) << "Paragon.Sdk.dll base address: " << HEX_TO_UPPER(reinterpret_cast<uint64_t>(GetModuleHandleA("Paragon.Sdk.dll")));
+
 		const auto peb = reinterpret_cast<PPEB>(NtCurrentTeb()->ProcessEnvironmentBlock);
 		if (!peb)
 			return;

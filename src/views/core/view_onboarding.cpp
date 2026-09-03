@@ -45,39 +45,39 @@ namespace big
 
 	void view::onboarding()
 	{
-		static bool onboarding_open = false;
-		if (g.settings.onboarding_complete)
-		{
-			return;
-		}
-
-		if (!onboarding_open)
-		{
-			g_gui->toggle(true);
-			ImGui::OpenPopup("ONBOARDING_WELCOME_TITLE"_T.data());
-			onboarding_open = true;
-		}
-
-		const auto window_size     = ImVec2{600, 400};
-		const auto window_position = ImVec2{(*g_pointers->m_gta.m_resolution_x - window_size.x) / 2,
-		    (*g_pointers->m_gta.m_resolution_y - window_size.y) / 2};
-
-		ImGui::SetNextWindowSize(window_size, ImGuiCond_Always);
-		ImGui::SetNextWindowPos(window_position, ImGuiCond_Always);
-
-		if (ImGui::BeginPopupModal("ONBOARDING_WELCOME_TITLE"_T.data()))
-		{
-			select_language();
-			select_menu_open_key();
-			developer_console();
-
-			if (ImGui::Button("CLOSE"_T.data()))
-			{
-				g.settings.onboarding_complete = true;
-				ImGui::CloseCurrentPopup();
-			}
-
-			ImGui::EndPopup();
-		}
+		// static bool onboarding_open = false;
+		// if (g.settings.onboarding_complete)
+		// {
+		// 	return;
+		// }
+		//
+		// if (!onboarding_open)
+		// {
+		// 	g_gui->toggle(true);
+		// 	ImGui::OpenPopup("ONBOARDING_WELCOME_TITLE"_T.data());
+		// 	onboarding_open = true;
+		// }
+		//
+		// const auto window_size     = ImVec2{600, 400};
+		// const auto window_position = ImVec2{(*g_pointers->m_gta.m_resolution_x - window_size.x) / 2,
+		//     (*g_pointers->m_gta.m_resolution_y - window_size.y) / 2};
+		//
+		// ImGui::SetNextWindowSize(window_size, ImGuiCond_Always);
+		// ImGui::SetNextWindowPos(window_position, ImGuiCond_Always);
+		//
+		// if (ImGui::BeginPopupModal("ONBOARDING_WELCOME_TITLE"_T.data()))
+		// {
+		// 	select_language();
+		// 	select_menu_open_key();
+		// 	developer_console();
+		//
+		// 	if (ImGui::Button("CLOSE"_T.data()))
+		// 	{
+		// 		g.settings.onboarding_complete = true;
+		// 		ImGui::CloseCurrentPopup();
+		// 	}
+		//
+		// 	ImGui::EndPopup();
+		// }
 	}
 }

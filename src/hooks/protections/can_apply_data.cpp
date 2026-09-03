@@ -197,6 +197,7 @@ namespace big
 
 	inline std::string get_model_hash_string(uint32_t model)
 	{
+#if ENABLE_CACHE
 		auto info = model_info::get_model(model);
 
 		if (!info)
@@ -229,8 +230,10 @@ namespace big
 
 		if (!model_str)
 			return std::format("0x{:X}", model);
-
 		return std::format("{} (0x{:X})", model_str, model);
+#else
+		return std::format("0x{:X}", model);
+#endif
 	}
 
 	inline std::string get_network_id_string(int16_t net_id)

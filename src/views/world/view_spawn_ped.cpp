@@ -28,6 +28,7 @@ namespace big
 			return;
 		}
 
+#if ENABLE_CACHE
 		const auto& weapon_type_arr = g_gta_data_service.weapon_types();
 		for (auto& [_, weapon] : g_gta_data_service.weapons())
 		{
@@ -39,6 +40,7 @@ namespace big
 				}
 			}
 		}
+#endif
 	}
 
 	Ped spawn_ped_at_location(const int selected_ped_type, const char* ped_model_buf, const Player selected_ped_player_id, const Player selected_ped_for_player_id, const bool is_bodyguard)
@@ -189,6 +191,7 @@ namespace big
 
 	void view::spawn_ped()
 	{
+#if ENABLE_CACHE
 		static int selected_ped_type        = -2;
 		static bool ped_model_dropdown_open = false;
 		static char ped_model_buf[64];
@@ -678,5 +681,6 @@ namespace big
 
 			spawned_peds.clear();
 		});
+#endif
 	}
 }

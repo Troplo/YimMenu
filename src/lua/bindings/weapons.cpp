@@ -18,7 +18,11 @@ namespace lua::weapons
 	//```
 	static std::string get_weapon_display_name(Hash weapon_hash)
 	{
+#if ENABLE_TOXIC_CHEATS
 		return big::g_gta_data_service.weapon_by_hash(weapon_hash).m_display_name;
+#else
+		return "Weapon Hash " + std::to_string(weapon_hash);
+#endif
 	}
 
 	// Lua API: Function
@@ -32,7 +36,11 @@ namespace lua::weapons
 	//```
 	static std::string get_weapon_display_name_string(std::string weapon_name)
 	{
+#if ENABLE_TOXIC_CHEATS
 		return big::g_gta_data_service.weapon_by_hash(rage::joaat(weapon_name)).m_display_name;
+#else
+		return weapon_name;
+#endif
 	}
 
 	// Lua API: Function
@@ -49,6 +57,7 @@ namespace lua::weapons
 	//```
 	static std::vector<std::string> get_all_weapons_of_group_type(Hash group_hash)
 	{
+#if ENABLE_TOXIC_CHEATS
 		std::vector<std::string> return_value;
 		for (auto& [name, weapon] : big::g_gta_data_service.weapons())
 		{
@@ -58,6 +67,9 @@ namespace lua::weapons
 			}
 		}
 		return return_value;
+#else
+		return {};
+#endif
 	}
 
 	// Lua API: Function
@@ -79,6 +91,7 @@ namespace lua::weapons
 	//```
 	static std::vector<std::string> get_all_weapons_of_group_type_string(std::string group_name)
 	{
+#if ENABLE_CACHE
 		std::transform(group_name.begin(), group_name.end(), group_name.begin(), ::toupper);
 		if (group_name.find("GROUP_") == 0)
 		{
@@ -93,6 +106,9 @@ namespace lua::weapons
 			}
 		}
 		return return_value;
+#else
+		return {};
+#endif
 	}
 
 	// Lua API: Function
@@ -109,7 +125,11 @@ namespace lua::weapons
 	//```
 	static std::vector<std::string> get_all_weapon_components(Hash weapon_hash)
 	{
+#if ENABLE_CACHE
 		return big::g_gta_data_service.weapon_by_hash(weapon_hash).m_attachments;
+#else
+		return {};
+#endif
 	}
 
 	// Lua API: Function
@@ -126,7 +146,11 @@ namespace lua::weapons
 	//```
 	static std::vector<std::string> get_all_weapon_components_string(std::string weapon_name)
 	{
+#if ENABLE_CACHE
 		return big::g_gta_data_service.weapon_by_hash(rage::joaat(weapon_name)).m_attachments;
+#else
+		return {};
+#endif
 	}
 
 	// Lua API: Function
@@ -140,7 +164,11 @@ namespace lua::weapons
 	//```
 	static std::string get_weapon_component_display_name(Hash weapon_component_hash)
 	{
+#if ENABLE_CACHE
 		return big::g_gta_data_service.weapon_component_by_hash(weapon_component_hash).m_display_name;
+#else
+		return "Component Hash: " +  std::to_string(weapon_component_hash);
+#endif
 	}
 
 	// Lua API: Function
@@ -154,7 +182,11 @@ namespace lua::weapons
 	//```
 	static std::string get_weapon_component_display_name_string(std::string weapon_component)
 	{
+#if ENABLE_CACHE
 		return big::g_gta_data_service.weapon_component_by_hash(rage::joaat(weapon_component)).m_display_name;
+#else
+		return weapon_component;
+#endif
 	}
 
 	// Lua API: Function
@@ -168,7 +200,11 @@ namespace lua::weapons
 	//```
 	static std::string get_weapon_component_display_desc(Hash weapon_component_hash)
 	{
+#if ENABLE_CACHE
 		return big::g_gta_data_service.weapon_component_by_hash(weapon_component_hash).m_display_desc;
+#else
+		return "Component Hash: " + std::to_string(weapon_component_hash);
+#endif
 	}
 
 	// Lua API: Function
@@ -182,7 +218,11 @@ namespace lua::weapons
 	//```
 	static std::string get_weapon_component_display_desc_string(std::string weapon_component)
 	{
+#if ENABLE_CACHE
 		return big::g_gta_data_service.weapon_component_by_hash(rage::joaat(weapon_component)).m_display_desc;
+#else
+		return weapon_component;
+#endif
 	}
 
 	void bind(sol::state& state)

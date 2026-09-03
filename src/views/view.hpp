@@ -69,7 +69,9 @@ namespace big
 		static void weapons();
 		static void ammunation();
 		static void context_menu();
+#if ENABLE_CACHE
 		static void gta_data();
+#endif
 		static void creator();
 		static void train();
 		static void blackhole();

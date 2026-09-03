@@ -10,6 +10,7 @@ namespace big
 
 	void persist_weapons::save_weapons(std::string loadout_name)
 	{
+#if ENABLE_CACHE
 		Player player  = self::id;
 		Ped player_ped = self::ped;
 		weaponloadout_json weapon_json{};
@@ -57,6 +58,7 @@ namespace big
 		std::ofstream file_stream(file.get_path(), std::ios::out | std::ios::trunc);
 		file_stream << json_output_file.dump(4);
 		file_stream.close();
+#endif
 	}
 
 	void persist_weapons::set_weapon_loadout(std::string loadout_name)
@@ -149,6 +151,7 @@ namespace big
 
 	void persist_weapons::give_Loadout(const weaponloadout_json& loadout)
 	{
+#if ENABLE_CACHE
 		Player player  = self::id;
 		Ped player_ped = self::ped;
 		if (PED::IS_PED_DEAD_OR_DYING(player_ped, true)) [[unlikely]]
@@ -193,5 +196,6 @@ namespace big
 				PLAYER::SET_PLAYER_PARACHUTE_SMOKE_TRAIL_COLOR(player, smoke_trail[0], smoke_trail[1], smoke_trail[2]);
 			}
 		}
+#endif
 	}
 }

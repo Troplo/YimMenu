@@ -54,6 +54,7 @@ namespace big
 		}
 
 
+#if ENABLE_CACHE
 		static int selected_class = -1;
 		const auto& class_arr     = g_gta_data_service.vehicle_classes();
 
@@ -81,6 +82,7 @@ namespace big
 
 			ImGui::EndCombo();
 		}
+#endif
 
 		ImGui::SetNextItemWidth(300.f);
 		std::string garage_display = g.clone_pv.garage.empty() ? "ALL"_T.data() : g.clone_pv.garage;
@@ -121,6 +123,7 @@ namespace big
 			std::string lower_search = search;
 			std::transform(lower_search.begin(), lower_search.end(), lower_search.begin(), tolower);
 
+#if ENABLE_CACHE
 			for (const auto& it : g_mobile_service->personal_vehicles())
 			{
 				const auto& label        = it.first;
@@ -143,6 +146,7 @@ namespace big
 					indexes_to_use.insert(personal_veh->get_id());
 				}
 			}
+#endif
 			num_of_rows = indexes_to_use.size();
 		}
 		else

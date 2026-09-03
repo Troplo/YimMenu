@@ -403,6 +403,9 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 
                 auto handler = exception_handler();
                 auto pointers_instance = std::make_unique<pointers>();
+#if RGSC_ENABLED
+				RgscRegistration();
+#endif
 
                 std::this_thread::sleep_for(10000ms);
 
@@ -414,10 +417,6 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
                 }
             	LOG(INFO) << "Imported";
 
-
-            	#if RGSC_ENABLED
-                RgscRegistration();
-            	#endif
                 if (!*g_pointers->m_gta.m_anticheat_initialized_hash)
                     *g_pointers->m_gta.m_anticheat_initialized_hash = new rage::Obf32;
 
@@ -433,8 +432,9 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
 
                 std::unique_ptr<hooking> hooking_instance{};
                 hooking_instance = std::make_unique<hooking>();
+#if ENABLE_CACHE
                 g_gta_data_service.init();
-
+#endif
                 auto context_menu_service_instance      = std::make_unique<context_menu_service>();
                 auto custom_text_service_instance       = std::make_unique<custom_text_service>();
                 auto mobile_service_instance            = std::make_unique<mobile_service>();

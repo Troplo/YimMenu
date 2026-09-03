@@ -5,6 +5,7 @@ namespace big
 {
 	void view::gta_cache()
 	{
+#if ENABLE_CACHE
 		auto ped_count      = g_gta_data_service.peds().size();
 		auto veh_count      = g_gta_data_service.vehicles().size();
 		auto wep_count      = g_gta_data_service.weapons().size();
@@ -18,5 +19,6 @@ namespace big
 			g_gta_data_service.set_state(eGtaDataUpdateState::NEEDS_UPDATE);
 			g_gta_data_service.update_now();
 		}
+#endif
 	}
 }

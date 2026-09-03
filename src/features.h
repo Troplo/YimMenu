@@ -6,5 +6,6 @@
 #define ENABLE_UI 1
 #define ENABLE_OVERLAY 0
 #define ENABLE_PARAGON_DEBUGGING 0
+#define ENABLE_CACHE 0
 
 #endif //FEATURES_H

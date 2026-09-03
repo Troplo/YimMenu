@@ -18,7 +18,11 @@ namespace lua::vehicles
 	//```
 	static std::string get_vehicle_display_name(Hash vehicle_hash)
 	{
+#if ENABLE_CACHE
 		return big::g_gta_data_service.vehicle_by_hash(vehicle_hash).m_display_name;
+#else
+		return "Vehicle hash: " + std::to_string(vehicle_hash);
+#endif
 	}
 
 	// Lua API: Function
@@ -32,7 +36,11 @@ namespace lua::vehicles
 	//```
 	static std::string get_vehicle_display_name_string(std::string vehicle_name)
 	{
+#if ENABLE_CACHE
 		return big::g_gta_data_service.vehicle_by_hash(rage::joaat(vehicle_name)).m_display_name;
+#else
+		return vehicle_name;
+#endif
 	}
 
 	// Lua API: Function
@@ -49,6 +57,7 @@ namespace lua::vehicles
 	//```
 	static std::vector<std::string> get_all_vehicles_by_class(std::string vehicle_class)
 	{
+#if ENABLE_CACHE
 		std::vector<std::string> return_value;
 		for (auto& [name, vehicle] : big::g_gta_data_service.vehicles())
 		{
@@ -58,6 +67,9 @@ namespace lua::vehicles
 			}
 		}
 		return return_value;
+#else
+		return {};
+#endif
 	}
 
 
@@ -75,6 +87,7 @@ namespace lua::vehicles
 	//```
 	static std::vector<std::string> get_all_vehicles_by_mfr(std::string manufacturer)
 	{
+#if ENABLE_CACHE
 		std::vector<std::string> return_value;
 		for (auto& [name, vehicle] : big::g_gta_data_service.vehicles())
 		{
@@ -84,6 +97,9 @@ namespace lua::vehicles
 			}
 		}
 		return return_value;
+#else
+		return {};
+#endif
 	}
 
 	void bind(sol::state& state)

@@ -41,15 +41,17 @@ namespace big
 	{
 		g_renderer.add_dx_callback(view::notifications, eRenderPriority::NOTIFICATIONS);
 		g_renderer.add_dx_callback(view::onboarding, eRenderPriority::ONBOARDING);
+#if ENABLE_CACHE
 		g_renderer.add_dx_callback(view::gta_data, eRenderPriority::GTA_DATA_CACHE);
+#endif
 		g_renderer.add_dx_callback(view::cmd_executor, eRenderPriority::CMD_EXECUTOR);
 #if ENABLE_OVERLAY
 		g_renderer.add_dx_callback(view::overlay, eRenderPriority::INFO_OVERLAY);
 #endif
 		g_renderer.add_dx_callback(view::vehicle_control, eRenderPriority::VEHICLE_CONTROL);
-		#if ENABLE_OVERLAY
+#if ENABLE_OVERLAY
 		g_renderer.add_dx_callback(esp::draw, eRenderPriority::ESP); // TODO: move to ESP service
-		#endif
+#endif
 		g_renderer.add_dx_callback(view::context_menu, eRenderPriority::CONTEXT_MENU);
 
 		g_renderer.add_dx_callback(

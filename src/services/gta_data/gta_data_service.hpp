@@ -1,3 +1,4 @@
+#if ENABLE_CACHE
 #pragma once
 #include "cache_file.hpp"
 #include "ped_item.hpp"
@@ -92,3 +93,4 @@ namespace big
 
 	inline gta_data_service g_gta_data_service{};
 }
+#endif

@@ -99,6 +99,7 @@ namespace big
 		ImGui::SameLine();
 		components::command_checkbox<"nosway">();
 
+#if ENABLE_CACHE
 		components::button("GET_ALL_WEAPONS"_T, [] {
 			for (const auto& [_, weapon] : g_gta_data_service.weapons())
 			{
@@ -114,6 +115,7 @@ namespace big
 					WEAPON::REMOVE_WEAPON_FROM_PED(self::ped, weapon.m_hash);
 			}
 		});
+#endif
 		components::button("REMOVE_CUR_WEAPON"_T, [] {
 			Hash weapon_hash;
 			WEAPON::GET_CURRENT_PED_WEAPON(self::ped, &weapon_hash, 1);

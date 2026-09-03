@@ -104,7 +104,6 @@ namespace big
 		// static constexpr auto get_gta_161_batch();
 		// static constexpr auto get_gta_169_batch();
 		static constexpr auto get_gta_batch();
-		static constexpr auto get_sc_batch();
 
 		template<cstxpr_str batch_name, size_t N>
 		void run_batch(const memory::batch<N>& batch, const memory::module& mem_region)

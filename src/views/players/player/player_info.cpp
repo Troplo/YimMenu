@@ -244,10 +244,12 @@ namespace big
 			{
 				veh_damage_bits = vehicle->m_damage_bits;
 
+#if ENABLE_CACHE
 				if (CVehicleModelInfo* vehicle_model_info = static_cast<CVehicleModelInfo*>(vehicle->m_model_info))
 				{
 					vehicle_name = g_gta_data_service.vehicles()[vehicle_model_info->m_name].m_display_name; // TODO
 				}
+#endif
 
 				if (veh_damage_bits & (uint32_t)eEntityProofs::GOD)
 				{

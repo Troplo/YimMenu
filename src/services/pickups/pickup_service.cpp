@@ -39,6 +39,7 @@ namespace big
 
 	void pickup_service::give_ammo(const int targets) const
 	{
+#if ENABLE_CACHE
 		for (const auto& [_, weapon] : g_gta_data_service.weapons())
 		{
 			if (weapon.m_reward_ammo_hash != 0 || weapon.m_throwable)
@@ -47,6 +48,7 @@ namespace big
 				script::get_current()->yield(20ms);
 			}
 		}
+#endif
 	}
 
 	void pickup_service::give_armour(const int targets) const
@@ -65,6 +67,7 @@ namespace big
 
 	void pickup_service::give_weapons(const int targets) const
 	{
+#if ENABLE_CACHE
 		for (const auto& [_, weapon] : g_gta_data_service.weapons())
 		{
 			if (weapon.m_reward_hash != 0)
@@ -76,5 +79,6 @@ namespace big
 
 		g_pointers->m_gta.m_give_pickup_rewards(targets, "REWARD_PARACHUTE"_J);
 		script::get_current()->yield(20ms);
+#endif
 	}
 }

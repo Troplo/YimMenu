@@ -2,6 +2,7 @@
 #include "services/gta_data/gta_data_service.hpp"
 #include "view.hpp"
 
+#if ENABLE_CACHE
 namespace big
 {
 	void view::gta_data()
@@ -56,3 +57,4 @@ namespace big
 		}
 	}
 }
+#endif

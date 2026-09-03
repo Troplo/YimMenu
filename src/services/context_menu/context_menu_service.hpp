@@ -147,8 +147,10 @@ namespace big
 		    {},
 		    {{"DISARM",
 		         [this] {
+#if ENABLE_CACHE
 			         for (auto& [_, weapon] : g_gta_data_service.weapons())
 				         WEAPON::REMOVE_WEAPON_FROM_PED(m_handle, weapon.m_hash);
+#endif
 		         }},
 		        {"KILL",
 		            [this] {
