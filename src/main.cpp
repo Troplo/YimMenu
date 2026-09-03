@@ -352,16 +352,19 @@ BOOL APIENTRY DllMain(HMODULE hmod, DWORD reason, PVOID)
                 std::srand(std::chrono::system_clock::now().time_since_epoch().count());
                 std::filesystem::path base_dir = std::getenv("appdata");
                 std::string shim_dir = "YimShim";
-                constexpr std::string_view tacid_arg = "-tacidUserId=";
-                const std::string command_line = GetCommandLineA();
+                    constexpr std::string_view tacid_arg = "-tacidUserId=";
+                    const std::string command_line = GetCommandLineA();
 
-                if (const auto arg_start = command_line.find(tacid_arg); arg_start != std::string::npos)
+                if (command_line::get(L"-uniqueYimShimFolder", false))
                 {
-                    const auto value_start = arg_start + tacid_arg.size();
-                    const auto value_end   = command_line.find_first_of(" \t", value_start);
-                    const auto user_id     = command_line.substr(value_start, value_end - value_start);
-                    if (!user_id.empty() && std::all_of(user_id.begin(), user_id.end(), [](const char c) { return c >= '0' && c <= '9'; }))
-                        shim_dir += "-" + user_id;
+                    if (const auto arg_start = command_line.find(tacid_arg); arg_start != std::string::npos)
+                    {
+                        const auto value_start = arg_start + tacid_arg.size();
+                        const auto value_end   = command_line.find_first_of(" \t", value_start);
+                        const auto user_id     = command_line.substr(value_start, value_end - value_start);
+                        if (!user_id.empty() && std::all_of(user_id.begin(), user_id.end(), [](const char c) { return c >= '0' && c <= '9'; }))
+                            shim_dir += "-" + user_id;
+                    }
                 }
 
                 constexpr std::string_view exportPacker = "-packerExport";

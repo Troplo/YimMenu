@@ -159,6 +159,24 @@ public:
 
     void Insert(rage_u64 hashcode, T cmd);
 
+    bool Replace(rage_u64 hashcode, T cmd) {
+        Bucket *b = m_Buckets[hashcode & (ToplevelSize - 1)];
+        while (b) {
+            const auto count = b->GetCount();
+            if (count > PerBucket)
+                return false;
+
+            for (rage_u32 i{}; i != count; ++i) {
+                if (b->obf_Hashes[i].Get() == hashcode) {
+                    b->Data[i] = cmd;
+                    return true;
+                }
+            }
+            b = b->obf_Next.Get();
+        }
+        return false;
+    }
+
     T Lookup(rage_u64 hashcode) {
         Bucket *b = m_Buckets[hashcode & (ToplevelSize - 1)];
         while (b) {
