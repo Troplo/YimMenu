@@ -1,5 +1,8 @@
 #include "backend.hpp"
 
+#define DIRECTINPUT_VERSION 0x0800
+#include <dinput.h>
+
 #include "looped/looped.hpp"
 #include "looped_command.hpp"
 #include "natives/native_registration.hpp"
@@ -18,16 +21,18 @@
 
 #include <game_files/GameDataHash.hpp>
 
+#include "hooking/hooking.hpp"
+#include "util/current_module.hpp"
+
 namespace big
 {
 	namespace
 	{
 		HHOOK g_keyboard_hook{};
 
-		LRESULT CALLBACK LowLevelKeyboardProc(int n_code, WPARAM w_param, LPARAM l_param)
+		LRESULT CALLBACK LowLevelKeyboardProc(int code, WPARAM wParam, LPARAM lParam)
 		{
-		    // Do absolutely nothing
-			return CallNextHookEx(nullptr, n_code, w_param, l_param);
+			return CallNextHookEx(nullptr, code, wParam, lParam);
 		}
 	}
 
@@ -61,6 +66,12 @@ namespace big
 
 		while (g_running)
 		{
+		    // I don't know why it doesn't work if I just set it up once at startup and I like... don't really care sadly.
+		    if (!command_line::get(L"-disableWindowsKey", false)) {
+		        const memory::module module(GetCurrentModule());
+                auto* device = *reinterpret_cast<IDirectInputDevice8W**>(module.begin().as<std::uintptr_t>() + 0x2CDE660);
+                device->SetCooperativeLevel(g_pointers->m_hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+		    }
 
 			looped::system_self_globals();
 			looped::system_update_pointers();

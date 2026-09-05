@@ -707,6 +707,8 @@ namespace big
 			if (player->is_spammer)
 				return true;
 
+		    // There are no spammers on Paragon.
+		    /*
 			if (auto spam_reason = chat::is_text_spam(message, player))
 			{
 				if (g.session.log_chat_messages)
@@ -718,6 +720,7 @@ namespace big
 				// g.reactions.chat_spam.process(player);
 				return true;
 			}
+			*/
 			else
 			{
 				if (g.session.log_chat_messages)

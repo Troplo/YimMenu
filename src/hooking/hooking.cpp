@@ -15,10 +15,8 @@ namespace big
 
 		CFire* disable_fire(CFireManager* _this, const CFireSettings& fire_settings, fire_function original) {
 		    // Don't produce fire if PARAGON_DISABLE_FIRE is true
-			auto* tunables_ptr = CTunables::GetInstance();
-			if (tunables_ptr) {
-				auto& tunables = *tunables_ptr;
-				if (tunables.GetBool(MP_GLOBAL_HASH, "PARAGON_DISABLE_FIRE"_J, false)) {
+            if (auto* tunables = CTunables::GetInstance()) {
+				if (tunables->GetBool(MP_GLOBAL_HASH, "PARAGON_DISABLE_FIRE"_J, false)) {
 				    return nullptr;
 				}
 			}

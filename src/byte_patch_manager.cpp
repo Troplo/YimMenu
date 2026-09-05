@@ -2,6 +2,8 @@
 
 #include "backend/commands/weapons/no_sway.hpp"
 #include "gta/net_array.hpp"
+#include "gta/tunables.hpp"
+#include "hooking/hooking.hpp"
 #include "memory/byte_patch.hpp"
 #include "memory/first_person_camera_patch.hpp"
 #include "memory/module.hpp"
@@ -18,11 +20,33 @@ uint64_t g_sound_overload_ret_addr;
 
 namespace big
 {
+	namespace
+	{
+		using GetTargetModeFn = std::uint32_t (*)(CPed* ped);
+        GetTargetModeFn g_originalGetTargetMode = nullptr;
+
+		std::uint32_t HookGetTargetMode(CPed* ped)
+		{
+			if (!g_originalGetTargetMode) {
+			    g_originalGetTargetMode = hooking::get_original<HookGetTargetMode>();
+			}
+
+			const auto gameMode = g_originalGetTargetMode(ped);
+
+			if (auto* tunables = CTunables::GetInstance()) {
+				if (tunables->GetBool(MP_GLOBAL_HASH, "PARAGON_DISBALE_ASSISTED_AIM"_J, false)) {
+				    return 3;
+				}
+			}
+
+			return gameMode;
+		}
+	}
+
 	static void init()
 	{
 		// Disable alt enter fullsreen
-		if (!command_line::get(L"-enableAltEnter", false))
-		{
+		if (!command_line::get(L"-enableAltEnter", false)) {
 			const memory::module module(GetCurrentModule());
 
 			auto* match = module.scan(memory::pattern("48 83 FE 0D 75 22 E8 ? ? ? ? 3B 05 ? ? ? ? 76 2D E8 ? ? ? ? E8 ? ? ? ? 05 D0 07 00 00 89 05 ? ? ? ?"))
@@ -32,7 +56,34 @@ namespace big
 			memory::byte_patch::make(match + 0x04, std::uint8_t{0xEB})->apply();
 		}
 
+
+		if (!command_line::get(L"-disableWindowsKey", false)) {
+		    /*
+		    const memory::module module(GetCurrentModule());
+		    auto* device = *reinterpret_cast<IDirectInputDevice8W**>(module.begin().as<std::uintptr_t>() + 0x2CDE660);
+		    device->SetCooperativeLevel(g_pointers->m_hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+		    LOG(INFO) << "Updated cooperative level to allow windows key";
+		    */
+
+		    // Idk if this matters but it seemed kinda inconsistent so idk
+		    const memory::module module(GetCurrentModule());
+		    auto* match = module.scan(memory::pattern("48 8B 0D ? ? ? ? 41 B8 16 00 00 00 48 8B D3 48 8B 01 FF 50 68 85 C0 74 07 8B CF E8 ? ? ? ?"))
+            .value()
+            .as<std::uint8_t*>();
+
+		    memory::byte_patch::make(match + 0x09, std::uint8_t{0x06})->apply();
+
+		    LOG(INFO) << "Patched out windows key thing";
+		}
+
 		if (command_line::get(L"-pvpPatch", false)) {
+			hooking::detour_hook_helper::add_lazy<HookGetTargetMode>("GTM", [] {
+				return memory::module(GetCurrentModule())
+				    .scan(memory::pattern("48 89 5C 24 08 48 89 74 24 10 57 48 83 EC 20 48 8B F9 E8 ? ? ? ? 33 F6 48 85 C0 74 ? 8B 80 ? ? ? ? 83 C0 06 A9 FD FF FF FF"))
+				    .value()
+				    .as<void*>();
+			});
+
 		    // Disable BLIP_CHANGE_FLASH, makes it easier to see exactly when you respawn
 			auto* blip_change_flash = memory::module(GetCurrentModule())
                                      .scan(memory::pattern("8B 15 ? ? ? ? B9 11 00 00 00 E8 ? ? ? ? 8B 15 ? ? ? ? B9 16 00 00 00"))
